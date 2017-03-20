@@ -1,0 +1,2 @@
+{ "httpMethod" : "GET", "path" : "/exportXML", "method" : "exportXML", "regex" : false}
+{ "httpMethod" : "GET", "path" : "", "method" : "view", "regex" : false}

@@ -1,0 +1,15 @@
+{
+   "name": "net.atos~mediacentre~0.1-SNAPSHOT",
+    "config": {
+	"main" : "net.atos.entng.mediacentre.Mediacentre",
+	"port" : 8033,
+	"app-name" : "Mediacentre",
+	"app-address" : "/mediacentre",
+	"app-icon" : "mediacentre-large",
+	"mode": "dev",
+	"integration-mode" : "HTTP",
+	"app-registry.port" : 8012,
+	"entcore.port" : 8009,
+	"export-path" : "c:\\exportXML"
+    }
+}

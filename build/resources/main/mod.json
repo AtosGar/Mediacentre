@@ -1,0 +1,14 @@
+{
+	"main" : "net.atos.entng.mediacentre.Mediacentre",
+	"port" : 8033,
+	"app-name" : "Mediacentre",
+	"app-address" : "/mediacentre",
+	"app-icon" : "mediacentre-large",
+	"app-displayName" : "Mediacentre",
+	"mode": "dev",
+	"sql": true,
+	"integration-mode" : "HTTP",
+	"app-registry.port" : 8012,
+	"entcore.port" : 8090,
+	"auto-redeploy": false
+}

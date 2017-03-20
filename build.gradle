@@ -1,0 +1,64 @@
+apply from: "gradle/vertx.gradle"
+apply plugin: 'scala'
+
+dependencies {
+	compile "org.entcore:common:$entCoreVersion"
+	testCompile "org.entcore:tests:$entCoreVersion"
+	testCompile 'io.gatling.highcharts:gatling-charts-highcharts:2.0.3'
+}
+
+javadoc {
+  options.encoding = 'UTF-8'
+  classpath  = configurations.provided
+  classpath += configurations.compile
+}
+
+repositories {
+    maven {
+		url "http://maven.web-education.net/nexus/content/groups/public"
+    }
+}
+
+task testJar(type: Jar) {
+  classifier = 'tests'
+  from sourceSets.test.output
+}
+
+task deploymentJar(type: Jar) {
+  classifier = 'deployment'
+  from 'deployment'
+}
+
+artifacts {
+  archives testJar
+  archives deploymentJar
+}
+
+configurations.all {
+	resolutionStrategy.cacheChangingModulesFor 0, 'seconds'
+}
+
+def configurePom(def pom) {
+	pom.project {
+		description 'Webconf (ent-core)'
+		inceptionYear '2016'
+		packaging 'zip'
+		url 'http://151.80.29.153:8484/thomas.perrot/webconf'
+
+		developers {
+			developer {
+				id 'thomas.perrot'
+				name 'Thomas_Perrot'
+				email 'thomas.perrot@atos.net'
+			}
+		}
+
+		scm {
+			url 'http://151.80.29.153:8484/git/thomas.perrot/webconf.git'
+		}
+
+		properties {
+			setProperty('project.build.sourceEncoding', 'UTF8')
+		}
+	}
+}

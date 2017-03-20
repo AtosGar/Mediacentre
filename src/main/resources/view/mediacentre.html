@@ -1,0 +1,68 @@
+﻿<!DOCTYPE html>
+<html>
+
+<head>
+    <title>{{#i18n}}mediacentre.title{{/i18n}}</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+    <script src="{{#infra}}js/loader.js{{/infra}}" type="text/javascript" id="context"></script>
+    <script src="/mediacentre/public/js/controller.js" type="text/javascript"></script>
+    <script src="/mediacentre/public/js/model.js" type="text/javascript"></script>
+    <link href="/mediacentre/public/css/additional.css" rel="stylesheet">
+    <script type="text/ng-template" id="empty"></script>
+</head>
+
+<body ng-controller="MediacentreController" class="mediacentre">
+<portal>
+    <h2>{{#i18n}}mediacentre.title{{/i18n}}</h2>
+    <div>[[firstName]]&nbsp[[lastName]]</div></portal>
+
+<div class="contextual-buttons six cell">
+    <div ng-if="userIsLocalAdmin()">
+        <button ng-click="exportXML()" class="cell right-magnet">
+            <i18n>mediacentre.export</i18n>
+        </button>
+    </div>
+</div>
+<div class="material main wrapper">
+    <section class="main">
+        <table class="list-view twelve" >
+            <thead>
+            <tr>
+                <th class="one centered">
+                </th>
+                <th class="three centered"
+                    ng-class="{'order-by-reversed': (sort.expression === 'id' && sort.reverse === false),
+										'order-by': (sort.expression === 'id' && sort.reverse === true)}">
+                    <i18n>mediacentre.entete.name</i18n>
+                </th>
+                <th class="four centered"
+                        ng-class="{'order-by-reversed': (sort.expression === 'subject' && sort.reverse === false),
+										'order-by': (sort.expression === 'subject' && sort.reverse === true),
+										'four': userIsLocalAdmin() && atLeastOneTicketEscalated(),
+										'five': !userIsLocalAdmin() || !atLeastOneTicketEscalated()}">
+                    <i18n>mediacentre.entete.editor</i18n>
+                </th>
+                <th class="four centered"
+                    ng-class="{'order-by-reversed': (sort.expression === sortCategoryFunction && sort.reverse === false),
+										'order-by': (sort.expression === sortCategoryFunction && sort.reverse === true)}">
+                    <i18n>mediacentre.entete.presentation</i18n>
+                </th>
+                <th class="one centered"
+                    ng-class="{'order-by-reversed': (sort.expression === 'owner_name' && sort.reverse === false),
+										'order-by': (sort.expression === 'owner_name' && sort.reverse === true)}">
+                    <i18n>mediacentre.entete.label</i18n>
+                </th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr >
+            </tr>
+            </tbody>
+        </table>
+    </section>
+</div>
+
+
+</body>
+
+</html>
