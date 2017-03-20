@@ -1,0 +1,11 @@
+<component name="libraryTable">
+  <library name="Gradle: fr.wseduc:eventbus-wrapper:1.1.0">
+    <CLASSES>
+      <root url="jar://$USER_HOME$/.gradle/caches/artifacts-24/filestore/fr.wseduc/eventbus-wrapper/1.1.0/jar/e50d672e724324f453fc9978eaf153bfbc4edc0d/eventbus-wrapper-1.1.0.jar!/" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES>
+      <root url="jar://$USER_HOME$/.gradle/caches/artifacts-24/filestore/fr.wseduc/eventbus-wrapper/1.1.0/source/59c16181942c042307d0ade8a35d2292dfce54d3/eventbus-wrapper-1.1.0-sources.jar!/" />
+    </SOURCES>
+  </library>
+</component>

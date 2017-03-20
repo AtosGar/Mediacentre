@@ -18,37 +18,29 @@ import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
 import java.io.File;
 
-
 public class StudentsController {
+
+    private     int counter = 0;            // nb of elements currently put in the file
+    private     int nbElem = 10000;         // max elements authorized in a file
+    private     int fileIndex = 0;          // index of the export file
+    private     String pathExport = "";     // path where the generated files are put
+    private     Element garEntEleve = null;
+    private     Document doc = null;
 
     /**
      *  export Students
      */
-    public void exportStudents(final MediacentreService mediacentreService, final String path){
+    public void exportStudents(final MediacentreService mediacentreService, final String path, int nbElementPerFile){
+        counter = 0;
+        pathExport = path;
+        nbElem = nbElementPerFile;
         mediacentreService.getUserExportData(new Handler<Either<String, JsonArray>>() {
             @Override
             public void handle(Either<String, JsonArray> event) {
                 if( event.isRight()){
                     // write the content into xml file
                     final JsonArray students = event.right().getValue();
-                    DocumentBuilderFactory docFactory = DocumentBuilderFactory.newInstance();
-                    DocumentBuilder docBuilder = null;
-                    try {
-                        docBuilder = docFactory.newDocumentBuilder();
-                    } catch (ParserConfigurationException e) {
-                        e.printStackTrace();
-                    }
-                    // root elements
-                    final Document doc = docBuilder.newDocument();
-                    final Element garEntEleve = doc.createElement("men:GAR-ENT-Eleve");
-                    doc.appendChild(garEntEleve);
-                    garEntEleve.setAttribute("xmlns:men", "http://data.education.fr/ns/gar");
-                    garEntEleve.setAttribute("xmlns:xalan", "http://xml.apache.org/xalan");
-                    garEntEleve.setAttribute("xmlns:xslFormatting", "urn:xslFormatting");
-                    garEntEleve.setAttribute("xmlns:xsi", "http://www.w3.org/2001/XMLSchema-instance");
-                    garEntEleve.setAttribute("Version", "1.0");
-                    garEntEleve.setAttribute("xsi:schemaLocation", "http://data.education.fr/ns/gar GAR-ENT.xsd");
-
+                    doc = fileHeader();
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
                     // men:GAREleve
                     String lastStudentId = "";
@@ -57,6 +49,7 @@ public class StudentsController {
                         if( obj instanceof JsonObject){
                             JsonObject jObj = (JsonObject) obj;
                             if( jObj.getString("u.id") != null && jObj.getString("u.id") != lastStudentId ) {
+                                doc = testNumberOfOccurrences(doc);
                                 // new node
                                 garEleve = doc.createElement("men:GAREleve");
                                 garEntEleve.appendChild(garEleve);
@@ -86,6 +79,7 @@ public class StudentsController {
                                     MediacentreController.insertNode( "men:GARPersonEtab"          , doc, garEleve, jObj.getString("s2.UAI"));
                                 }
                                 lastStudentId = jObj.getString("u.id");
+                                counter += 14;
                             } else {
                                 // add the s2.UAI to the object.
                                 MediacentreController.insertNode( "men:GARPersonEtab"          , doc, garEleve, jObj.getString("s2.UAI"));
@@ -93,7 +87,9 @@ public class StudentsController {
                                 MediacentreController.insertNode( "men:GARStructureUAI"           , doc, garProfil, jObj.getString("s2.UAI"));
                                 MediacentreController.insertNode( "men:GARPersonProfil"           , doc, garProfil, "National_ELV");
                                 garEleve.appendChild(garProfil);
+                                counter += 4;
                             }
+
                         }
                     }
 
@@ -113,6 +109,8 @@ public class StudentsController {
                                         MediacentreController.insertNode("men:GARStructureUAI", doc, garPersonMef, jObj.getString("s.UAI"));
                                         MediacentreController.insertNode("men:GARPersonIdentifiant", doc, garPersonMef, jObj.getString("u.id"));
                                         MediacentreController.insertNode("men:GARMEFCode", doc, garPersonMef, jObj.getString("u.module"));
+                                        counter += 4;
+                                        doc = testNumberOfOccurrences(doc);
                                     }
                                 }
 
@@ -136,7 +134,9 @@ public class StudentsController {
                                                             MediacentreController.insertNode("men:GARStructureUAI",       doc, garEleveEnseignement, jObj.getString("s.UAI"));
                                                             MediacentreController.insertNode("men:GARPersonIdentifiant",  doc, garEleveEnseignement, jObj.getString("u.id"));
                                                             MediacentreController.insertNode("men:GARMatiereCode", doc, garEleveEnseignement, fos);
+                                                            counter += 4;
                                                         }
+                                                        doc = testNumberOfOccurrences(doc);
                                                     }
                                                 }
                                         }
@@ -146,11 +146,15 @@ public class StudentsController {
                                                 TransformerFactory transformerFactory = TransformerFactory.newInstance();
                                                 Transformer transformer = transformerFactory.newTransformer();
                                                 DOMSource source = new DOMSource(doc);
-                                                StreamResult result = new StreamResult(new File(path + "\\Students.xml"));
-
+                                                StreamResult result = null;
+                                                if( fileIndex == 0) {
+                                                    result = new StreamResult(new File(path + "\\Students.xml"));
+                                                } else {
+                                                    result = new StreamResult(new File(path + "\\Students" + fileIndex + ".xml"));
+                                                }
                                                 transformer.transform(source, result);
 
-                                                System.out.println("Students.xml saved");
+                                                System.out.println("Students saved");
                                             } catch (TransformerException tfe) {
                                                 tfe.printStackTrace();
                                             }
@@ -165,5 +169,49 @@ public class StudentsController {
         });
     }
 
+    private Document testNumberOfOccurrences(Document doc) {
+        if (nbElem <= counter) {
+            // close the full file
+            try {
+                TransformerFactory transformerFactory = TransformerFactory.newInstance();
+                Transformer transformer = transformerFactory.newTransformer();
+                DOMSource source = new DOMSource(doc);
+                StreamResult result = new StreamResult(new File(pathExport + "\\Students" + fileIndex + ".xml"));
+
+                transformer.transform(source, result);
+
+                System.out.println("Students" + fileIndex + ".xml saved");
+                fileIndex++;
+                counter = 0;
+            } catch (TransformerException tfe) {
+                tfe.printStackTrace();
+            }
+            // open the new one
+            return fileHeader();
+        } else {
+            return doc;
+        }
+    }
+
+    private Document fileHeader(){
+        DocumentBuilderFactory docFactory = DocumentBuilderFactory.newInstance();
+        DocumentBuilder docBuilder = null;
+        try {
+            docBuilder = docFactory.newDocumentBuilder();
+        } catch (ParserConfigurationException e) {
+            e.printStackTrace();
+        }
+        // root elements
+        final Document doc = docBuilder.newDocument();
+        garEntEleve = doc.createElement("men:GAR-ENT-Eleve");
+        doc.appendChild(garEntEleve);
+        garEntEleve.setAttribute("xmlns:men", "http://data.education.fr/ns/gar");
+        garEntEleve.setAttribute("xmlns:xalan", "http://xml.apache.org/xalan");
+        garEntEleve.setAttribute("xmlns:xslFormatting", "urn:xslFormatting");
+        garEntEleve.setAttribute("xmlns:xsi", "http://www.w3.org/2001/XMLSchema-instance");
+        garEntEleve.setAttribute("Version", "1.0");
+        garEntEleve.setAttribute("xsi:schemaLocation", "http://data.education.fr/ns/gar GAR-ENT.xsd");
+        return doc;
+    }
 
 }

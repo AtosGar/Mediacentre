@@ -1,0 +1,11 @@
+<component name="libraryTable">
+  <library name="Gradle: com.typesafe.zinc:zinc:0.3.5.3">
+    <CLASSES>
+      <root url="jar://$USER_HOME$/.gradle/caches/artifacts-24/filestore/com.typesafe.zinc/zinc/0.3.5.3/jar/d9d722d477bcb68eca6b4c7d67e79b0e25653d1/zinc-0.3.5.3.jar!/" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES>
+      <root url="jar://$USER_HOME$/.gradle/caches/artifacts-24/filestore/com.typesafe.zinc/zinc/0.3.5.3/source/4fe685fd3ed90018258502fe828e583346b37366/zinc-0.3.5.3-sources.jar!/" />
+    </SOURCES>
+  </library>
+</component>

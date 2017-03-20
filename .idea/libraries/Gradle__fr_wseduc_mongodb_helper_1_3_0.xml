@@ -1,0 +1,11 @@
+<component name="libraryTable">
+  <library name="Gradle: fr.wseduc:mongodb-helper:1.3.0">
+    <CLASSES>
+      <root url="jar://$USER_HOME$/.gradle/caches/artifacts-24/filestore/fr.wseduc/mongodb-helper/1.3.0/jar/a5b11ce89263154eb6271f4f7d7b9f0684d31edf/mongodb-helper-1.3.0.jar!/" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES>
+      <root url="jar://$USER_HOME$/.gradle/caches/artifacts-24/filestore/fr.wseduc/mongodb-helper/1.3.0/source/dcb950dd1f99dec50e2ca7e8637590431694a70b/mongodb-helper-1.3.0-sources.jar!/" />
+    </SOURCES>
+  </library>
+</component>

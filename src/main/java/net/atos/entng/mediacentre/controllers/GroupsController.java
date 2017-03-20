@@ -20,34 +20,27 @@ import java.io.File;
 
 public class GroupsController {
 
+    private     int counter = 0;            // nb of elements currently put in the file
+    private     int nbElem = 10000;         // max elements authorized in a file
+    private     int fileIndex = 0;          // index of the export file
+    private     String pathExport = "";     // path where the generated files are put
+    private     Element garEntGroup = null;
+    private     Document doc = null;
+
     /**
      * export Groups
      */
-    public void exportGroups(final MediacentreService mediacentreService, final String path) {
+    public void exportGroups(final MediacentreService mediacentreService, final String path, final int nbElementPerFile) {
+        counter = 0;
+        pathExport = path;
+        nbElem = nbElementPerFile;
         mediacentreService.getDivisionsExportData(new Handler<Either<String, JsonArray>>() {
             @Override
             public void handle(Either<String, JsonArray> event) {
                 if (event.isRight()) {
                     // write the content into xml file
                     final JsonArray divisions = event.right().getValue();
-                    DocumentBuilderFactory docFactory = DocumentBuilderFactory.newInstance();
-                    DocumentBuilder docBuilder = null;
-                    try {
-                        docBuilder = docFactory.newDocumentBuilder();
-                    } catch (ParserConfigurationException e) {
-                        e.printStackTrace();
-                    }
-                    // root elements
-                    final Document doc = docBuilder.newDocument();
-                    final Element garEntGroup = doc.createElement("men:GAR-ENT-Groupe");
-                    doc.appendChild(garEntGroup);
-                    garEntGroup.setAttribute("xmlns:men", "http://data.education.fr/ns/gar");
-                    garEntGroup.setAttribute("xmlns:xalan", "http://xml.apache.org/xalan");
-                    garEntGroup.setAttribute("xmlns:xslFormatting", "urn:xslFormatting");
-                    garEntGroup.setAttribute("xmlns:xsi", "http://www.w3.org/2001/XMLSchema-instance");
-                    garEntGroup.setAttribute("Version", "1.0");
-                    garEntGroup.setAttribute("xsi:schemaLocation", "http://data.education.fr/ns/gar GAR-ENT.xsd");
-
+                    doc = fileHeader();
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
                     // men:GAREleve
                     for (Object obj : divisions) {
@@ -55,11 +48,12 @@ public class GroupsController {
                         garEntGroup.appendChild(garDivision);
                         if (obj instanceof JsonObject) {
                             JsonObject jObj = (JsonObject) obj;
-                            // TODO : faire le lien avec plusieurs établissements et récupérer l'UAI
                             MediacentreController.insertNode("men:GARGroupeCode", doc, garDivision, jObj.getString("c.externalId"));
                             MediacentreController.insertNode("men:GARStructureUAI", doc, garDivision, jObj.getString("s.UAI"));
                             MediacentreController.insertNode("men:GARGroupeLibelle", doc, garDivision, jObj.getString("c.name"));
                             MediacentreController.insertNode("men:GARGroupeStatut", doc, garDivision, "DIVISION");
+                            counter += 5;
+                            doc = testNumberOfOccurrences(doc);
                         }
                     }
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -76,6 +70,8 @@ public class GroupsController {
                                     if (obj instanceof JsonObject) {
                                         JsonObject jObj = (JsonObject) obj;
                                         if (!lastGroup.equals(jObj.getString("fg.id"))) {
+                                            counter += 6;
+                                            doc = testNumberOfOccurrences(doc);
                                             garGroup = doc.createElement("men:GARGroupe");
                                             garEntGroup.appendChild(garGroup);
                                             if( jObj.getString("fg.externalId") != null && "null".equals(jObj.getString("fg.externalId"))) {
@@ -114,6 +110,8 @@ public class GroupsController {
                                                     } else {
                                                         MediacentreController.insertNode("men:GARGroupeCode", doc, garPersonGroup, jObj.getString("fg.id"));
                                                     }
+                                                    counter += 4;
+                                                    doc = testNumberOfOccurrences(doc);
                                                 }
                                             }
                                         }
@@ -140,7 +138,6 @@ public class GroupsController {
                                                                     MediacentreController.insertNode("men:GARPersonIdentifiant", doc, garEnGroupeMatiere, jObj.getString("u.id"));
                                                                     MediacentreController.insertNode("men:GARGroupeCode", doc, garEnGroupeMatiere, group);
                                                                     MediacentreController.insertNode("men:GARMatiereCode", doc, garEnGroupeMatiere, jObj.getString("sub.code"));
-
                                                                 }
                                                             }
                                                             if( jObj.getArray("t.classes") != null && jObj.getArray("t.classes").size() > 0 ) {
@@ -157,6 +154,8 @@ public class GroupsController {
                                                                 }
                                                             }
                                                         }
+                                                        counter += 5;
+                                                        doc = testNumberOfOccurrences(doc);
                                                     }
                                                 }
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -165,11 +164,16 @@ public class GroupsController {
                                                     TransformerFactory transformerFactory = TransformerFactory.newInstance();
                                                     Transformer transformer = transformerFactory.newTransformer();
                                                     DOMSource source = new DOMSource(doc);
-                                                    StreamResult result = new StreamResult(new File(path + "\\Groupes.xml"));
+                                                    StreamResult result = null;
+                                                    if( fileIndex == 0) {
+                                                        result = new StreamResult(new File(path + "\\Groupes.xml"));
+                                                    } else {
+                                                        result = new StreamResult(new File(path + "\\Groupes" + fileIndex + ".xml"));
+                                                    }
 
                                                     transformer.transform(source, result);
 
-                                                    System.out.println("Groupes.xml saved");
+                                                    System.out.println("Groupes saved");
                                                 } catch (TransformerException tfe) {
                                                     tfe.printStackTrace();
                                                 }
@@ -184,5 +188,50 @@ public class GroupsController {
 
             }
         });
+    }
+
+    private Document testNumberOfOccurrences(Document doc) {
+        if (nbElem <= counter) {
+            // close the full file
+            try {
+                TransformerFactory transformerFactory = TransformerFactory.newInstance();
+                Transformer transformer = transformerFactory.newTransformer();
+                DOMSource source = new DOMSource(doc);
+                StreamResult result = new StreamResult(new File(pathExport + "\\Groupes" + fileIndex + ".xml"));
+
+                transformer.transform(source, result);
+
+                System.out.println("Groupes" + fileIndex + ".xml saved");
+                fileIndex++;
+                counter = 0;
+            } catch (TransformerException tfe) {
+                tfe.printStackTrace();
+            }
+            // open the new one
+            return fileHeader();
+        } else {
+            return doc;
+        }
+    }
+
+    private Document fileHeader(){
+        DocumentBuilderFactory docFactory = DocumentBuilderFactory.newInstance();
+        DocumentBuilder docBuilder = null;
+        try {
+            docBuilder = docFactory.newDocumentBuilder();
+        } catch (ParserConfigurationException e) {
+            e.printStackTrace();
+        }
+        // root elements
+        final Document doc = docBuilder.newDocument();
+        garEntGroup = doc.createElement("men:GAR-ENT-Groupe");
+        doc.appendChild(garEntGroup);
+        garEntGroup.setAttribute("xmlns:men", "http://data.education.fr/ns/gar");
+        garEntGroup.setAttribute("xmlns:xalan", "http://xml.apache.org/xalan");
+        garEntGroup.setAttribute("xmlns:xslFormatting", "urn:xslFormatting");
+        garEntGroup.setAttribute("xmlns:xsi", "http://www.w3.org/2001/XMLSchema-instance");
+        garEntGroup.setAttribute("Version", "1.0");
+        garEntGroup.setAttribute("xsi:schemaLocation", "http://data.education.fr/ns/gar GAR-ENT.xsd");
+        return doc;
     }
 }

@@ -10,6 +10,7 @@
 	"integration-mode" : "HTTP",
 	"app-registry.port" : 8012,
 	"entcore.port" : 8009,
-	"export-path" : "c:\\exportXML"
+	"export-path" : "c:\\exportXML",
+	"elementsPerFile" : 2000
     }
 }

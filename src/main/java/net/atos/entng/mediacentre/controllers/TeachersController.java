@@ -20,34 +20,27 @@ import java.io.File;
 
 public class TeachersController {
 
+    private     int counter = 0;            // nb of elements currently put in the file
+    private     int nbElem = 10000;         // max elements authorized in a file
+    private     int fileIndex = 0;          // index of the export file
+    private     String pathExport = "";     // path where the generated files are put
+    private     Element garEntEnseignant = null;
+    private     Document doc = null;
+
     /**
      *  export Teachers
      */
-    public void exportTeachers(final MediacentreService mediacentreService, final String path){
+    public void exportTeachers(final MediacentreService mediacentreService, final String path, int nbElementPerFile){
+        counter = 0;
+        pathExport = path;
+        nbElem = nbElementPerFile;
         mediacentreService.getTeachersExportData(new Handler<Either<String, JsonArray>>() {
             @Override
             public void handle(Either<String, JsonArray> event) {
                 if( event.isRight()){
                     // write the content into xml file
                     final JsonArray students = event.right().getValue();
-                    DocumentBuilderFactory docFactory = DocumentBuilderFactory.newInstance();
-                    DocumentBuilder docBuilder = null;
-                    try {
-                        docBuilder = docFactory.newDocumentBuilder();
-                    } catch (ParserConfigurationException e) {
-                        e.printStackTrace();
-                    }
-                    // root elements
-                    final Document doc = docBuilder.newDocument();
-                    final Element garEntEnseignant = doc.createElement("men:GAR-ENT-Enseignent");
-                    doc.appendChild(garEntEnseignant);
-                    garEntEnseignant.setAttribute("xmlns:men", "http://data.education.fr/ns/gar");
-                    garEntEnseignant.setAttribute("xmlns:xalan", "http://xml.apache.org/xalan");
-                    garEntEnseignant.setAttribute("xmlns:xslFormatting", "urn:xslFormatting");
-                    garEntEnseignant.setAttribute("xmlns:xsi", "http://www.w3.org/2001/XMLSchema-instance");
-                    garEntEnseignant.setAttribute("Version", "1.0");
-                    garEntEnseignant.setAttribute("xsi:schemaLocation", "http://data.education.fr/ns/gar GAR-ENT.xsd");
-
+                    doc = fileHeader();
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
                     // men:GAREleve
                     String lastTeacherId = "";
@@ -58,7 +51,6 @@ public class TeachersController {
                             if( jObj.getString("u.id") != null && jObj.getString("u.id") != lastTeacherId ) {
                                 garEnseignant = doc.createElement("men:GAREnseignant");
                                 garEntEnseignant.appendChild(garEnseignant);
-                                // TODO : faire le lien avec plusieurs établissements et récupérer l'UAI
                                 MediacentreController.insertNode("men:GARPersonIdentifiant", doc, garEnseignant, jObj.getString("u.id"));
                                 MediacentreController.insertNode("men:GARPersonNomPatro", doc, garEnseignant, jObj.getString("u.lastName"));
                                 MediacentreController.insertNode("men:GARPersonNom", doc, garEnseignant, jObj.getString("u.displayName"));
@@ -71,6 +63,7 @@ public class TeachersController {
                                 MediacentreController.insertNode("men:GARPersonCivilite", doc, garEnseignant, jObj.getString(""));
                                 MediacentreController.insertNode("men:GARPersonStructRattach", doc, garEnseignant, jObj.getString("s.UAI"));
                                 MediacentreController.insertNode("men:GARPersonDateNaissance", doc, garEnseignant, jObj.getString("u.birthDate"));
+                                counter += 9;
                                 // EnsDisciplinesPostes
                                 if( jObj.getArray("u.functions") != null && jObj.getArray("u.functions").size() > 0 ) {
                                     JsonArray functionsArray = jObj.getArray("u.functions");
@@ -81,6 +74,7 @@ public class TeachersController {
                                         MediacentreController.insertNode("men:GARStructureUAI", doc, garEnsDisciplinesPostes, jObj.getString("s.UAI"));
                                         MediacentreController.insertNode("men:GAREnsDisciplinePosteCode", doc, garEnsDisciplinesPostes, parts[2]);
                                         garEnseignant.appendChild(garEnsDisciplinesPostes);
+                                        counter += 3;
                                     }
                                 }
                                 // PersonProfils
@@ -102,6 +96,8 @@ public class TeachersController {
                                     MediacentreController.insertNode("men:GARPersonEtab", doc, garEnseignant, jObj.getString("s2.UAI"));
                                 }
                             }
+                            counter += 6;
+                            doc = testNumberOfOccurrences(doc);
                         }
                     }
 
@@ -126,9 +122,11 @@ public class TeachersController {
                                                 MediacentreController.insertNode("men:GARStructureUAI", doc, garPersonMef, jObj.getString("s.UAI"));
                                                 MediacentreController.insertNode("men:GARPersonIdentifiant", doc, garPersonMef, jObj.getString("u.id"));
                                                 MediacentreController.insertNode("men:GARMEFCode", doc, garPersonMef, parts[1]);
+                                                counter += 4;
                                             }
                                         }
                                     }
+                                    doc = testNumberOfOccurrences(doc);
                                 }
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -136,11 +134,16 @@ public class TeachersController {
                                     TransformerFactory transformerFactory = TransformerFactory.newInstance();
                                     Transformer transformer = transformerFactory.newTransformer();
                                     DOMSource source = new DOMSource(doc);
-                                    StreamResult result = new StreamResult(new File(path + "\\Teachers.xml"));
+                                    StreamResult result = null;
+                                    if( fileIndex == 0) {
+                                        result = new StreamResult(new File(path + "\\Teachers.xml"));
+                                    } else {
+                                        result = new StreamResult(new File(path + "\\Teachers" + fileIndex + ".xml"));
+                                    }
 
                                     transformer.transform(source, result);
 
-                                    System.out.println("Teachers.xml saved");
+                                    System.out.println("Teachers saved");
                                 } catch (TransformerException tfe) {
                                     tfe.printStackTrace();
                                 }
@@ -150,6 +153,51 @@ public class TeachersController {
                 }
             }
         });
+    }
+
+    private Document testNumberOfOccurrences(Document doc) {
+        if (nbElem <= counter) {
+            // close the full file
+            try {
+                TransformerFactory transformerFactory = TransformerFactory.newInstance();
+                Transformer transformer = transformerFactory.newTransformer();
+                DOMSource source = new DOMSource(doc);
+                StreamResult result = new StreamResult(new File(pathExport + "\\Teachers" + fileIndex + ".xml"));
+
+                transformer.transform(source, result);
+
+                System.out.println("Teachers" + fileIndex + ".xml saved");
+                fileIndex++;
+                counter = 0;
+            } catch (TransformerException tfe) {
+                tfe.printStackTrace();
+            }
+            // open the new one
+            return fileHeader();
+        } else {
+            return doc;
+        }
+    }
+
+    private Document fileHeader(){
+        DocumentBuilderFactory docFactory = DocumentBuilderFactory.newInstance();
+        DocumentBuilder docBuilder = null;
+        try {
+            docBuilder = docFactory.newDocumentBuilder();
+        } catch (ParserConfigurationException e) {
+            e.printStackTrace();
+        }
+        // root elements
+        final Document doc = docBuilder.newDocument();
+        garEntEnseignant = doc.createElement("men:GAR-ENT-Enseignent");
+        doc.appendChild(garEntEnseignant);
+        garEntEnseignant.setAttribute("xmlns:men", "http://data.education.fr/ns/gar");
+        garEntEnseignant.setAttribute("xmlns:xalan", "http://xml.apache.org/xalan");
+        garEntEnseignant.setAttribute("xmlns:xslFormatting", "urn:xslFormatting");
+        garEntEnseignant.setAttribute("xmlns:xsi", "http://www.w3.org/2001/XMLSchema-instance");
+        garEntEnseignant.setAttribute("Version", "1.0");
+        garEntEnseignant.setAttribute("xsi:schemaLocation", "http://data.education.fr/ns/gar GAR-ENT.xsd");
+        return doc;
     }
 
 }

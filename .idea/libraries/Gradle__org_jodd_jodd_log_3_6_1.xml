@@ -1,0 +1,11 @@
+<component name="libraryTable">
+  <library name="Gradle: org.jodd:jodd-log:3.6.1">
+    <CLASSES>
+      <root url="jar://$USER_HOME$/.gradle/caches/artifacts-24/filestore/org.jodd/jodd-log/3.6.1/jar/58d29e5a816489094bacec3fd04678e8e4d5ddc/jodd-log-3.6.1.jar!/" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES>
+      <root url="jar://$USER_HOME$/.gradle/caches/artifacts-24/filestore/org.jodd/jodd-log/3.6.1/source/3ed4b9f7a9bd535b521824edee81847e5d61695/jodd-log-3.6.1-sources.jar!/" />
+    </SOURCES>
+  </library>
+</component>

@@ -1,0 +1,11 @@
+<component name="libraryTable">
+  <library name="Gradle: fr.wseduc:vertx-swift-client:0.2.0">
+    <CLASSES>
+      <root url="jar://$USER_HOME$/.gradle/caches/artifacts-24/filestore/fr.wseduc/vertx-swift-client/0.2.0/jar/1159919aebd3c4cce53cc025c3c12bac82dfa2b0/vertx-swift-client-0.2.0.jar!/" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES>
+      <root url="jar://$USER_HOME$/.gradle/caches/artifacts-24/filestore/fr.wseduc/vertx-swift-client/0.2.0/source/bef51746e0b257ef5d79e1dfcf3f081a89ae0a65/vertx-swift-client-0.2.0-sources.jar!/" />
+    </SOURCES>
+  </library>
+</component>

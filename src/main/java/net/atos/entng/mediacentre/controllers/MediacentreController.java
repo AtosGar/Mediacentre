@@ -76,17 +76,19 @@ public class MediacentreController extends BaseController {
 /*    @SecuredAction("mediacentre.exportXML")*/
     public void exportXML(final HttpServerRequest request) {
         String path = container.config().getString("export-path", "/tmp");
+        int nbElementPerFile = container.config().getInteger("elementsPerFile", 10000);
+
         StudentsController studentsController = new StudentsController();
         TeachersController teachersController = new TeachersController();
         StructuresController structuresController = new StructuresController();
         GroupsController groupsController = new GroupsController();
         InChargeOfAssignementController inChargeOfAssignementController = new InChargeOfAssignementController();
 
-        studentsController.exportStudents(mediacentreService, path);
-        teachersController.exportTeachers(mediacentreService, path);
-        structuresController.exportStructures(mediacentreService, path);
-        groupsController.exportGroups(mediacentreService, path);
-        inChargeOfAssignementController.exportInChargeOfAssignement(mediacentreService, path);
+        studentsController.exportStudents(mediacentreService, path, nbElementPerFile);
+        teachersController.exportTeachers(mediacentreService, path, nbElementPerFile);
+        structuresController.exportStructures(mediacentreService, path, nbElementPerFile);
+        groupsController.exportGroups(mediacentreService, path, nbElementPerFile);
+        inChargeOfAssignementController.exportInChargeOfAssignement(mediacentreService, path, nbElementPerFile);
 
         // Export Teachers
         // Export Structures
