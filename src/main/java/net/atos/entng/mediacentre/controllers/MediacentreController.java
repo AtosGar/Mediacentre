@@ -84,6 +84,7 @@ public class MediacentreController extends BaseController {
         String path = container.config().getString("export-path", "/tmp");
         int nbElementPerFile = container.config().getInteger("elementsPerFile", 10000);
         exportFilePrefix = container.config().getString("exportFilePrefix", "/tmp");
+        String inChargeOfAssignementName = container.config().getString("inChargeOfAssignementGroupName", "Responsables d'affectation");
 
         StudentsController studentsController = new StudentsController();
         TeachersController teachersController = new TeachersController();
@@ -95,7 +96,7 @@ public class MediacentreController extends BaseController {
         teachersController.exportTeachers(mediacentreService, path, nbElementPerFile);
         structuresController.exportStructures(mediacentreService, path, nbElementPerFile);
         groupsController.exportGroups(mediacentreService, path, nbElementPerFile);
-        inChargeOfAssignementController.exportInChargeOfAssignement(mediacentreService, path, nbElementPerFile);
+        inChargeOfAssignementController.exportInChargeOfAssignement(mediacentreService, path, nbElementPerFile, inChargeOfAssignementName);
 
     }
 

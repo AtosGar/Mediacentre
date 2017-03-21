@@ -26,9 +26,9 @@ public class InChargeOfAssignementController {
     /**
      *  export Structures
      */
-    public void exportInChargeOfAssignement(final MediacentreService mediacentreService, final String path, int nbElementPerFile){
+    public void exportInChargeOfAssignement(final MediacentreService mediacentreService, final String path, int nbElementPerFile, String inChargeOfAssignementName){
         String groupName = "Responsables d'affectation";
-        mediacentreService.getInChargeOfExportData(groupName, new Handler<Either<String, JsonArray>>() {
+        mediacentreService.getInChargeOfExportData(inChargeOfAssignementName, new Handler<Either<String, JsonArray>>() {
             @Override
             public void handle(Either<String, JsonArray> event) {
                 if( event.isRight()){
