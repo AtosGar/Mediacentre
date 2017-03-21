@@ -14,6 +14,8 @@ import org.vertx.java.platform.Container;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.Map;
 
 
@@ -21,6 +23,10 @@ import java.util.Map;
  * Vert.x backend controller for the application using Mongodb.
  */
 public class MediacentreController extends BaseController {
+
+    private static String exportFilePrefix = "";
+    private static SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMdd_HHmmss");
+    private static String fileDate = sdf.format(new Date());
 
     /**
      * Computation service
@@ -77,6 +83,7 @@ public class MediacentreController extends BaseController {
     public void exportXML(final HttpServerRequest request) {
         String path = container.config().getString("export-path", "/tmp");
         int nbElementPerFile = container.config().getInteger("elementsPerFile", 10000);
+        exportFilePrefix = container.config().getString("exportFilePrefix", "/tmp");
 
         StudentsController studentsController = new StudentsController();
         TeachersController teachersController = new TeachersController();
@@ -89,11 +96,6 @@ public class MediacentreController extends BaseController {
         structuresController.exportStructures(mediacentreService, path, nbElementPerFile);
         groupsController.exportGroups(mediacentreService, path, nbElementPerFile);
         inChargeOfAssignementController.exportInChargeOfAssignement(mediacentreService, path, nbElementPerFile);
-
-        // Export Teachers
-        // Export Structures
-        // Export Groups
-        // Export In charge of Assignement
 
     }
 
@@ -110,6 +112,18 @@ public class MediacentreController extends BaseController {
             elem.appendChild(doc.createTextNode(value));
             source.appendChild(elem);
         }
+    }
+
+    /**
+     *
+     * @param name : name of the type of export
+     * @param fileIndex : it is a number put at the end
+     * @return
+     */
+    public static String getExportFileName(String name, int fileIndex){
+        String formattedIndex = String.format ("%04d", fileIndex);
+        String fileName = exportFilePrefix + "_GAR-ENT_Complet_" + fileDate + "_" + name + "_" + formattedIndex + ".xml";
+        return fileName;
     }
 
 }

@@ -18,6 +18,8 @@ import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
 import java.io.File;
 
+import static net.atos.entng.mediacentre.controllers.MediacentreController.getExportFileName;
+
 public class TeachersController {
 
     private     int counter = 0;            // nb of elements currently put in the file
@@ -134,12 +136,7 @@ public class TeachersController {
                                     TransformerFactory transformerFactory = TransformerFactory.newInstance();
                                     Transformer transformer = transformerFactory.newTransformer();
                                     DOMSource source = new DOMSource(doc);
-                                    StreamResult result = null;
-                                    if( fileIndex == 0) {
-                                        result = new StreamResult(new File(path + "\\Teachers.xml"));
-                                    } else {
-                                        result = new StreamResult(new File(path + "\\Teachers" + fileIndex + ".xml"));
-                                    }
+                                    StreamResult result = new StreamResult(new File(path + "\\" + getExportFileName("Enseignants", fileIndex)));
 
                                     transformer.transform(source, result);
 
@@ -162,11 +159,11 @@ public class TeachersController {
                 TransformerFactory transformerFactory = TransformerFactory.newInstance();
                 Transformer transformer = transformerFactory.newTransformer();
                 DOMSource source = new DOMSource(doc);
-                StreamResult result = new StreamResult(new File(pathExport + "\\Teachers" + fileIndex + ".xml"));
+                StreamResult result = new StreamResult(new File(pathExport + "\\" + getExportFileName("Enseignants", fileIndex)));
 
                 transformer.transform(source, result);
 
-                System.out.println("Teachers" + fileIndex + ".xml saved");
+                System.out.println("Teachers" + fileIndex + " saved");
                 fileIndex++;
                 counter = 0;
             } catch (TransformerException tfe) {

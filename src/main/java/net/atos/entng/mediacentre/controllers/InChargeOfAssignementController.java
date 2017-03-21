@@ -19,6 +19,8 @@ import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
 import java.io.File;
 
+import static net.atos.entng.mediacentre.controllers.MediacentreController.getExportFileName;
+
 public class InChargeOfAssignementController {
 
     /**
@@ -71,11 +73,11 @@ public class InChargeOfAssignementController {
                         TransformerFactory transformerFactory = TransformerFactory.newInstance();
                         Transformer transformer = transformerFactory.newTransformer();
                         DOMSource source = new DOMSource(doc);
-                        StreamResult result = new StreamResult(new File(path + "\\RespAff.xml"));
+                        StreamResult result = new StreamResult(new File(path + "\\" + getExportFileName("RespAff", 0)));
 
                         transformer.transform(source, result);
 
-                        System.out.println("RespAff.xml saved");
+                        System.out.println("RespAff saved");
                     } catch (TransformerException tfe) {
                         tfe.printStackTrace();
                     }

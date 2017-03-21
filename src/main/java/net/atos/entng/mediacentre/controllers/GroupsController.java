@@ -18,6 +18,8 @@ import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
 import java.io.File;
 
+import static net.atos.entng.mediacentre.controllers.MediacentreController.getExportFileName;
+
 public class GroupsController {
 
     private     int counter = 0;            // nb of elements currently put in the file
@@ -164,12 +166,7 @@ public class GroupsController {
                                                     TransformerFactory transformerFactory = TransformerFactory.newInstance();
                                                     Transformer transformer = transformerFactory.newTransformer();
                                                     DOMSource source = new DOMSource(doc);
-                                                    StreamResult result = null;
-                                                    if( fileIndex == 0) {
-                                                        result = new StreamResult(new File(path + "\\Groupes.xml"));
-                                                    } else {
-                                                        result = new StreamResult(new File(path + "\\Groupes" + fileIndex + ".xml"));
-                                                    }
+                                                    StreamResult result = new StreamResult(new File(path + "\\" + getExportFileName("Groupes", fileIndex)));
 
                                                     transformer.transform(source, result);
 
@@ -197,11 +194,11 @@ public class GroupsController {
                 TransformerFactory transformerFactory = TransformerFactory.newInstance();
                 Transformer transformer = transformerFactory.newTransformer();
                 DOMSource source = new DOMSource(doc);
-                StreamResult result = new StreamResult(new File(pathExport + "\\Groupes" + fileIndex + ".xml"));
+                StreamResult result = new StreamResult(new File(pathExport + "\\" + getExportFileName("Groupes", fileIndex)));
 
                 transformer.transform(source, result);
 
-                System.out.println("Groupes" + fileIndex + ".xml saved");
+                System.out.println("Groupes" + fileIndex + " saved");
                 fileIndex++;
                 counter = 0;
             } catch (TransformerException tfe) {
