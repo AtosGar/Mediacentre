@@ -166,7 +166,7 @@ public class GroupsController {
                                                     TransformerFactory transformerFactory = TransformerFactory.newInstance();
                                                     Transformer transformer = transformerFactory.newTransformer();
                                                     DOMSource source = new DOMSource(doc);
-                                                    StreamResult result = new StreamResult(new File(path + "\\" + getExportFileName("Groupes", fileIndex)));
+                                                    StreamResult result = new StreamResult(new File(path + getExportFileName("Groupes", fileIndex)));
 
                                                     transformer.transform(source, result);
 
@@ -194,7 +194,7 @@ public class GroupsController {
                 TransformerFactory transformerFactory = TransformerFactory.newInstance();
                 Transformer transformer = transformerFactory.newTransformer();
                 DOMSource source = new DOMSource(doc);
-                StreamResult result = new StreamResult(new File(pathExport + "\\" + getExportFileName("Groupes", fileIndex)));
+                StreamResult result = new StreamResult(new File(pathExport + getExportFileName("Groupes", fileIndex)));
 
                 transformer.transform(source, result);
 

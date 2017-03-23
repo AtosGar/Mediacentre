@@ -120,7 +120,7 @@ public class StructuresController {
                                                 TransformerFactory transformerFactory = TransformerFactory.newInstance();
                                                 Transformer transformer = transformerFactory.newTransformer();
                                                 DOMSource source = new DOMSource(doc);
-                                                StreamResult result = new StreamResult(new File(path + "\\" + getExportFileName("Etab", fileIndex)));
+                                                StreamResult result = new StreamResult(new File(path + getExportFileName("Etab", fileIndex)));
                                                 transformer.transform(source, result);
 
                                                 System.out.println("Structures saved");
@@ -145,7 +145,7 @@ public class StructuresController {
                 TransformerFactory transformerFactory = TransformerFactory.newInstance();
                 Transformer transformer = transformerFactory.newTransformer();
                 DOMSource source = new DOMSource(doc);
-                StreamResult result = new StreamResult(new File(pathExport + "\\" + getExportFileName("Etab", fileIndex)));
+                StreamResult result = new StreamResult(new File(pathExport + getExportFileName("Etab", fileIndex)));
 
                 transformer.transform(source, result);
 

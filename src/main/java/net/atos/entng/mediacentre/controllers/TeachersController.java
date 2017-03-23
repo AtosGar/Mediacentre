@@ -136,7 +136,7 @@ public class TeachersController {
                                     TransformerFactory transformerFactory = TransformerFactory.newInstance();
                                     Transformer transformer = transformerFactory.newTransformer();
                                     DOMSource source = new DOMSource(doc);
-                                    StreamResult result = new StreamResult(new File(path + "\\" + getExportFileName("Enseignants", fileIndex)));
+                                    StreamResult result = new StreamResult(new File(path + getExportFileName("Enseignants", fileIndex)));
 
                                     transformer.transform(source, result);
 
@@ -159,7 +159,7 @@ public class TeachersController {
                 TransformerFactory transformerFactory = TransformerFactory.newInstance();
                 Transformer transformer = transformerFactory.newTransformer();
                 DOMSource source = new DOMSource(doc);
-                StreamResult result = new StreamResult(new File(pathExport + "\\" + getExportFileName("Enseignants", fileIndex)));
+                StreamResult result = new StreamResult(new File(pathExport + getExportFileName("Enseignants", fileIndex)));
 
                 transformer.transform(source, result);
 

@@ -5,5 +5,6 @@
   "mediacentre.entete.name" : "Nom",
   "mediacentre.entete.editor" : "Editeur",
   "mediacentre.entete.presentation" : "Type de présentation",
-  "mediacentre.entete.label" : "Etiquette Ressource"
+  "mediacentre.entete.label" : "Etiquette Ressource",
+  "mediacentre.export.launched" : "L'export est lancé."
 }

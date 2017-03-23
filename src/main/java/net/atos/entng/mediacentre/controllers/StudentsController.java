@@ -149,7 +149,7 @@ public class StudentsController {
                                                 Transformer transformer = transformerFactory.newTransformer();
                                                 DOMSource source = new DOMSource(doc);
 
-                                                StreamResult result = new StreamResult(new File(path + "\\" + getExportFileName("Eleves", fileIndex)));
+                                                StreamResult result = new StreamResult(new File(path + getExportFileName("Eleves", fileIndex)));
                                                 transformer.transform(source, result);
 
                                                 System.out.println("Students saved");
@@ -174,7 +174,7 @@ public class StudentsController {
                 TransformerFactory transformerFactory = TransformerFactory.newInstance();
                 Transformer transformer = transformerFactory.newTransformer();
                 DOMSource source = new DOMSource(doc);
-                StreamResult result = new StreamResult(new File(pathExport + "\\" + getExportFileName("Eleves", fileIndex)));
+                StreamResult result = new StreamResult(new File(pathExport + getExportFileName("Eleves", fileIndex)));
 
                 transformer.transform(source, result);
 

@@ -73,7 +73,7 @@ public class InChargeOfAssignementController {
                         TransformerFactory transformerFactory = TransformerFactory.newInstance();
                         Transformer transformer = transformerFactory.newTransformer();
                         DOMSource source = new DOMSource(doc);
-                        StreamResult result = new StreamResult(new File(path + "\\" + getExportFileName("RespAff", 0)));
+                        StreamResult result = new StreamResult(new File(path + getExportFileName("RespAff", 0)));
 
                         transformer.transform(source, result);
 
