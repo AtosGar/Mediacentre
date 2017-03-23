@@ -4,15 +4,15 @@ import fr.wseduc.rs.ApiDoc;
 import fr.wseduc.rs.Get;
 import fr.wseduc.security.ActionType;
 import fr.wseduc.security.SecuredAction;
+import fr.wseduc.webutils.Either;
 import fr.wseduc.webutils.http.BaseController;
 import net.atos.entng.mediacentre.services.MediacentreService;
 import net.atos.entng.mediacentre.services.impl.MediacentreServiceImpl;
-import org.entcore.common.user.UserInfos;
-import org.entcore.common.user.UserUtils;
 import org.vertx.java.core.Handler;
 import org.vertx.java.core.Vertx;
 import org.vertx.java.core.http.HttpServerRequest;
 import org.vertx.java.core.http.RouteMatcher;
+import org.vertx.java.core.json.JsonObject;
 import org.vertx.java.platform.Container;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -103,17 +103,20 @@ public class MediacentreController extends BaseController {
 
     }
 
-    @Get("/resources")
-    @ApiDoc("Get resources")
-    public void getResources ( final HttpServerRequest request){
-        UserUtils.getUserInfos(eb, request, new Handler<UserInfos>() {
+    @Get("/userStructure/:userId")
+    @ApiDoc("Get user main structure")
+    public void getUserStructure(final HttpServerRequest request) {
+        final String userId = request.params().get("userId");
+        MediacentreServiceImpl mediacentreService = new MediacentreServiceImpl();
+        mediacentreService.getUserStructure(userId, new Handler<Either<String, JsonObject>>() {
             @Override
-            public void handle(final UserInfos user) {
-                if (user != null) {
-                    Map<String, UserInfos.Function> functions = user.getFunctions();
-
+            public void handle(Either<String, JsonObject> event) {
+                if( event.isRight()){
+                    JsonObject res = event.right().getValue();
+                    JsonObject result = new JsonObject().putString("structure", res.getString("UAI"));
+                    renderJson(request, result);
                 }
-            }
+            };
         });
     }
 

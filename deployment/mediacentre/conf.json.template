@@ -15,6 +15,7 @@
 	"export-path" : "/opt/GAR/export/",
 	"elementsPerFile" : 10000,
 	"exportFilePrefix" : "Z0_",
-	"inChargeOfAssignementGroupName" : "Responsables d'affectation"
+	"inChargeOfAssignementGroupName" : "Responsables d'affectation",
+    "idEnt" : "ENTTEST1"
     }
 }

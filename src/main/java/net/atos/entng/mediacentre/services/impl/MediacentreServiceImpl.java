@@ -9,6 +9,7 @@ import org.vertx.java.core.json.JsonArray;
 import org.vertx.java.core.json.JsonObject;
 
 import static org.entcore.common.neo4j.Neo4jResult.validResultHandler;
+import static org.entcore.common.neo4j.Neo4jResult.validUniqueResultHandler;
 
 public class MediacentreServiceImpl implements MediacentreService {
 
@@ -115,4 +116,13 @@ public class MediacentreServiceImpl implements MediacentreService {
         JsonObject params = new JsonObject().putString("groupName", groupName);
         neo4j.execute(query, params, validResultHandler(handler));
     }
+
+    @Override
+    public void getUserStructure(String userId, Handler<Either<String, JsonObject>> handler){
+        String query = "match (s:Structure)<-[ADMINISTRATIVE_ATTACHMENT]-(u:User) where u.id = {id} return s.UAI as UAI";
+        JsonObject params = new JsonObject().putString("id", userId);
+        neo4j.execute(query, params, validUniqueResultHandler(handler));
+    }
+
+
 }
