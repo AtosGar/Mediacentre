@@ -1,16 +1,3 @@
-routes.define(function ($routeProvider) {
-    $routeProvider
-        .when('/resource/:resourceId', {
-        action: 'displayResource'
-    })
-        .when('/list-resources', {
-            action: 'listResources'
-        })
-        .otherwise({
-            redirectTo: '/list-resources'
-        });
-});
-
 function MediacentreController($scope, template, model, route, $location) {
 
     this.initialize = function() {
