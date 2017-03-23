@@ -1,0 +1,41 @@
+﻿<button ng-click="retour()" style="halign:right" class="cell right-magnet">
+    <i18n>mediacentre.back</i18n>
+</button>
+
+<article class="twelve cell details">
+
+    <div class="material main wrapper">
+        <div class="ten cell">
+            <img src="[[detail.urlVignette]]"><br><br>
+            <label>Id Ressource : </label>[[detail.idRessource]]<br>
+            <label>Type : </label>[[detail.idType]]<br>
+            <label>Nom : </label>[[detail.nomRessource]]<br>
+            <label>Editeur : </label>[[detail.nomEditeur]]<br>
+            <label>Url Vignette : </label><a href="[[detail.urlVignette]]" target="new">[[detail.urlVignette]]</a><br>
+            <label>Type de présentation : </label>[[detail.typePresentation.nom]]&nbsp;([[detail.typePresentation.code]])<br>
+            <label>Type pédagogique : </label>
+            <div ng-repeat="typePedagogique in detail.typePedagogique">
+                &nbsp;-&nbsp;<a href="[[typePedagogique.uri]]" target="new">[[typePedagogique.nom]]</a>
+            </div>
+            <label>Typologie du document : </label><br>
+            <div ng-repeat="typologieDocument in detail.typologieDocument">
+                &nbsp;-&nbsp;<a href="[[typologieDocument.uri]]" target="new">[[typologieDocument.nom]]</a>
+            </div>
+            <label>Niveau éducatif : </label><br>
+            <div ng-repeat="niveauEducatif in detail.niveauEducatif">
+                &nbsp;-&nbsp;<a href="[[niveauEducatif.uri]]" target="new">[[niveauEducatif.nom]]</a>
+            </div>
+            <label>Domaine d'enseignement : </label><br>
+            <div ng-repeat="domaineEnseignement in detail.domaineEnseignement">
+                &nbsp;-&nbsp;<a href="[[domaineEnseignement.uri]]" target="new">[[domaineEnseignement.nom]]</a>
+            </div>
+            <label>URL d'accès : </label><a href="[[detail.urlAccesRessource]]" target="new">[[detail.urlAccesRessource]]</a><br>
+            <label>Nom de la source : </label>[[detail.nomSourceEtiquetteGar]]<br>
+            <label>Url de la source : </label><a href="[[detail.urlSourceEtiquetteGar]]" target="new">[[detail.urlSourceEtiquetteGar]]</a><br>
+            <label>Distributeur technique : </label>[[detail.distributeurTech]]<br>
+            <label>Validateur technique : </label>[[detail.validateurTech]]<br>
+
+        </div>
+
+    </div>
+</article>

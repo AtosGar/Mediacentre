@@ -14,7 +14,7 @@
 <body ng-controller="MediacentreController" class="mediacentre">
 <portal>
     <h2>{{#i18n}}mediacentre.title{{/i18n}}</h2>
-    <div>[[firstName]]&nbsp[[lastName]]</div></portal>
+</portal>
 
 <div class="contextual-buttons six cell">
     <div ng-if="userIsLocalAdmin()">
@@ -24,7 +24,10 @@
     </div>
 </div>
 <div class="material main wrapper">
-    <section class="main">
+    <section ng-if="display.detail">
+        <container template="detail"></container>
+    </section>
+    <section class="main" ng-if="display.detail == false">
         <table class="list-view twelve" >
             <thead>
             <tr>
@@ -55,8 +58,15 @@
             </tr>
             </thead>
             <tbody>
-            <tr >
-            </tr>
+                <tr ng-repeat="ressource in ressources.listeRessources.ressource track by $index">
+                    <td>
+                        <a href="[[ressource.urlAccesRessource]]" target="new"><img src="[[ressource.urlVignette]]" style="height:100px"></a>
+                    </td>
+                    <td class="smallFontSize"><a href="[[ressource.urlAccesRessource]]" target="new">[[ressource.nomRessource]]</a></td>
+                    <td class="smallFontSize centered">[[ressource.nomEditeur]]</td>
+                    <td class="smallFontSize centered">[[ressource.typePresentation.nom]]</td>
+                    <td><img ng-click="viewDetail([[$index]])" src="mediacentre/public/img/i.png" style="height:30px"></td>
+                </tr>
             </tbody>
         </table>
     </section>

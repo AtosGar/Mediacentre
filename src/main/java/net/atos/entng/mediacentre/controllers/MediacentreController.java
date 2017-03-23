@@ -7,6 +7,9 @@ import fr.wseduc.security.SecuredAction;
 import fr.wseduc.webutils.http.BaseController;
 import net.atos.entng.mediacentre.services.MediacentreService;
 import net.atos.entng.mediacentre.services.impl.MediacentreServiceImpl;
+import org.entcore.common.user.UserInfos;
+import org.entcore.common.user.UserUtils;
+import org.vertx.java.core.Handler;
 import org.vertx.java.core.Vertx;
 import org.vertx.java.core.http.HttpServerRequest;
 import org.vertx.java.core.http.RouteMatcher;
@@ -98,6 +101,20 @@ public class MediacentreController extends BaseController {
         groupsController.exportGroups(mediacentreService, path, nbElementPerFile);
         inChargeOfAssignementController.exportInChargeOfAssignement(mediacentreService, path, nbElementPerFile, inChargeOfAssignementName);
 
+    }
+
+    @Get("/resources")
+    @ApiDoc("Get resources")
+    public void getResources ( final HttpServerRequest request){
+        UserUtils.getUserInfos(eb, request, new Handler<UserInfos>() {
+            @Override
+            public void handle(final UserInfos user) {
+                if (user != null) {
+                    Map<String, UserInfos.Function> functions = user.getFunctions();
+
+                }
+            }
+        });
     }
 
     /**
