@@ -142,6 +142,14 @@ public class GroupsController {
                                                                     MediacentreController.insertNode("men:GARMatiereCode", doc, garEnGroupeMatiere, jObj.getString("sub.code"));
                                                                 }
                                                             }
+                                                        }
+                                                        counter += 5;
+                                                        doc = testNumberOfOccurrences(doc);
+                                                    }
+                                                    for (Object obj : enGroupeAndClasseMatiere) {
+                                                        if (obj instanceof JsonObject) {
+                                                            JsonObject jObj = (JsonObject) obj;
+                                                            // classes
                                                             if( jObj.getArray("t.classes") != null && jObj.getArray("t.classes").size() > 0 ) {
                                                                 JsonArray classes = jObj.getArray("t.classes");
                                                                 for (int i = 0; i < classes.size(); i++) {
@@ -159,6 +167,7 @@ public class GroupsController {
                                                         counter += 5;
                                                         doc = testNumberOfOccurrences(doc);
                                                     }
+
                                                 }
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -169,10 +178,20 @@ public class GroupsController {
                                                     StreamResult result = new StreamResult(new File(path + getExportFileName("Groupes", fileIndex)));
 
                                                     transformer.transform(source, result);
+                                                    /*boolean res = MediacentreController.isFileValid(pathExport + getExportFileName("Groupes", fileIndex));
+                                                    if( res == false ){
+                                                        System.out.println("Error on file : " + pathExport + getExportFileName("Groupes", fileIndex));
+                                                    } else {
+                                                        System.out.println("File valid : " + pathExport + getExportFileName("Groupes", fileIndex));
+                                                    }*/
 
                                                     System.out.println("Groupes saved");
                                                 } catch (TransformerException tfe) {
                                                     tfe.printStackTrace();
+                                              /*  } catch (SAXException e) {
+                                                    e.printStackTrace();
+                                                } catch (IOException e) {
+                                                    e.printStackTrace();*/
                                                 }
                                             }
                                         });
@@ -197,12 +216,22 @@ public class GroupsController {
                 StreamResult result = new StreamResult(new File(pathExport + getExportFileName("Groupes", fileIndex)));
 
                 transformer.transform(source, result);
+             /*   boolean res = MediacentreController.isFileValid(pathExport + getExportFileName("Groupes", fileIndex));
+                if( res == false ){
+                    System.out.println("Error on file : " + pathExport + getExportFileName("Groupes", fileIndex));
+                } else {
+                    System.out.println("File valid : " + pathExport + getExportFileName("Groupes", fileIndex));
+                }*/
 
                 System.out.println("Groupes" + fileIndex + " saved");
                 fileIndex++;
                 counter = 0;
             } catch (TransformerException tfe) {
                 tfe.printStackTrace();
+           /* } catch (SAXException e) {
+                e.printStackTrace();
+            } catch (IOException e) {
+                e.printStackTrace();*/
             }
             // open the new one
             return fileHeader();

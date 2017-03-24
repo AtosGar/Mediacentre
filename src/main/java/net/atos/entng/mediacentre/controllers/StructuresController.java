@@ -58,18 +58,19 @@ public class StructuresController {
                                 //GARPersonIdentifiant
                                 MediacentreController.insertNode("men:GARStructureUAI", doc, garEtab, jObj.getString("s.UAI"));
                                 MediacentreController.insertNode("men:GARStructureNomCourant", doc, garEtab, jObj.getString("s.name"));
-                                MediacentreController.insertNode("men:GARStructureContrat", doc, garEtab, jObj.getString("s.contract"));
-                                MediacentreController.insertNode("men:GARStructureTelephone", doc, garEtab, jObj.getString("s.phone"));
                                 if( jObj.getString("s2.UAI") != null ) {
-                                    MediacentreController.insertNode("men:GAREtablissementStrctRattachFctl", doc, garEtab, jObj.getString("s2.UAI"));
+                                    MediacentreController.insertNode("men:GAREtablissementStructRattachFctl", doc, garEtab, jObj.getString("s2.UAI"));
                                 }
                                 counter += 5;
                             } else {
                                 if( jObj.getString("s2.UAI") != null ) {
-                                    MediacentreController.insertNode("men:GAREtablissementStrctRattachFctl", doc, garEtab, jObj.getString("s2.UAI"));
+                                    MediacentreController.insertNode("men:GAREtablissementStructRattachFctl", doc, garEtab, jObj.getString("s2.UAI"));
                                     counter ++;
                                 }
                             }
+                                MediacentreController.insertNode("men:GARStructureContrat", doc, garEtab, jObj.getString("s.contract"));
+                                MediacentreController.insertNode("men:GARStructureTelephone", doc, garEtab, jObj.getString("s.phone"));
+                                MediacentreController.insertNode("men:GARStructureEmail", doc, garEtab, "null");
                         }
 
                     }
@@ -83,15 +84,17 @@ public class StructuresController {
                                 JsonArray etablissementMef = event.right().getValue();
                                 // men:GARMEF
                                 for (Object obj : etablissementMef) {
-                                    Element garEtablissementMef = doc.createElement("men:GARPersonMEF");
-                                    garEntEtablissement.appendChild(garEtablissementMef);
                                     if (obj instanceof JsonObject) {
                                         JsonObject jObj = (JsonObject) obj;
-                                        MediacentreController.insertNode("men:GARStructureUAI",       doc, garEtablissementMef, jObj.getString("s.UAI"));
-                                        MediacentreController.insertNode("men:GARMEFCode",  doc, garEtablissementMef, jObj.getString("n.module"));
-                                        MediacentreController.insertNode("men:GARMEFLibelle",            doc, garEtablissementMef, jObj.getString("n.moduleName"));
-                                        counter += 3;
-                                        doc = testNumberOfOccurrences(doc);
+                                        if( jObj.getString("n.module") != null ) {
+                                            Element garEtablissementMef = doc.createElement("men:GARMEF");
+                                            garEntEtablissement.appendChild(garEtablissementMef);
+                                            MediacentreController.insertNode("men:GARStructureUAI", doc, garEtablissementMef, jObj.getString("s.UAI"));
+                                            MediacentreController.insertNode("men:GARMEFCode", doc, garEtablissementMef, jObj.getString("n.module"));
+                                            MediacentreController.insertNode("men:GARMEFLibelle", doc, garEtablissementMef, jObj.getString("n.moduleName"));
+                                            counter += 3;
+                                            doc = testNumberOfOccurrences(doc);
+                                        }
                                     }
                                 }
 
@@ -124,8 +127,18 @@ public class StructuresController {
                                                 transformer.transform(source, result);
 
                                                 System.out.println("Structures saved");
+/*                                                boolean res = MediacentreController.isFileValid(pathExport + getExportFileName("Etab", fileIndex));
+                                                if( res == false ){
+                                                    System.out.println("Error on file : " + pathExport + getExportFileName("Etab", fileIndex));
+                                                } else {
+                                                    System.out.println("File valid : " + pathExport + getExportFileName("Etab", fileIndex));
+                                                }*/
                                             } catch (TransformerException tfe) {
                                                 tfe.printStackTrace();
+                                    /*        } catch (SAXException e) {
+                                                e.printStackTrace();
+                                            } catch (IOException e) {
+                                                e.printStackTrace();*/
                                             }
                                         }
                                     }

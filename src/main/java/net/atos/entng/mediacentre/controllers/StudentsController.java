@@ -55,15 +55,16 @@ public class StudentsController {
                                 // new node
                                 garEleve = doc.createElement("men:GAREleve");
                                 garEntEleve.appendChild(garEleve);
+
                                 //GARPersonIdentifiant
                                 // TODO : faire le lien avec plusieurs établissements et récupérer l'UAI
                                 MediacentreController.insertNode( "men:GARPersonIdentifiant"   , doc, garEleve, jObj.getString("u.id"));
 
-                                // GARPersonProfils
-                                Element garProfil = doc.createElement("men:GARPersonProfils");
-                                MediacentreController.insertNode( "men:GARStructureUAI"           , doc, garProfil, jObj.getString("s.UAI"));
-                                MediacentreController.insertNode( "men:GARPersonProfil"           , doc, garProfil, "National_ELV");
-                                garEleve.appendChild(garProfil);
+                                    // GARPersonProfils
+                                    Element garProfil = doc.createElement("men:GARPersonProfils");
+                                    MediacentreController.insertNode( "men:GARStructureUAI"           , doc, garProfil, jObj.getString("s.UAI"));
+                                    MediacentreController.insertNode( "men:GARPersonProfil"           , doc, garProfil, "National_ELV");
+                                    garEleve.appendChild(garProfil);
 
                                 MediacentreController.insertNode( "men:GARPersonNomPatro"      , doc, garEleve, jObj.getString("u.lastName"));
                                 MediacentreController.insertNode( "men:GARPersonNom"           , doc, garEleve, jObj.getString("u.displayName"));
@@ -151,10 +152,20 @@ public class StudentsController {
 
                                                 StreamResult result = new StreamResult(new File(path + getExportFileName("Eleves", fileIndex)));
                                                 transformer.transform(source, result);
+                                         /*       boolean res = MediacentreController.isFileValid(pathExport + getExportFileName("Eleves", fileIndex));
+                                                if( res == false ){
+                                                    System.out.println("Error on file : " + pathExport + getExportFileName("Eleves", fileIndex));
+                                                } else {
+                                                    System.out.println("File valid : " + pathExport + getExportFileName("Eleves", fileIndex));
+                                                }*/
 
                                                 System.out.println("Students saved");
                                             } catch (TransformerException tfe) {
                                                 tfe.printStackTrace();
+                                        /*    } catch (SAXException e) {
+                                                e.printStackTrace();
+                                            } catch (IOException e) {
+                                                e.printStackTrace();*/
                                             }
                                         }
                                     }
@@ -175,14 +186,23 @@ public class StudentsController {
                 Transformer transformer = transformerFactory.newTransformer();
                 DOMSource source = new DOMSource(doc);
                 StreamResult result = new StreamResult(new File(pathExport + getExportFileName("Eleves", fileIndex)));
-
                 transformer.transform(source, result);
 
                 System.out.println("Students" + fileIndex + " saved");
+         /*       boolean res = MediacentreController.isFileValid(pathExport + getExportFileName("Eleves", fileIndex));
+                if( res == false ){
+                    System.out.println("Error on file : " + pathExport + getExportFileName("Eleves", fileIndex));
+                } else {
+                    System.out.println("File valid : " + pathExport + getExportFileName("Eleves", fileIndex));
+                }*/
                 fileIndex++;
                 counter = 0;
             } catch (TransformerException tfe) {
                 tfe.printStackTrace();
+          /*  } catch (SAXException e) {
+                e.printStackTrace();
+            } catch (IOException e) {
+                e.printStackTrace();*/
             }
             // open the new one
             return fileHeader();
