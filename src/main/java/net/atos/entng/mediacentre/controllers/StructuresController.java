@@ -70,7 +70,7 @@ public class StructuresController {
                             }
                                 MediacentreController.insertNode("men:GARStructureContrat", doc, garEtab, jObj.getString("s.contract"));
                                 MediacentreController.insertNode("men:GARStructureTelephone", doc, garEtab, jObj.getString("s.phone"));
-                                MediacentreController.insertNode("men:GARStructureEmail", doc, garEtab, "null");
+                                //MediacentreController.insertNode("men:GARStructureEmail", doc, garEtab, "null");
                         }
 
                     }
