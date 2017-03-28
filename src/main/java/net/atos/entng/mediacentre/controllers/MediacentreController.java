@@ -17,6 +17,7 @@ import org.vertx.java.core.http.HttpClient;
 import org.vertx.java.core.http.HttpClientResponse;
 import org.vertx.java.core.http.HttpServerRequest;
 import org.vertx.java.core.http.RouteMatcher;
+import org.vertx.java.core.json.JsonArray;
 import org.vertx.java.core.json.JsonObject;
 import org.vertx.java.platform.Container;
 import org.w3c.dom.Document;
@@ -116,13 +117,13 @@ public class MediacentreController extends BaseController {
         inChargeOfAssignementController.exportInChargeOfAssignement(mediacentreService, path, nbElementPerFile, inChargeOfAssignementName);
 
     }
-
+/*
     @Get("/userStructure/:userId")
     @ApiDoc("Get user main structure")
     public void getUserStructure(final HttpServerRequest request) {
         final String userId = request.params().get("userId");
         MediacentreServiceImpl mediacentreService = new MediacentreServiceImpl();
-        mediacentreService.getUserStructure(userId, new Handler<Either<String, JsonObject>>() {
+        mediacentreService.getUserStructures(userId, new Handler<Either<String, JsonObject>>() {
             @Override
             public void handle(Either<String, JsonObject> event) {
                 if( event.isRight()){
@@ -133,12 +134,13 @@ public class MediacentreController extends BaseController {
             };
         });
     }
+*/
 
-
-    @Get("/getRessources/:ident")
+    @Get("/getRessources/:structureUAI")
     @ApiDoc("Get user main structure")
     public void getRessources(final HttpServerRequest request) {
-        final String ident = request.params().get("ident");
+        final String uai = request.params().get("structureUAI");
+        final String ident = container.config().getString("idEnt", "");
         MediacentreServiceImpl mediacentreService = new MediacentreServiceImpl();
         UserUtils.getUserInfos(eb, request, new Handler<UserInfos>() {
             @Override
@@ -146,52 +148,45 @@ public class MediacentreController extends BaseController {
                 if (user != null) {
                     final String userId = user.getUserId();
                     MediacentreServiceImpl mediacentreService = new MediacentreServiceImpl();
-                    mediacentreService.getUserStructure(userId, new Handler<Either<String, JsonObject>>() {
+                    HttpClient httpClient = vertx.createHttpClient().setHost("list-ressource.gar.as8677.net").setPort(80);
+                    String uri = "/ressources/" + ident + "/" + uai + "/" + userId;
+                    //uri = "/ressources/ENTTEST1/0650499P-ET6/5577102-ET6";
+                    httpClient.get(uri, new Handler<HttpClientResponse>() {
                         @Override
-                        public void handle(Either<String, JsonObject> event) {
-                            if (event.isRight()) {
-                                JsonObject res = event.right().getValue();
-                                String uai = res.getString("UAI");
-                                HttpClient httpClient = vertx.createHttpClient(); //.setHost("list-ressource.gar.as8677.net");
-                                String uri = "/ressources/" + ident + "/" + uai + "/" + userId;
-                                uri = "http://list-ressource.gar.as8677.net/ressources/ENTTEST1/0650499P-ET6/5577102-ET6";
-                                uri = "http://adullact.net/docman/view.php/450/3622/readme.txt\n";
-                              /*  MultiMap headers = new CaseInsensitiveMultiMap();
-                                headers.add("X-Id-Ent-Autorisation", "cn");
-                                headers.add("Accept", "application/json");*/
-                                httpClient.getNow(uri, new Handler<HttpClientResponse>() {
-                                    @Override
-                                    public void handle(HttpClientResponse httpClientResponse) {
-                                        System.out.println("Response received");
-                                        httpClientResponse.bodyHandler(new Handler<Buffer>() {
-                                            @Override
-                                            public void handle(Buffer buffer) {
-                                                String sBuffer = buffer.getString(0, buffer.length());
-                                                request.response().end(sBuffer);
-                                            }
-                                        });
-                                    }
-                                }); //.putHeader("X-Id-Ent-Autorisation", "cn").putHeader("Accept", "application/json").end();
-                            }
+                        public void handle(HttpClientResponse httpClientResponse) {
+                            System.out.println("Response received");
+                            httpClientResponse.bodyHandler(new Handler<Buffer>() {
+                                @Override
+                                public void handle(Buffer buffer) {
+                                    String sBuffer = buffer.getString(0, buffer.length());
+                                    JsonObject obj = new JsonObject(sBuffer);
+                                    renderJson(request, obj);
+                                }
+                            });
                         }
-                    });
+                    }).putHeader("X-Id-Ent-Autorisation", "cn").putHeader("Accept", "application/json").end();
                 }
             }
         });
     }
 
-        /*
-        mediacentreService.getUserStructure(userId, new Handler<Either<String, JsonObject>>() {
+
+
+    @Get("/getUserStructures/:userId")
+    @ApiDoc("Get user main structure")
+    public void getUserStructures(final HttpServerRequest request) {
+        final String userId = request.params().get("userId");
+        mediacentreService.getUserStructures(userId, new Handler<Either<String, JsonArray>>() {
             @Override
-            public void handle(Either<String, JsonObject> event) {
-                if( event.isRight()){
-                    JsonObject res = event.right().getValue();
-                    JsonObject result = new JsonObject().putString("structure", res.getString("UAI"));
+            public void handle(Either<String, JsonArray> event) {
+                if (event.isRight()) {
+                    JsonArray res = event.right().getValue();
+                    JsonObject result = new JsonObject().putArray("structures", res);
                     renderJson(request, result);
                 }
-            };
-        });*/
-
+            }
+        });
+    }
 
 
     /**

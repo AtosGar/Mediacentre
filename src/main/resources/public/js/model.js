@@ -23,9 +23,8 @@ model.getRessources = function(ident, callback) {
      /*   this.load(ressources);
     }.bind(this));*/
 
-
-model.getUserStructure = function(userId, callback) {
-    http().get('/mediacentre/userStructure/' + userId).done(function(result) {
+model.getStructures = function(userId, callback) {
+    http().get('/mediacentre/getUserStructures/' + userId).done(function(result) {
         if(typeof callback === 'function'){
             callback(result);
         }

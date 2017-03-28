@@ -3,7 +3,6 @@ package net.atos.entng.mediacentre.services;
 import fr.wseduc.webutils.Either;
 import org.vertx.java.core.Handler;
 import org.vertx.java.core.json.JsonArray;
-import org.vertx.java.core.json.JsonObject;
 
 public interface MediacentreService {
 
@@ -34,6 +33,6 @@ public interface MediacentreService {
 
     void getInChargeOfExportData(String groupName, Handler<Either<String, JsonArray>> handler);
 
-    void getUserStructure(String userId, Handler<Either<String, JsonObject>> handler);
+    void getUserStructures(String userId, Handler<Either<String, JsonArray>> handler);
 
 }

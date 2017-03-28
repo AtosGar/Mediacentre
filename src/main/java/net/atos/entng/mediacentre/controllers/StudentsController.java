@@ -150,7 +150,7 @@ public class StudentsController {
                                                 Transformer transformer = transformerFactory.newTransformer();
                                                 DOMSource source = new DOMSource(doc);
 
-                                                StreamResult result = new StreamResult(new File(path + getExportFileName("Eleves", fileIndex)));
+                                                StreamResult result = new StreamResult(new File(path + getExportFileName("Eleve", fileIndex)));
                                                 transformer.transform(source, result);
                                          /*       boolean res = MediacentreController.isFileValid(pathExport + getExportFileName("Eleves", fileIndex));
                                                 if( res == false ){
@@ -185,7 +185,7 @@ public class StudentsController {
                 TransformerFactory transformerFactory = TransformerFactory.newInstance();
                 Transformer transformer = transformerFactory.newTransformer();
                 DOMSource source = new DOMSource(doc);
-                StreamResult result = new StreamResult(new File(pathExport + getExportFileName("Eleves", fileIndex)));
+                StreamResult result = new StreamResult(new File(pathExport + getExportFileName("Eleve", fileIndex)));
                 transformer.transform(source, result);
 
                 System.out.println("Students" + fileIndex + " saved");

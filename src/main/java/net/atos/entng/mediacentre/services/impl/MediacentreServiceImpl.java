@@ -9,7 +9,6 @@ import org.vertx.java.core.json.JsonArray;
 import org.vertx.java.core.json.JsonObject;
 
 import static org.entcore.common.neo4j.Neo4jResult.validResultHandler;
-import static org.entcore.common.neo4j.Neo4jResult.validUniqueResultHandler;
 
 public class MediacentreServiceImpl implements MediacentreService {
 
@@ -32,7 +31,7 @@ public class MediacentreServiceImpl implements MediacentreService {
     public void getPersonMef(Handler<Either<String, JsonArray>> handler) {
         String query = "MATCH  (p:Profile)<-[HAS_PROFILE]-(pg:ProfileGroup)<-[IN]-(u:User)-[ADMINISTRATIVE_ATTACHMENT]->(s:Structure) " +
                 "where p.name = 'Student' " +
-                "return u.id, u.module, s.UAI order by u.id";
+                "return distinct u.id, u.module, s.UAI order by u.id";
         neo4j.execute(query, new JsonObject(), validResultHandler(handler));
     }
 
@@ -40,7 +39,7 @@ public class MediacentreServiceImpl implements MediacentreService {
     public void getEleveEnseignement(Handler<Either<String, JsonArray>> handler) {
         String query = "MATCH  (p:Profile)<-[HAS_PROFILE]-(pg:ProfileGroup)<-[IN]-(u:User)-[ADMINISTRATIVE_ATTACHMENT]->(s:Structure) " +
                 "where p.name = 'Student' " +
-                "return u.id, s.UAI, u.fieldOfStudy";
+                "return distinct u.id, s.UAI, u.fieldOfStudy";
         neo4j.execute(query, new JsonObject(), validResultHandler(handler));
     }
 
@@ -58,13 +57,13 @@ public class MediacentreServiceImpl implements MediacentreService {
     public void getPersonMefTeacher(Handler<Either<String, JsonArray>> handler) {
         String query = "MATCH  (p:Profile)<-[HAS_PROFILE]-(pg:ProfileGroup)<-[IN]-(u:User)-[ADMINISTRATIVE_ATTACHMENT]->(s:Structure) " +
                 "where p.name = 'Teacher' " +
-                "return u.id, u.modules, s.UAI order by u.id";
+                "return distinct u.id, u.modules, s.UAI order by u.id";
         neo4j.execute(query, new JsonObject(), validResultHandler(handler));
     }
 
     @Override
     public void getEtablissement(Handler<Either<String, JsonArray>> handler) {
-        String query = " MATCH (s:Structure) OPTIONAL MATCH (s2:Structure)<-[HAS_ATTACHMENT]-(s:Structure)  RETURN s.UAI, s.contract, s.name, s.phone, s2.UAI order by s.UAI";
+        String query = " MATCH (s:Structure) OPTIONAL MATCH (s2:Structure)<-[HAS_ATTACHMENT]-(s:Structure)  RETURN distinct s.UAI, s.contract, s.name, s.phone, s2.UAI order by s.UAI";
         // MATCH (s:Structure), (s2:Structure)-[HAS_ATTACHMENT]->(s3:Structure) where s.UAI = s2.UAI or s2 is null  return  s.UAI, s.contract, s.name, s.phone, s3.UAI LIMIT 25
         neo4j.execute(query, new JsonObject(), validResultHandler(handler));
     }
@@ -118,10 +117,10 @@ public class MediacentreServiceImpl implements MediacentreService {
     }
 
     @Override
-    public void getUserStructure(String userId, Handler<Either<String, JsonObject>> handler){
-        String query = "match (s:Structure)<-[ADMINISTRATIVE_ATTACHMENT]-(u:User) where u.id = {id} return s.UAI as UAI";
+    public void getUserStructures(String userId, Handler<Either<String, JsonArray>> handler){
+        String query = "match (s:Structure)<-[ADMINISTRATIVE_ATTACHMENT]-(u:User) where u.id = {id} return s.UAI as UAI, s.name as name UNION match (s2:Structure)<-[DEPENDS]-(g:Group)<-[IN]-(u:User) where u.id = {id} return s2.UAI as UAI, s2.name as name;";
         JsonObject params = new JsonObject().putString("id", userId);
-        neo4j.execute(query, params, validUniqueResultHandler(handler));
+        neo4j.execute(query, params, validResultHandler(handler));
     }
 
 
