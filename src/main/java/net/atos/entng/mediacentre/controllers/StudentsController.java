@@ -128,8 +128,8 @@ public class StudentsController {
                                             for (Object obj : eleveEnseignement) {
                                                 if (obj instanceof JsonObject) {
                                                     JsonObject jObj = (JsonObject) obj;
-                                                    if( jObj.getArray("u.FieldOfStudy") != null && jObj.getArray("u.fieldOfStudy").size() > 0 ) {
-                                                        JsonArray fosArray = jObj.getArray("u.FieldOfStudy");
+                                                    if( jObj.getArray("u.fieldOfStudy") != null && jObj.getArray("u.fieldOfStudy").size() > 0 ) {
+                                                        JsonArray fosArray = jObj.getArray("u.fieldOfStudy");
                                                         for (int i = 0; i < fosArray.size(); i++) {
                                                             Element garEleveEnseignement = doc.createElement("men:GAREleveEnseignement");
                                                             garEntEleve.appendChild(garEleveEnseignement);
