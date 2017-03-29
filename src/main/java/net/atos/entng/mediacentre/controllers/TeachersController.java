@@ -50,7 +50,7 @@ public class TeachersController {
                     for( Object obj : students ){
                         if( obj instanceof JsonObject){
                             JsonObject jObj = (JsonObject) obj;
-                            if( jObj.getString("u.id") != null && jObj.getString("u.id") != lastTeacherId ) {
+                            if( jObj.getString("u.id") != null && !lastTeacherId.equals(jObj.getString("u.id")) ) {
                                 garEnseignant = doc.createElement("men:GAREnseignant");
                                 garEntEnseignant.appendChild(garEnseignant);
                                 MediacentreController.insertNode("men:GARPersonIdentifiant", doc, garEnseignant, jObj.getString("u.id"));
