@@ -67,7 +67,7 @@ public class StudentsController {
                                     garEleve.appendChild(garProfil);
 
                                 MediacentreController.insertNode( "men:GARPersonNomPatro"      , doc, garEleve, jObj.getString("u.lastName"));
-                                MediacentreController.insertNode( "men:GARPersonNom"           , doc, garEleve, jObj.getString("u.displayName"));
+                                MediacentreController.insertNode( "men:GARPersonNom"           , doc, garEleve, jObj.getString("u.lastName"));
                                 MediacentreController.insertNode( "men:GARPersonPrenom"        , doc, garEleve, jObj.getString("u.firstName"));
                                 if( jObj.getString("u.otherNames") != null ) {
                                     MediacentreController.insertNode( "men:GARPersonAutresPrenoms" , doc, garEleve, jObj.getString("u.firstName"));
