@@ -115,7 +115,15 @@ public class MediacentreServiceImpl implements MediacentreService {
     public void getInChargeOfExportData(String groupName, Handler<Either<String, JsonArray>> handler) {
         String query = "MATCH (s:Structure)<-[ADMINISTRATIVE_ATTACHMENT]-(u:User)-[IN]->(n:ManualGroup) " +
                 "where n.name = {groupName} " +
+                "RETURN u.id, u.lastName, u.firstName, u.email, s.UAI " +
+                "union " +
+                "match (s:Structure)<-[DEPENDS]-(pg:ProfileGroup)<-[i1:IN]-(u:User)-[i2:IN]->(n:ManualGroup) " +
+                "where n.name = {groupName}  " +
                 "RETURN u.id, u.lastName, u.firstName, u.email, s.UAI";
+
+        /*String query = "MATCH (s:Structure)<-[ADMINISTRATIVE_ATTACHMENT]-(u:User)-[IN]->(n:ManualGroup) " +
+                "where n.name = {groupName} " +
+                "RETURN u.id, u.lastName, u.firstName, u.email, s.UAI";*/
         JsonObject params = new JsonObject().putString("groupName", groupName);
         neo4j.execute(query, params, validResultHandler(handler));
     }
