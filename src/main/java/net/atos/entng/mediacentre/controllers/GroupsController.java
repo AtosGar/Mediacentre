@@ -17,10 +17,54 @@ import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
 import java.io.File;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Set;
 
 import static net.atos.entng.mediacentre.controllers.MediacentreController.getExportFileName;
 
 public class GroupsController {
+
+    public class GAREnsGroupeMatiereKey{
+        private String uai;
+        private String uid;
+        private String group;
+
+        GAREnsGroupeMatiereKey(String uai, String uid, String group){
+            this.uai = uai;
+            this.uid = uid;
+            this.group = group;
+        }
+
+        @Override
+        public int hashCode() {
+            return (getUai() + getUid() + getGroup()).hashCode();
+        }
+
+        @Override
+        public boolean equals(Object obj) {
+            if( obj instanceof GAREnsGroupeMatiereKey){
+                GAREnsGroupeMatiereKey key = (GAREnsGroupeMatiereKey)obj;
+                return key.getUai().equals(this.getUai()) &&
+                        key.getUid().equals(this.getUid()) &&
+                        key.getGroup().equals(this.getGroup());
+            }
+            return false;
+        }
+
+        public String getUai() {
+            return uai;
+        }
+
+        public String getUid() {
+            return uid;
+        }
+
+        public String getGroup() {
+            return group;
+        }
+    }
 
     private     int counter = 0;            // nb of elements currently put in the file
     private     int nbElem = 10000;         // max elements authorized in a file
@@ -126,42 +170,79 @@ public class GroupsController {
                                                     JsonArray enGroupeAndClasseMatiere = event.right().getValue();
                                                     // men:GARPersonGroup
                                                     Element garEnGroupeMatiere = null;
+                                                    String lastUserId = "";
+                                                    String lastStructureId = "";
+                                                    String lastGroupeCode = "";
+                                                    // preparing hashmap for xml
+
+                                                    Map<GAREnsGroupeMatiereKey, Set<String>> mapGroupes = new HashMap<GAREnsGroupeMatiereKey, Set<String>>();
+                                                    Map<GAREnsGroupeMatiereKey, Set<String>> mapClasses = new HashMap<GAREnsGroupeMatiereKey, Set<String>>();
                                                     for (Object obj : enGroupeAndClasseMatiere) {
                                                         if (obj instanceof JsonObject) {
                                                             JsonObject jObj = (JsonObject) obj;
-                                                            // groups
-                                                            if( jObj.getArray("t.groups") != null && jObj.getArray("t.groups").size() > 0 ) {
+                                                            if (jObj.getArray("t.groups") != null && jObj.getArray("t.groups").size() > 0) {
                                                                 JsonArray groups = jObj.getArray("t.groups");
                                                                 for (int i = 0; i < groups.size(); i++) {
                                                                     String group = groups.get(i).toString();
-                                                                    garEnGroupeMatiere = doc.createElement("men:GAREnsGroupeMatiere");
-                                                                    garEntGroup.appendChild(garEnGroupeMatiere);
-                                                                    MediacentreController.insertNode("men:GARStructureUAI", doc, garEnGroupeMatiere, jObj.getString("s.UAI"));
-                                                                    MediacentreController.insertNode("men:GARPersonIdentifiant", doc, garEnGroupeMatiere, jObj.getString("u.id"));
-                                                                    MediacentreController.insertNode("men:GARGroupeCode", doc, garEnGroupeMatiere, group);
-                                                                    MediacentreController.insertNode("men:GARMatiereCode", doc, garEnGroupeMatiere, jObj.getString("sub.code"));
+                                                                    GAREnsGroupeMatiereKey key = new GAREnsGroupeMatiereKey(jObj.getString("s.UAI"), jObj.getString("u.id"), group);
+                                                                    //String key = jObj.getString("s.UAI") + jObj.getString("u.id") + group;
+                                                                    Set currentList = mapGroupes.get(key);
+                                                                    if (currentList == null) {
+                                                                        currentList = new HashSet<String>();
+                                                                        mapGroupes.put(key, currentList);
+                                                                    }
+                                                                    currentList.add(jObj.getString("sub.code"));
                                                                 }
+                                                            }
+                                                            if (jObj.getArray("t.classes") != null && jObj.getArray("t.classes").size() > 0) {
+                                                                JsonArray classes = jObj.getArray("t.classes");
+                                                                for (int i = 0; i < classes.size(); i++) {
+                                                                    String classe = classes.get(i).toString();
+                                                                    GAREnsGroupeMatiereKey key = new GAREnsGroupeMatiereKey(jObj.getString("s.UAI"), jObj.getString("u.id"), classe);
+                                                                    Set currentList = mapClasses.get(key);
+                                                                    if (currentList == null) {
+                                                                        currentList = new HashSet<String>();
+                                                                        mapClasses.put(key, currentList);
+                                                                    }
+                                                                    currentList.add(jObj.getString("sub.code"));
+                                                                }
+                                                            }
+                                                        }
+                                                    }
+
+                                                    // making xml
+                                                    for (Map.Entry<GAREnsGroupeMatiereKey, Set<String>> entry : mapClasses.entrySet()) {
+                                                        GAREnsGroupeMatiereKey key = entry.getKey();
+                                                        Set<String> currentList = entry.getValue();
+                                                        garEnGroupeMatiere = doc.createElement("men:GAREnsGroupeMatiere");
+                                                        garEntGroup.appendChild(garEnGroupeMatiere);
+                                                        MediacentreController.insertNode("men:GARStructureUAI", doc, garEnGroupeMatiere, key.getUai());
+                                                        MediacentreController.insertNode("men:GARPersonIdentifiant", doc, garEnGroupeMatiere, key.getUid());
+                                                        MediacentreController.insertNode("men:GARGroupeCode", doc, garEnGroupeMatiere, key.getGroup());
+                                                        for (Object s : currentList) {
+                                                            if (s instanceof String) {
+                                                                String subject = (String) s;
+                                                                MediacentreController.insertNode("men:GARMatiereCode", doc, garEnGroupeMatiere, subject);
+                                                                counter++;
                                                             }
                                                         }
                                                         counter += 5;
                                                         doc = testNumberOfOccurrences(doc);
                                                     }
-                                                    for (Object obj : enGroupeAndClasseMatiere) {
-                                                        if (obj instanceof JsonObject) {
-                                                            JsonObject jObj = (JsonObject) obj;
-                                                            // classes
-                                                            if( jObj.getArray("t.classes") != null && jObj.getArray("t.classes").size() > 0 ) {
-                                                                JsonArray classes = jObj.getArray("t.classes");
-                                                                for (int i = 0; i < classes.size(); i++) {
-                                                                    String classe = classes.get(i).toString();
-                                                                    garEnGroupeMatiere = doc.createElement("men:GAREnsClasseMatiere");
-                                                                    garEntGroup.appendChild(garEnGroupeMatiere);
-                                                                    MediacentreController.insertNode("men:GARStructureUAI", doc, garEnGroupeMatiere, jObj.getString("s.UAI"));
-                                                                    MediacentreController.insertNode("men:GARPersonIdentifiant", doc, garEnGroupeMatiere, jObj.getString("u.id"));
-                                                                    MediacentreController.insertNode("men:GARGroupeCode", doc, garEnGroupeMatiere, classe);
-                                                                    MediacentreController.insertNode("men:GARMatiereCode", doc, garEnGroupeMatiere, jObj.getString("sub.code"));
 
-                                                                }
+                                                    for (Map.Entry<GAREnsGroupeMatiereKey, Set<String>> entry : mapGroupes.entrySet()) {
+                                                        GAREnsGroupeMatiereKey key = entry.getKey();
+                                                        Set<String> currentList = entry.getValue();
+                                                        garEnGroupeMatiere = doc.createElement("men:GAREnsClasseMatiere");
+                                                        garEntGroup.appendChild(garEnGroupeMatiere);
+                                                        MediacentreController.insertNode("men:GARStructureUAI", doc, garEnGroupeMatiere, key.getUai());
+                                                        MediacentreController.insertNode("men:GARPersonIdentifiant", doc, garEnGroupeMatiere, key.getUid());
+                                                        MediacentreController.insertNode("men:GARGroupeCode", doc, garEnGroupeMatiere, key.getGroup());
+                                                        for (Object s : currentList) {
+                                                            if (s instanceof String) {
+                                                                String subject = (String) s;
+                                                                MediacentreController.insertNode("men:GARMatiereCode", doc, garEnGroupeMatiere, subject);
+                                                                counter++;
                                                             }
                                                         }
                                                         counter += 5;

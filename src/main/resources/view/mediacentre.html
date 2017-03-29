@@ -14,11 +14,12 @@
 <body ng-controller="MediacentreController" class="mediacentre">
 <portal>
     <h2>{{#i18n}}mediacentre.title{{/i18n}}</h2>
+    <i18n>mediacentre.texte.test</i18n>
 </portal>
 
 <div class="contextual-buttons six cell">
     <div ng-if="userIsLocalAdmin()">
-        <button ng-click="exportXML()" class="cell right-magnet">
+        <br><br><button ng-click="exportXML()" class="cell right-magnet">
             <i18n>mediacentre.export</i18n>
         </button>
     </div>
@@ -30,7 +31,7 @@
     <section class="main" ng-if="display.detail == false">
 
         <div class="row" ng-hide="schools.length === 1 || !display.listSchools">
-            <label class="two cell center"><i18n>support.ticket.school</i18n></label>
+            <label class="two cell center"><i18n>mediacentre.structure</i18n></label>
 			<span class="ten cell">
 				<select ng-model="selectedSchool"
                         ng-init="selectedSchool = schools[0].UAI"

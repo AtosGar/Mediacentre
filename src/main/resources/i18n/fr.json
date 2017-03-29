@@ -6,5 +6,8 @@
   "mediacentre.entete.editor" : "Editeur",
   "mediacentre.entete.presentation" : "Type de présentation",
   "mediacentre.entete.label" : "Etiquette Ressource",
-  "mediacentre.export.launched" : "L'export est lancé."
+  "mediacentre.export.launched" : "L'export est lancé.",
+  "mediacentre.texte.test" : "Ce médiacentre de test a été réalisé à des fins de tests. Il ne préjuge pas des choix de présentation et des types de filtres pouvant être implémentés dans la solution ENT",
+  "mediacentre.error.getRessources" : "Erreur lors de la récupération des ressources",
+  "mediacentre.structure" : "Etablissement : "
 }
