@@ -63,7 +63,7 @@ public class StudentsController {
                                     // GARPersonProfils
                                     Element garProfil = doc.createElement("men:GARPersonProfils");
                                     MediacentreController.insertNode( "men:GARStructureUAI"           , doc, garProfil, jObj.getString("s.UAI"));
-                                    MediacentreController.insertNode( "men:GARPersonProfil"           , doc, garProfil, "National_ELV");
+                                    MediacentreController.insertNode( "men:GARPersonProfil"           , doc, garProfil, "National_elv");
                                     garEleve.appendChild(garProfil);
 
                                 MediacentreController.insertNode( "men:GARPersonNomPatro"      , doc, garEleve, jObj.getString("u.lastName"));
@@ -88,7 +88,7 @@ public class StudentsController {
                                 MediacentreController.insertNode( "men:GARPersonEtab"          , doc, garEleve, jObj.getString("s2.UAI"));
                                 Element garProfil = doc.createElement("men:GARPersonProfils");
                                 MediacentreController.insertNode( "men:GARStructureUAI"           , doc, garProfil, jObj.getString("s2.UAI"));
-                                MediacentreController.insertNode( "men:GARPersonProfil"           , doc, garProfil, "National_ELV");
+                                MediacentreController.insertNode( "men:GARPersonProfil"           , doc, garProfil, "National_elv");
                                 garEleve.appendChild(garProfil);
                                 counter += 4;
                             }
