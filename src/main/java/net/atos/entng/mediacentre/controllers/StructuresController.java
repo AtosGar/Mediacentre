@@ -113,7 +113,7 @@ public class StructuresController {
                                                     JsonObject jObj = (JsonObject) obj;
                                                     MediacentreController.insertNode("men:GARStructureUAI",    doc, garEtablissementMatiere, jObj.getString("s.UAI"));
                                                     MediacentreController.insertNode("men:GARMatiereCode",     doc, garEtablissementMatiere, jObj.getString("sub.code"));
-                                                    MediacentreController.insertNode("men:GARMatiereLibelle",  doc, garEtablissementMatiere, jObj.getString("sub.libelle"));
+                                                    MediacentreController.insertNode("men:GARMatiereLibelle",  doc, garEtablissementMatiere, jObj.getString("sub.label"));
                                                 }
                                                 counter += 4;
                                                 doc = testNumberOfOccurrences(doc);
