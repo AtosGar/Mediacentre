@@ -31,4 +31,12 @@ model.getStructures = function(userId, callback) {
     });
 }
 
+model.isExportButtonVisible = function(callback) {
+    http().get('/mediacentre/isExportButtonVisible').done(function(result) {
+        if(typeof callback === 'function'){
+            callback(result);
+        }
+    });
+}
+
 

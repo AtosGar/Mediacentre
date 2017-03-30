@@ -117,24 +117,23 @@ public class MediacentreController extends BaseController {
         inChargeOfAssignementController.exportInChargeOfAssignement(mediacentreService, path, nbElementPerFile, inChargeOfAssignementName);
 
     }
-/*
-    @Get("/userStructure/:userId")
-    @ApiDoc("Get user main structure")
-    public void getUserStructure(final HttpServerRequest request) {
-        final String userId = request.params().get("userId");
-        MediacentreServiceImpl mediacentreService = new MediacentreServiceImpl();
-        mediacentreService.getUserStructures(userId, new Handler<Either<String, JsonObject>>() {
+
+    @Get("/isExportButtonVisible")
+    @ApiDoc("Returns true if user is authorized to display export button")
+    public void isExportButtonVisible(final HttpServerRequest request) {
+        UserUtils.getUserInfos(eb, request, new Handler<UserInfos>() {
             @Override
-            public void handle(Either<String, JsonObject> event) {
-                if( event.isRight()){
-                    JsonObject res = event.right().getValue();
-                    JsonObject result = new JsonObject().putString("structure", res.getString("UAI"));
-                    renderJson(request, result);
+            public void handle(final UserInfos user) {
+                if (user != null) {
+                    final String userExportXML = container.config().getString("userExportXML", "admin.xmlgar");
+                    final String userLogin = user.getLogin();
+                    JsonObject obj = new JsonObject();
+                    obj.putBoolean("isAuthorized", userLogin.equals(userExportXML));
+                    renderJson(request, obj);
                 }
-            };
+            }
         });
     }
-*/
 
     @Get("/getRessources/:structureUAI")
     @ApiDoc("Get user main structure")

@@ -16,6 +16,7 @@
 	"elementsPerFile" : 10000,
 	"exportFilePrefix" : "Z0_",
 	"inChargeOfAssignementGroupName" : "GARRESPAFFECTATION",
-    "idEnt" : "ENTTEST1"
+    "idEnt" : "ENTTEST1",
+    "userExportXML" : "admin.xmlgar"
     }
 }

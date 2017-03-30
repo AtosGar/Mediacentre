@@ -6,6 +6,10 @@ function MediacentreController($scope, template, model, route, $location) {
         $scope.display = {};
         $scope.display.detail = false;
 
+        model.isExportButtonVisible( function(result) {
+            $scope.isDisplayExportXmlButton = result.isAuthorized;
+        });
+
         model.getStructures(model.me.userId, function(result) {
             $scope.schools = result.structures;
             if( $scope.schools.size == 1){
@@ -57,11 +61,6 @@ function MediacentreController($scope, template, model, route, $location) {
         var isLocalAdmin = (model.me.functions &&
         model.me.functions.ADMIN_LOCAL && model.me.functions.ADMIN_LOCAL.scope );
 
-        if(ticket && ticket.school_id) {
-            // if parameter "ticket" is supplied, check that current user is local administrator for the ticket's school
-            return isLocalAdmin && _.contains(model.me.functions.ADMIN_LOCAL.scope, ticket.school_id);
-        }
-        return isLocalAdmin;
     };
 
     $scope.viewDetail = function(index){

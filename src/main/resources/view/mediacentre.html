@@ -18,7 +18,7 @@
 </portal>
 
 <div class="contextual-buttons six cell">
-    <div ng-if="userIsLocalAdmin()">
+    <div ng-if="isDisplayExportXmlButton">
         <br><br><button ng-click="exportXML()" class="cell right-magnet">
             <i18n>mediacentre.export</i18n>
         </button>
