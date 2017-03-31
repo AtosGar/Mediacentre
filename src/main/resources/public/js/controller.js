@@ -14,7 +14,7 @@ function MediacentreController($scope, template, model, route, $location) {
             $scope.schools = result.structures;
             if( $scope.schools.length == 1){
                 $scope.display.listSchools = false;
-                getRessources($scope.schools[0].UAI);
+                $scope.getRessources($scope.schools[0].UAI);
             } else {
                 $scope.display.listSchools = true;
             }
