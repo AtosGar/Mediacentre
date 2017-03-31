@@ -12,7 +12,7 @@ function MediacentreController($scope, template, model, route, $location) {
 
         model.getStructures(model.me.userId, function(result) {
             $scope.schools = result.structures;
-            if( $scope.schools.size == 1){
+            if( $scope.schools.length == 1){
                 $scope.display.listSchools = false;
                 getRessources($scope.schools[0].UAI);
             } else {
