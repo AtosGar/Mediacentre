@@ -148,6 +148,7 @@ public class MediacentreController extends BaseController {
                     final String userId = user.getUserId();
                     MediacentreServiceImpl mediacentreService = new MediacentreServiceImpl();
                     final String hostInfo = container.config().getString("hostWS", "");
+                    final String header = container.config().getString("headerWSX-Id-Ent", "");
                     HttpClient httpClient = vertx.createHttpClient().setHost(hostInfo).setPort(80);
                     String uri = "/ressources/" + ident + "/" + uai + "/" + userId;
                     //uri = "/ressources/ENTTEST1/0650499P-ET6/5577102-ET6";
@@ -164,7 +165,7 @@ public class MediacentreController extends BaseController {
                                 }
                             });
                         }
-                    }).putHeader("X-Id-Ent-Autorisation", "cn").putHeader("Accept", "application/json").end();
+                    }).putHeader("X-Id-Ent-Autorisation", header).putHeader("Accept", "application/json").end();
                 }
             }
         });

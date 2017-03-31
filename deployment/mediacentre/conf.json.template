@@ -16,8 +16,9 @@
 	"elementsPerFile" : 10000,
 	"exportFilePrefix" : "Z0_",
 	"inChargeOfAssignementGroupName" : "GARRESPAFFECTATION",
-    "idEnt" : "ENTTEST1",
+    "idEnt" : "Z0",
     "userExportXML" : "admin.xmlgar",
-    "hostWS" : "list-ressource.gar.as8677.net"
+    "hostWS" : "list-ressource.gar.as8677.net",
+    "headerWSX-Id-Ent" : "simulent.validation.test-gar.education.fr"
     }
 }
