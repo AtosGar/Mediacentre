@@ -91,8 +91,7 @@ public class StructuresController {
                                             garEntEtablissement.appendChild(garEtablissementMef);
                                             MediacentreController.insertNode("men:GARStructureUAI", doc, garEtablissementMef, jObj.getString("s.UAI"));
                                             MediacentreController.insertNode("men:GARMEFCode", doc, garEtablissementMef, jObj.getString("n.module"));
-                                            String temp = jObj.getString("n.moduleName").replace("&", " et ");
-                                            MediacentreController.insertNode("men:GARMEFLibelle", doc, garEtablissementMef, temp);
+                                            MediacentreController.insertNode("men:GARMEFLibelle", doc, garEtablissementMef, jObj.getString("n.moduleName"));
                                             counter += 3;
                                             doc = testNumberOfOccurrences(doc);
                                         }
