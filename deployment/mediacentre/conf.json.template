@@ -17,6 +17,7 @@
 	"exportFilePrefix" : "Z0_",
 	"inChargeOfAssignementGroupName" : "GARRESPAFFECTATION",
     "idEnt" : "ENTTEST1",
-    "userExportXML" : "admin.xmlgar"
+    "userExportXML" : "admin.xmlgar",
+    "hostWS" : "list-ressource.gar.as8677.net"
     }
 }

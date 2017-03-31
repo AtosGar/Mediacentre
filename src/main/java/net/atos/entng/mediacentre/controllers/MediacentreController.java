@@ -147,7 +147,8 @@ public class MediacentreController extends BaseController {
                 if (user != null) {
                     final String userId = user.getUserId();
                     MediacentreServiceImpl mediacentreService = new MediacentreServiceImpl();
-                    HttpClient httpClient = vertx.createHttpClient().setHost("list-ressource.gar.as8677.net").setPort(80);
+                    final String hostInfo = container.config().getString("hostWS", "");
+                    HttpClient httpClient = vertx.createHttpClient().setHost(hostInfo).setPort(80);
                     String uri = "/ressources/" + ident + "/" + uai + "/" + userId;
                     //uri = "/ressources/ENTTEST1/0650499P-ET6/5577102-ET6";
                     httpClient.get(uri, new Handler<HttpClientResponse>() {
