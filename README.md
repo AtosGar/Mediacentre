@@ -1,4 +1,4 @@
-webconf
+Mediacentre
 ===============
 
 Initialisation of webconf repository
