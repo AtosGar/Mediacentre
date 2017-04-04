@@ -17,6 +17,7 @@ import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
 import java.io.File;
+import java.util.ArrayList;
 
 import static net.atos.entng.mediacentre.controllers.MediacentreController.getExportFileName;
 
@@ -46,11 +47,26 @@ public class TeachersController {
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
                     // men:GAREleve
                     String lastTeacherId = "";
+                    String lastTeacherBirthDate = "";
                     Element garEnseignant = null;
+                    ArrayList<String[]> listDisciplinesPostes = new ArrayList<String[]>();
                     for( Object obj : students ){
                         if( obj instanceof JsonObject){
                             JsonObject jObj = (JsonObject) obj;
                             if( jObj.getString("u.id") != null && !lastTeacherId.equals(jObj.getString("u.id")) ) {
+                                // add all the disciplinesPostes, because it's a new node
+                                if( garEnseignant != null ) {
+                                    MediacentreController.insertNode("men:GARPersonDateNaissance", doc, garEnseignant, lastTeacherBirthDate);
+                                    for (String[] data : listDisciplinesPostes) {
+                                        Element garEnsDisciplinesPostes = doc.createElement("men:GAREnsDisciplinesPostes");
+                                        MediacentreController.insertNode("men:GARStructureUAI", doc, garEnsDisciplinesPostes, data[0]);
+                                        MediacentreController.insertNode("men:GAREnsDisciplinePosteCode", doc, garEnsDisciplinesPostes, data[1]);
+                                        garEnseignant.appendChild(garEnsDisciplinesPostes);
+                                        counter += 3;
+                                    }
+                                }
+                                doc = testNumberOfOccurrences(doc);
+                                listDisciplinesPostes = new ArrayList<String[]>();
                                 garEnseignant = doc.createElement("men:GAREnseignant");
                                 garEntEnseignant.appendChild(garEnseignant);
                                 MediacentreController.insertNode("men:GARPersonIdentifiant", doc, garEnseignant, jObj.getString("u.id"));
@@ -78,30 +94,40 @@ public class TeachersController {
                                     MediacentreController.insertNode("men:GARPersonEtab", doc, garEnseignant, jObj.getString("s2.UAI"));
                                 }
                                 lastTeacherId = jObj.getString("u.id");
+                                lastTeacherBirthDate = jObj.getString("u.birthDate");
                             } else {
                                 if( jObj.getString("s2.UAI") != null ) {
                                     MediacentreController.insertNode("men:GARPersonEtab", doc, garEnseignant, jObj.getString("s2.UAI"));
                                 }
-                                MediacentreController.insertNode("men:GARPersonDateNaissance", doc, garEnseignant, jObj.getString("u.birthDate"));
                                 counter += 9;
-                                // EnsDisciplinesPostes
+                                // EnsDisciplinesPostes : save all, in order to place them at the END of node  (after ALL s2.UAI)
                                 if( jObj.getArray("u.functions") != null && jObj.getArray("u.functions").size() > 0 ) {
                                     JsonArray functionsArray = jObj.getArray("u.functions");
                                     for (int i = 0; i < functionsArray.size(); i++) {
                                         String function = functionsArray.get(i).toString();
                                         String[] parts = function.split("\\$");
-                                        Element garEnsDisciplinesPostes = doc.createElement("men:GAREnsDisciplinesPostes");
-                                        MediacentreController.insertNode("men:GARStructureUAI", doc, garEnsDisciplinesPostes, jObj.getString("s.UAI"));
-                                        MediacentreController.insertNode("men:GAREnsDisciplinePosteCode", doc, garEnsDisciplinesPostes, parts[2]);
-                                        garEnseignant.appendChild(garEnsDisciplinesPostes);
-                                        counter += 3;
+                                        String[] data = new String[2];
+                                        data[0] = jObj.getString("s.UAI");
+                                        data[1] = parts[2];
+                                        listDisciplinesPostes.add(data);
                                     }
                                 }
                             }
                             counter += 6;
-                            doc = testNumberOfOccurrences(doc);
+                            // end, so we add the last not added disciplinesPostes
                         }
+
                     }
+
+                    MediacentreController.insertNode("men:GARPersonDateNaissance", doc, garEnseignant, lastTeacherBirthDate);
+                    for( String[] data : listDisciplinesPostes ) {
+                        Element garEnsDisciplinesPostes = doc.createElement("men:GAREnsDisciplinesPostes");
+                        MediacentreController.insertNode("men:GARStructureUAI", doc, garEnsDisciplinesPostes, data[0]);
+                        MediacentreController.insertNode("men:GAREnsDisciplinePosteCode", doc, garEnsDisciplinesPostes, data[1]);
+                        garEnseignant.appendChild(garEnsDisciplinesPostes);
+                        counter += 3;
+                    }
+                    doc = testNumberOfOccurrences(doc);
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
                     mediacentreService.getPersonMefTeacher(new Handler<Either<String, JsonArray>>() {

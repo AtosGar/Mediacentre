@@ -1,4 +1,4 @@
 Mediacentre
 ===============
 
-Initialisation of webconf repository
+Initialisation of Mediacentre repository
