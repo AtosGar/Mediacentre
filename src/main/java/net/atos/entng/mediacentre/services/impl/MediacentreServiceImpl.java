@@ -119,7 +119,7 @@ public class MediacentreServiceImpl implements MediacentreService {
                 "union " +
                 "match (s:Structure)<-[DEPENDS]-(pg:ProfileGroup)<-[i1:IN]-(u:User)-[i2:IN]->(n:ManualGroup) " +
                 "where n.name = {groupName}  " +
-                "RETURN u.id, u.lastName, u.firstName, u.email, s.UAI";
+                "RETURN u.id, u.lastName, u.firstName, u.email, s.UAI order by u.id";
 
         /*String query = "MATCH (s:Structure)<-[ADMINISTRATIVE_ATTACHMENT]-(u:User)-[IN]->(n:ManualGroup) " +
                 "where n.name = {groupName} " +

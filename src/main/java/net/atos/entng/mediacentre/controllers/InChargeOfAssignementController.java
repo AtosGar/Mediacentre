@@ -54,17 +54,24 @@ public class InChargeOfAssignementController {
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
                     // men:garRespAff
+                    String lastUserId = "";
+                    Element garRespAff = null;
                     for( Object obj : members ){
-                        Element garRespAff = doc.createElement("men:GARRespAff");
-                        garEntRespAff.appendChild(garRespAff);
                         if( obj instanceof JsonObject){
                             JsonObject jObj = (JsonObject) obj;
-                            MediacentreController.insertNode( "men:GARPersonIdentifiant"             , doc, garRespAff, jObj.getString("u.id"));
-                            MediacentreController.insertNode( "men:GARPersonNom"      , doc, garRespAff, jObj.getString("u.lastName"));
-                            MediacentreController.insertNode( "men:GARPersonPrenom"         , doc, garRespAff, jObj.getString("u.firstName"));
-                            MediacentreController.insertNode( "men:GARPersonCivilite"       , doc, garRespAff, "");
-                            MediacentreController.insertNode( "men:GARPersonMail"       , doc, garRespAff, jObj.getString("u.email"));
-                            MediacentreController.insertNode( "men:GARRespAffEtab"       , doc, garRespAff, jObj.getString("s.UAI"));
+                            if( !lastUserId.equals(jObj.getString("u.id")) ) {
+                                garRespAff = doc.createElement("men:GARRespAff");
+                                garEntRespAff.appendChild(garRespAff);
+                                MediacentreController.insertNode("men:GARPersonIdentifiant", doc, garRespAff, jObj.getString("u.id"));
+                                MediacentreController.insertNode("men:GARPersonNom", doc, garRespAff, jObj.getString("u.lastName"));
+                                MediacentreController.insertNode("men:GARPersonPrenom", doc, garRespAff, jObj.getString("u.firstName"));
+                                MediacentreController.insertNode("men:GARPersonCivilite", doc, garRespAff, "");
+                                MediacentreController.insertNode("men:GARPersonMail", doc, garRespAff, jObj.getString("u.email"));
+                                MediacentreController.insertNode("men:GARRespAffEtab", doc, garRespAff, jObj.getString("s.UAI"));
+                                lastUserId = jObj.getString("u.id");
+                            } else {
+                                MediacentreController.insertNode("men:GARRespAffEtab", doc, garRespAff, jObj.getString("s.UAI"));
+                            }
                         }
                     }
 
