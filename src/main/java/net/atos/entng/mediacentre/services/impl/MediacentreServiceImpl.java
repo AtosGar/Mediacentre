@@ -140,5 +140,10 @@ public class MediacentreServiceImpl implements MediacentreService {
         neo4j.execute(query, params, validResultHandler(handler));
     }
 
+    @Override
+    public void getAllStructures(Handler<Either<String, JsonArray>> handler) {
+        String query = "match (s:Structure) return s.UAI, s.externalId";
+        neo4j.execute(query, new JsonObject(), validResultHandler(handler));
+    }
 
 }

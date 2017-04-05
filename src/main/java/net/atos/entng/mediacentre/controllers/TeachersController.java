@@ -18,6 +18,8 @@ import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
 import java.io.File;
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
 
 import static net.atos.entng.mediacentre.controllers.MediacentreController.getExportFileName;
 
@@ -37,134 +39,147 @@ public class TeachersController {
         counter = 0;
         pathExport = path;
         nbElem = nbElementPerFile;
-        mediacentreService.getTeachersExportData(new Handler<Either<String, JsonArray>>() {
+        mediacentreService.getAllStructures(new Handler<Either<String, JsonArray>>() {
             @Override
             public void handle(Either<String, JsonArray> event) {
-                if( event.isRight()){
-                    // write the content into xml file
-                    final JsonArray students = event.right().getValue();
-                    doc = fileHeader();
-//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-                    // men:GAREleve
-                    String lastTeacherId = "";
-                    String lastTeacherBirthDate = "";
-                    Element garEnseignant = null;
-                    ArrayList<String[]> listDisciplinesPostes = new ArrayList<String[]>();
-                    for( Object obj : students ){
-                        if( obj instanceof JsonObject){
+                if (event.isRight()) {
+                    // construct hashmap association between UAI and externalId
+                    final Map<String, String> mapStructures = new HashMap<String, String>();
+                    JsonArray allStructures = event.right().getValue();
+                    for (Object obj : allStructures) {
+                        if (obj instanceof JsonObject) {
                             JsonObject jObj = (JsonObject) obj;
-                            if( jObj.getString("u.id") != null && !lastTeacherId.equals(jObj.getString("u.id")) ) {
-                                // add all the disciplinesPostes, because it's a new node
-                                if( garEnseignant != null ) {
-                                    MediacentreController.insertNode("men:GARPersonDateNaissance", doc, garEnseignant, lastTeacherBirthDate);
-                                    for (String[] data : listDisciplinesPostes) {
-                                        Element garEnsDisciplinesPostes = doc.createElement("men:GAREnsDisciplinesPostes");
-                                        MediacentreController.insertNode("men:GARStructureUAI", doc, garEnsDisciplinesPostes, data[0]);
-                                        MediacentreController.insertNode("men:GAREnsDisciplinePosteCode", doc, garEnsDisciplinesPostes, data[1]);
-                                        garEnseignant.appendChild(garEnsDisciplinesPostes);
-                                        counter += 3;
-                                    }
-                                }
-                                doc = testNumberOfOccurrences(doc);
-                                listDisciplinesPostes = new ArrayList<String[]>();
-                                garEnseignant = doc.createElement("men:GAREnseignant");
-                                garEntEnseignant.appendChild(garEnseignant);
-                                MediacentreController.insertNode("men:GARPersonIdentifiant", doc, garEnseignant, jObj.getString("u.id"));
-                                // PersonProfils
-                                Element garProfil = doc.createElement("men:GARPersonProfils");
-                                MediacentreController.insertNode("men:GARStructureUAI", doc, garProfil, jObj.getString("s.UAI"));
-                                if ("Personnel".equals(jObj.getString("p.name"))) {
-                                    MediacentreController.insertNode("men:GARPersonProfil", doc, garProfil, "National_doc");
-                                } else {
-                                    MediacentreController.insertNode("men:GARPersonProfil", doc, garProfil, "National_ens");
-                                }
-                                garEnseignant.appendChild(garProfil);
-                                MediacentreController.insertNode("men:GARPersonNomPatro", doc, garEnseignant, jObj.getString("u.lastName"));
-                                MediacentreController.insertNode("men:GARPersonNom", doc, garEnseignant, jObj.getString("u.lastName"));
-                                MediacentreController.insertNode("men:GARPersonPrenom", doc, garEnseignant, jObj.getString("u.firstName"));
-                                if (jObj.getString("u.otherNames") != null) {
-                                    MediacentreController.insertNode("men:GARPersonAutresPrenoms", doc, garEnseignant, jObj.getString("u.otherNames"));
-                                } else {
-                                    MediacentreController.insertNode("men:GARPersonAutresPrenoms", doc, garEnseignant, jObj.getString("u.firstName"));
-                                }
-                                MediacentreController.insertNode("men:GARPersonCivilite", doc, garEnseignant, jObj.getString(""));
-                                MediacentreController.insertNode("men:GARPersonStructRattach", doc, garEnseignant, jObj.getString("s.UAI"));
-                                MediacentreController.insertNode("men:GARPersonEtab", doc, garEnseignant, jObj.getString("s.UAI"));
-                                if( jObj.getString("s2.UAI") != null ) {
-                                    MediacentreController.insertNode("men:GARPersonEtab", doc, garEnseignant, jObj.getString("s2.UAI"));
-                                }
-                                lastTeacherId = jObj.getString("u.id");
-                                lastTeacherBirthDate = jObj.getString("u.birthDate");
-                            } else {
-                                if( jObj.getString("s2.UAI") != null ) {
-                                    MediacentreController.insertNode("men:GARPersonEtab", doc, garEnseignant, jObj.getString("s2.UAI"));
-                                }
-                                counter += 9;
-                                // EnsDisciplinesPostes : save all, in order to place them at the END of node  (after ALL s2.UAI)
-                                if( jObj.getArray("u.functions") != null && jObj.getArray("u.functions").size() > 0 ) {
-                                    JsonArray functionsArray = jObj.getArray("u.functions");
-                                    for (int i = 0; i < functionsArray.size(); i++) {
-                                        String function = functionsArray.get(i).toString();
-                                        String[] parts = function.split("\\$");
-                                        String[] data = new String[2];
-                                        data[0] = jObj.getString("s.UAI");
-                                        data[1] = parts[2];
-                                        listDisciplinesPostes.add(data);
-                                    }
-                                }
-                            }
-                            counter += 6;
-                            // end, so we add the last not added disciplinesPostes
+                            mapStructures.put(jObj.getString("s.externalId"), jObj.getString("s.UAI"));
                         }
-
                     }
-
-                    MediacentreController.insertNode("men:GARPersonDateNaissance", doc, garEnseignant, lastTeacherBirthDate);
-                    for( String[] data : listDisciplinesPostes ) {
-                        Element garEnsDisciplinesPostes = doc.createElement("men:GAREnsDisciplinesPostes");
-                        MediacentreController.insertNode("men:GARStructureUAI", doc, garEnsDisciplinesPostes, data[0]);
-                        MediacentreController.insertNode("men:GAREnsDisciplinePosteCode", doc, garEnsDisciplinesPostes, data[1]);
-                        garEnseignant.appendChild(garEnsDisciplinesPostes);
-                        counter += 3;
-                    }
-                    doc = testNumberOfOccurrences(doc);
-
-//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-                    mediacentreService.getPersonMefTeacher(new Handler<Either<String, JsonArray>>() {
+                    mediacentreService.getTeachersExportData(new Handler<Either<String, JsonArray>>() {
                         @Override
                         public void handle(Either<String, JsonArray> event) {
                             if (event.isRight()) {
                                 // write the content into xml file
-                                JsonArray personMef = event.right().getValue();
-                                // men:GARPersonMEF
-                                for (Object obj : personMef) {
+                                final JsonArray students = event.right().getValue();
+                                doc = fileHeader();
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+                                // men:GAREleve
+                                String lastTeacherId = "";
+                                String lastTeacherBirthDate = "";
+                                Element garEnseignant = null;
+                                ArrayList<String[]> listDisciplinesPostes = new ArrayList<String[]>();
+                                for (Object obj : students) {
                                     if (obj instanceof JsonObject) {
                                         JsonObject jObj = (JsonObject) obj;
-                                        if( jObj.getArray("u.modules") != null && jObj.getArray("u.modules").size() > 0 ) {
-                                            JsonArray modulesArray = jObj.getArray("u.modules");
-                                            for (int i = 0; i < modulesArray.size(); i++) {
-                                                String module = modulesArray.get(i).toString();
-                                                String[] parts = module.split("\\$");
-                                                Element garPersonMef = doc.createElement("men:GARPersonMEF");
-                                                garEntEnseignant.appendChild(garPersonMef);
-                                                MediacentreController.insertNode("men:GARStructureUAI", doc, garPersonMef, jObj.getString("s.UAI"));
-                                                MediacentreController.insertNode("men:GARPersonIdentifiant", doc, garPersonMef, jObj.getString("u.id"));
-                                                MediacentreController.insertNode("men:GARMEFCode", doc, garPersonMef, parts[1]);
-                                                counter += 4;
+                                        if (jObj.getString("u.id") != null && !lastTeacherId.equals(jObj.getString("u.id"))) {
+                                            // add all the disciplinesPostes, because it's a new node
+                                            if (garEnseignant != null) {
+                                                MediacentreController.insertNode("men:GARPersonDateNaissance", doc, garEnseignant, lastTeacherBirthDate);
+                                                for (String[] data : listDisciplinesPostes) {
+                                                    Element garEnsDisciplinesPostes = doc.createElement("men:GAREnsDisciplinesPostes");
+                                                    MediacentreController.insertNode("men:GARStructureUAI", doc, garEnsDisciplinesPostes, mapStructures.get(data[0]));
+                                                    MediacentreController.insertNode("men:GAREnsDisciplinePosteCode", doc, garEnsDisciplinesPostes, data[1]);
+                                                    garEnseignant.appendChild(garEnsDisciplinesPostes);
+                                                    counter += 3;
+                                                }
+                                            }
+                                            doc = testNumberOfOccurrences(doc);
+                                            listDisciplinesPostes = new ArrayList<String[]>();
+                                            garEnseignant = doc.createElement("men:GAREnseignant");
+                                            garEntEnseignant.appendChild(garEnseignant);
+                                            MediacentreController.insertNode("men:GARPersonIdentifiant", doc, garEnseignant, jObj.getString("u.id"));
+                                            // PersonProfils
+                                            Element garProfil = doc.createElement("men:GARPersonProfils");
+                                            MediacentreController.insertNode("men:GARStructureUAI", doc, garProfil, jObj.getString("s.UAI"));
+                                            if ("Personnel".equals(jObj.getString("p.name"))) {
+                                                MediacentreController.insertNode("men:GARPersonProfil", doc, garProfil, "National_doc");
+                                            } else {
+                                                MediacentreController.insertNode("men:GARPersonProfil", doc, garProfil, "National_ens");
+                                            }
+                                            garEnseignant.appendChild(garProfil);
+                                            MediacentreController.insertNode("men:GARPersonNomPatro", doc, garEnseignant, jObj.getString("u.lastName"));
+                                            MediacentreController.insertNode("men:GARPersonNom", doc, garEnseignant, jObj.getString("u.lastName"));
+                                            MediacentreController.insertNode("men:GARPersonPrenom", doc, garEnseignant, jObj.getString("u.firstName"));
+                                            if (jObj.getString("u.otherNames") != null) {
+                                                MediacentreController.insertNode("men:GARPersonAutresPrenoms", doc, garEnseignant, jObj.getString("u.otherNames"));
+                                            } else {
+                                                MediacentreController.insertNode("men:GARPersonAutresPrenoms", doc, garEnseignant, jObj.getString("u.firstName"));
+                                            }
+                                            MediacentreController.insertNode("men:GARPersonCivilite", doc, garEnseignant, jObj.getString(""));
+                                            MediacentreController.insertNode("men:GARPersonStructRattach", doc, garEnseignant, jObj.getString("s.UAI"));
+                                            MediacentreController.insertNode("men:GARPersonEtab", doc, garEnseignant, jObj.getString("s.UAI"));
+                                            if (jObj.getString("s2.UAI") != null) {
+                                                MediacentreController.insertNode("men:GARPersonEtab", doc, garEnseignant, jObj.getString("s2.UAI"));
+                                            }
+                                            lastTeacherId = jObj.getString("u.id");
+                                            lastTeacherBirthDate = jObj.getString("u.birthDate");
+                                        } else {
+                                            if (jObj.getString("s2.UAI") != null) {
+                                                MediacentreController.insertNode("men:GARPersonEtab", doc, garEnseignant, jObj.getString("s2.UAI"));
+                                            }
+                                            counter += 9;
+                                            // EnsDisciplinesPostes : save all, in order to place them at the END of node  (after ALL s2.UAI)
+                                            if (jObj.getArray("u.functions") != null && jObj.getArray("u.functions").size() > 0) {
+                                                JsonArray functionsArray = jObj.getArray("u.functions");
+                                                for (int i = 0; i < functionsArray.size(); i++) {
+                                                    String function = functionsArray.get(i).toString();
+                                                    String[] parts = function.split("\\$");
+                                                    String[] data = new String[2];
+                                                    data[0] = parts[0]; //jObj.getString("s.UAI");
+                                                    data[1] = parts[2];
+                                                    listDisciplinesPostes.add(data);
+                                                }
                                             }
                                         }
+                                        counter += 6;
+                                        // end, so we add the last not added disciplinesPostes
                                     }
-                                    doc = testNumberOfOccurrences(doc);
+
                                 }
 
-//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-                                try {
-                                    TransformerFactory transformerFactory = TransformerFactory.newInstance();
-                                    Transformer transformer = transformerFactory.newTransformer();
-                                    DOMSource source = new DOMSource(doc);
-                                    StreamResult result = new StreamResult(new File(path + getExportFileName("Enseignant", fileIndex)));
+                                MediacentreController.insertNode("men:GARPersonDateNaissance", doc, garEnseignant, lastTeacherBirthDate);
+                                for (String[] data : listDisciplinesPostes) {
+                                    Element garEnsDisciplinesPostes = doc.createElement("men:GAREnsDisciplinesPostes");
+                                    MediacentreController.insertNode("men:GARStructureUAI", doc, garEnsDisciplinesPostes,  mapStructures.get(data[0]));
+                                    MediacentreController.insertNode("men:GAREnsDisciplinePosteCode", doc, garEnsDisciplinesPostes, data[1]);
+                                    garEnseignant.appendChild(garEnsDisciplinesPostes);
+                                    counter += 3;
+                                }
+                                doc = testNumberOfOccurrences(doc);
 
-                                    transformer.transform(source, result);
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+                                mediacentreService.getPersonMefTeacher(new Handler<Either<String, JsonArray>>() {
+                                    @Override
+                                    public void handle(Either<String, JsonArray> event) {
+                                        if (event.isRight()) {
+                                            // write the content into xml file
+                                            JsonArray personMef = event.right().getValue();
+                                            // men:GARPersonMEF
+                                            for (Object obj : personMef) {
+                                                if (obj instanceof JsonObject) {
+                                                    JsonObject jObj = (JsonObject) obj;
+                                                    if (jObj.getArray("u.modules") != null && jObj.getArray("u.modules").size() > 0) {
+                                                        JsonArray modulesArray = jObj.getArray("u.modules");
+                                                        for (int i = 0; i < modulesArray.size(); i++) {
+                                                            String module = modulesArray.get(i).toString();
+                                                            String[] parts = module.split("\\$");
+                                                            Element garPersonMef = doc.createElement("men:GARPersonMEF");
+                                                            garEntEnseignant.appendChild(garPersonMef);
+                                                            MediacentreController.insertNode("men:GARStructureUAI", doc, garPersonMef, mapStructures.get(parts[0]));
+                                                            MediacentreController.insertNode("men:GARPersonIdentifiant", doc, garPersonMef, jObj.getString("u.id"));
+                                                            MediacentreController.insertNode("men:GARMEFCode", doc, garPersonMef, parts[1]);
+                                                            counter += 4;
+                                                        }
+                                                    }
+                                                }
+                                                doc = testNumberOfOccurrences(doc);
+                                            }
+
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+                                            try {
+                                                TransformerFactory transformerFactory = TransformerFactory.newInstance();
+                                                Transformer transformer = transformerFactory.newTransformer();
+                                                DOMSource source = new DOMSource(doc);
+                                                StreamResult result = new StreamResult(new File(path + getExportFileName("Enseignant", fileIndex)));
+
+                                                transformer.transform(source, result);
 /*                                    boolean res = MediacentreController.isFileValid(pathExport + getExportFileName("Enseignants", fileIndex));
                                     if( res == false ){
                                         System.out.println("Error on file : " + pathExport + getExportFileName("Enseignants", fileIndex));
@@ -172,14 +187,17 @@ public class TeachersController {
                                         System.out.println("File valid : " + pathExport + getExportFileName("Enseignants", fileIndex));
                                     }*/
 
-                                    System.out.println("Teachers saved");
-                                } catch (TransformerException tfe) {
-                                    tfe.printStackTrace();
+                                                System.out.println("Teachers saved");
+                                            } catch (TransformerException tfe) {
+                                                tfe.printStackTrace();
 /*                                } catch (SAXException e) {
                                     e.printStackTrace();
                                 } catch (IOException e) {
                                     e.printStackTrace();*/
-                                }
+                                            }
+                                        }
+                                    }
+                                });
                             }
                         }
                     });

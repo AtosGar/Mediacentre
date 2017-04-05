@@ -35,4 +35,6 @@ public interface MediacentreService {
 
     void getUserStructures(String userId, Handler<Either<String, JsonArray>> handler);
 
+    void getAllStructures(Handler<Either<String, JsonArray>> handler);
+
 }
