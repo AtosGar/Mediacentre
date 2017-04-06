@@ -46,13 +46,22 @@ public class StructuresController {
                     doc = fileHeader();
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
                     // men:GAREtab
-                    String lastStructureId = "";
+                    String lastStructureId = "none";
+                    String lastContract = "";
+                    String lastPhone = "";
                     Element garEtab = null;
                     for( Object obj : structures ){
                         if( obj instanceof JsonObject){
-                            doc = testNumberOfOccurrences(doc);
                             JsonObject jObj = (JsonObject) obj;
-                            if( jObj.getString("s.UAI") != null && jObj.getString("s.UAI") != lastStructureId ) {
+                            if( jObj.getString("s.UAI") != null && !jObj.getString("s.UAI").equals(lastStructureId) ) {
+                                // we finish the precedent node, if exists
+                                if( !"none".equals(lastStructureId) ) {
+                                    MediacentreController.insertNode("men:GARStructureContrat", doc, garEtab, lastContract);
+                                    MediacentreController.insertNode("men:GARStructureTelephone", doc, garEtab, lastPhone);
+                                    //MediacentreController.insertNode("men:GARStructureEmail", doc, garEtab, "null");
+                                }
+                                doc = testNumberOfOccurrences(doc);
+                                lastStructureId = jObj.getString("s.UAI");
                                 garEtab = doc.createElement("men:GAREtab");
                                 garEntEtablissement.appendChild(garEtab);
                                 //GARPersonIdentifiant
@@ -68,11 +77,15 @@ public class StructuresController {
                                     counter ++;
                                 }
                             }
-                                MediacentreController.insertNode("men:GARStructureContrat", doc, garEtab, jObj.getString("s.contract"));
-                                MediacentreController.insertNode("men:GARStructureTelephone", doc, garEtab, jObj.getString("s.phone"));
-                                //MediacentreController.insertNode("men:GARStructureEmail", doc, garEtab, "null");
+                            lastContract = jObj.getString("s.contract");
+                            lastPhone = jObj.getString("s.phone");
                         }
-
+                    }
+                    // we finish the last node
+                    if( !"none".equals(lastStructureId) ) {
+                        MediacentreController.insertNode("men:GARStructureContrat", doc, garEtab, lastContract);
+                        MediacentreController.insertNode("men:GARStructureTelephone", doc, garEtab, lastPhone);
+                        //MediacentreController.insertNode("men:GARStructureEmail", doc, garEtab, "null");
                     }
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
