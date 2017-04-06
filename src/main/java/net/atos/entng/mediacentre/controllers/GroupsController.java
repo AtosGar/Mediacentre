@@ -11,6 +11,7 @@ import org.w3c.dom.Element;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
+import javax.xml.transform.OutputKeys;
 import javax.xml.transform.Transformer;
 import javax.xml.transform.TransformerException;
 import javax.xml.transform.TransformerFactory;
@@ -255,6 +256,8 @@ public class GroupsController {
                                                 try {
                                                     TransformerFactory transformerFactory = TransformerFactory.newInstance();
                                                     Transformer transformer = transformerFactory.newTransformer();
+                                                    transformer.setOutputProperty(OutputKeys.INDENT, "yes");
+                                                    transformer.setOutputProperty("{http://xml.apache.org/xslt}indent-amount", "2");
                                                     DOMSource source = new DOMSource(doc);
                                                     StreamResult result = new StreamResult(new File(path + getExportFileName("Groupe", fileIndex)));
 
@@ -293,6 +296,8 @@ public class GroupsController {
             try {
                 TransformerFactory transformerFactory = TransformerFactory.newInstance();
                 Transformer transformer = transformerFactory.newTransformer();
+                transformer.setOutputProperty(OutputKeys.INDENT, "yes");
+                transformer.setOutputProperty("{http://xml.apache.org/xslt}indent-amount", "2");
                 DOMSource source = new DOMSource(doc);
                 StreamResult result = new StreamResult(new File(pathExport + getExportFileName("Groupe", fileIndex)));
 
