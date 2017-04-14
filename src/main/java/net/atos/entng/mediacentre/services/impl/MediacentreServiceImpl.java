@@ -81,6 +81,12 @@ public class MediacentreServiceImpl implements MediacentreService {
     }
 
     @Override
+    public void getEtablissementMatiereFromStudents(Handler<Either<String, JsonArray>> handler) {
+        String query = "MATCH (u:User)-[ADMINISTRATIVE_ATTACHMENT]->(s:Structure) RETURN distinct u.fieldOfStudyLabels, u.fieldOfStudy, s.UAI order by s.UAI;";
+        neo4j.execute(query, new JsonObject(), validResultHandler(handler));
+    }
+
+    @Override
     public void getGroupsExportData(Handler<Either<String, JsonArray>> handler) {
         String query = "match (s:Structure)<-[BELONGS]-(c:Class)<-[d:DEPENDS]-(pg:ProfileGroup)<-[IN]-(u:User)-[COMMUNIQUE]->(fg:FunctionalGroup)-[d2:DEPENDS]->(s2:Structure) " +
                 " where s.id = s2.id " +

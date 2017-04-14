@@ -23,6 +23,8 @@ public interface MediacentreService {
 
     void getEtablissementMatiere(Handler<Either<String, JsonArray>> handler);
 
+    void getEtablissementMatiereFromStudents(Handler<Either<String, JsonArray>> handler);
+
     void getGroupsExportData(Handler<Either<String, JsonArray>> handler);
 
     void getDivisionsExportData(Handler<Either<String, JsonArray>> handler);

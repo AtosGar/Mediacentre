@@ -19,10 +19,47 @@ import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
 import java.io.File;
+import java.util.HashMap;
+import java.util.Map;
 
 import static net.atos.entng.mediacentre.controllers.MediacentreController.getExportFileName;
 
 public class StructuresController {
+
+    public class GARStructureMatiereEleveKey{
+        private String uai;
+        private String subCode;
+        private String subName;
+
+        GARStructureMatiereEleveKey(String uai, String subCode){
+            this.uai = uai;
+            this.subCode = subCode;
+        }
+
+        @Override
+        public int hashCode() {
+            return (getUai() + getSubCode() ).hashCode();
+        }
+
+        @Override
+        public boolean equals(Object obj) {
+            if( obj instanceof GARStructureMatiereEleveKey){
+                GARStructureMatiereEleveKey key = (GARStructureMatiereEleveKey)obj;
+                return key.getUai().equals(this.getUai()) &&
+                        key.getSubCode().equals(this.getSubCode());
+            }
+            return false;
+        }
+
+        public String getUai() {
+            return uai;
+        }
+
+        public String getSubCode() {
+            return subCode;
+        }
+
+    }
 
     private     int counter = 0;            // nb of elements currently put in the file
     private     int nbElem = 10000;         // max elements authorized in a file
@@ -132,30 +169,85 @@ public class StructuresController {
                                                 counter += 4;
                                                 doc = testNumberOfOccurrences(doc);
                                             }
-//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-                                            try {
-                                                TransformerFactory transformerFactory = TransformerFactory.newInstance();
-                                                Transformer transformer = transformerFactory.newTransformer();
-                                                transformer.setOutputProperty(OutputKeys.INDENT, "yes");
-                                                transformer.setOutputProperty("{http://xml.apache.org/xslt}indent-amount", "2");
-                                                DOMSource source = new DOMSource(doc);
-                                                StreamResult result = new StreamResult(new File(path + getExportFileName("Etab", fileIndex)));
-                                                transformer.transform(source, result);
 
-                                                System.out.println("Structures saved");
-/*                                                boolean res = MediacentreController.isFileValid(pathExport + getExportFileName("Etab", fileIndex));
-                                                if( res == false ){
-                                                    System.out.println("Error on file : " + pathExport + getExportFileName("Etab", fileIndex));
-                                                } else {
-                                                    System.out.println("File valid : " + pathExport + getExportFileName("Etab", fileIndex));
-                                                }*/
-                                            } catch (TransformerException tfe) {
-                                                tfe.printStackTrace();
-                                    /*        } catch (SAXException e) {
-                                                e.printStackTrace();
-                                            } catch (IOException e) {
-                                                e.printStackTrace();*/
-                                            }
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+                                            mediacentreService.getEtablissementMatiereFromStudents(new Handler<Either<String, JsonArray>>() {
+                                                @Override
+                                                public void handle(Either<String, JsonArray> event) {
+                                                    if (event.isRight()) {
+                                                        Map<GARStructureMatiereEleveKey, String> mapSubjectStudent = new HashMap<>();
+                                                        JsonArray etablissementMatiereEleve = event.right().getValue();
+                                                        // men:GARMAtiere
+                                                        for (Object obj : etablissementMatiereEleve) {
+                                                            // construct the map
+                                                            if (obj instanceof JsonObject) {
+                                                                JsonObject jObj = (JsonObject) obj;
+                                                                if (jObj.getArray("u.fieldOfStudy") != null && jObj.getArray("u.fieldOfStudy").size() > 0) {
+                                                                    String uai = jObj.getString("s.UAI");
+                                                                    // getting the names
+                                                                    String[] subNames = new String[jObj.getArray("u.fieldOfStudyLabels").size()];
+                                                                    int cpt = 0;
+                                                                    for (Object subName : jObj.getArray("u.fieldOfStudyLabels")) {
+                                                                        if (subName instanceof String) {
+                                                                            String strSubName = (String)subName;
+                                                                            subNames[cpt] = strSubName;
+                                                                            cpt++;
+                                                                        }
+                                                                    }
+                                                                    // filling the map
+                                                                    cpt = 0;
+                                                                    for (Object subCode : jObj.getArray("u.fieldOfStudy")) {
+                                                                        if (subCode instanceof String) {
+                                                                            GARStructureMatiereEleveKey key = new GARStructureMatiereEleveKey(uai, (String) subCode);
+                                                                            mapSubjectStudent.put(key, subNames[cpt]);
+                                                                            cpt++;
+                                                                        }
+                                                                    }
+
+                                                                }
+                                                            }
+                                                        }
+
+                                                        // now, making the nodes in xml file, with datas from mapSubjectStudent
+                                                        for (Map.Entry<GARStructureMatiereEleveKey, String> entry : mapSubjectStudent.entrySet()) {
+                                                            GARStructureMatiereEleveKey key = entry.getKey();
+                                                            String subName = entry.getValue();
+                                                            Element garEtablissementMatiere = doc.createElement("men:GARMatiere");
+                                                            garEntEtablissement.appendChild(garEtablissementMatiere);
+                                                            MediacentreController.insertNode("men:GARStructureUAI",    doc, garEtablissementMatiere, key.getUai());
+                                                            MediacentreController.insertNode("men:GARMatiereCode",     doc, garEtablissementMatiere, key.getSubCode());
+                                                            MediacentreController.insertNode("men:GARMatiereLibelle",  doc, garEtablissementMatiere, subName);
+                                                            counter += 4;
+                                                            doc = testNumberOfOccurrences(doc);
+                                                        }
+
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+                                                        try {
+                                                            TransformerFactory transformerFactory = TransformerFactory.newInstance();
+                                                            Transformer transformer = transformerFactory.newTransformer();
+                                                            transformer.setOutputProperty(OutputKeys.INDENT, "yes");
+                                                            transformer.setOutputProperty("{http://xml.apache.org/xslt}indent-amount", "2");
+                                                            DOMSource source = new DOMSource(doc);
+                                                            StreamResult result = new StreamResult(new File(path + getExportFileName("Etab", fileIndex)));
+                                                            transformer.transform(source, result);
+
+                                                            System.out.println("Structures saved");
+        /*                                                boolean res = MediacentreController.isFileValid(pathExport + getExportFileName("Etab", fileIndex));
+                                                        if( res == false ){
+                                                            System.out.println("Error on file : " + pathExport + getExportFileName("Etab", fileIndex));
+                                                        } else {
+                                                            System.out.println("File valid : " + pathExport + getExportFileName("Etab", fileIndex));
+                                                        }*/
+                                                        } catch (TransformerException tfe) {
+                                                            tfe.printStackTrace();
+                                            /*        } catch (SAXException e) {
+                                                        e.printStackTrace();
+                                                    } catch (IOException e) {
+                                                        e.printStackTrace();*/
+                                                        }
+                                                    }
+                                                }
+                                            });
                                         }
                                     }
                                 });
