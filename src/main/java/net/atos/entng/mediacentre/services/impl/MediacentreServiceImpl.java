@@ -75,6 +75,12 @@ public class MediacentreServiceImpl implements MediacentreService {
     }
 
     @Override
+    public void getEtablissementMefFromTeacher(Handler<Either<String, JsonArray>> handler) {
+        String query = "MATCH (u:User)-[ADMINISTRATIVE_ATTACHMENT]->(s:Structure) RETURN distinct u.modules, s.UAI";
+        neo4j.execute(query, new JsonObject(), validResultHandler(handler));
+    }
+
+    @Override
     public void getEtablissementMatiere(Handler<Either<String, JsonArray>> handler) {
         String query = "match (sub:Subject)-[SUBJECT]->(s:Structure) return sub.label, sub.code, s.UAI order by s.UAI";
         neo4j.execute(query, new JsonObject(), validResultHandler(handler));

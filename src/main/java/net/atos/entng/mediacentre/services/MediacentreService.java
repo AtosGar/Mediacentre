@@ -21,6 +21,8 @@ public interface MediacentreService {
 
     void getEtablissementMef(Handler<Either<String, JsonArray>> handler);
 
+    void getEtablissementMefFromTeacher(Handler<Either<String, JsonArray>> handler);
+
     void getEtablissementMatiere(Handler<Either<String, JsonArray>> handler);
 
     void getEtablissementMatiereFromStudents(Handler<Either<String, JsonArray>> handler);
