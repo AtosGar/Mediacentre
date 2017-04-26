@@ -1,5 +1,0 @@
-{ "httpMethod" : "GET", "path" : "/isExportButtonVisible", "method" : "isExportButtonVisible", "regex" : false}
-{ "httpMethod" : "GET", "path" : "/getUserStructures/:userId", "method" : "getUserStructures", "regex" : false}
-{ "httpMethod" : "GET", "path" : "/getRessources/:structureUAI", "method" : "getRessources", "regex" : false}
-{ "httpMethod" : "GET", "path" : "/exportXML", "method" : "exportXML", "regex" : false}
-{ "httpMethod" : "GET", "path" : "", "method" : "view", "regex" : false}
