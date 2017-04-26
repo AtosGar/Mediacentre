@@ -235,7 +235,7 @@ public class GroupsController {
                                                     }
 
                                                     // making xml
-                                                    for (Map.Entry<GAREnsGroupeMatiereKey, Set<String>> entry : mapClasses.entrySet()) {
+                                                    for (Map.Entry<GAREnsGroupeMatiereKey, Set<String>> entry : mapGroupes.entrySet()) {
                                                         GAREnsGroupeMatiereKey key = entry.getKey();
                                                         Set<String> currentList = entry.getValue();
                                                         garEnGroupeMatiere = doc.createElement("men:GAREnsGroupeMatiere");
@@ -254,7 +254,7 @@ public class GroupsController {
                                                         doc = testNumberOfOccurrences(doc);
                                                     }
 
-                                                    for (Map.Entry<GAREnsGroupeMatiereKey, Set<String>> entry : mapGroupes.entrySet()) {
+                                                    for (Map.Entry<GAREnsGroupeMatiereKey, Set<String>> entry : mapClasses.entrySet()) {
                                                         GAREnsGroupeMatiereKey key = entry.getKey();
                                                         Set<String> currentList = entry.getValue();
                                                         garEnGroupeMatiere = doc.createElement("men:GAREnsClasseMatiere");
