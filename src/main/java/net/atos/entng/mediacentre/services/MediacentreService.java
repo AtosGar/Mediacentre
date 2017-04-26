@@ -33,6 +33,8 @@ public interface MediacentreService {
 
     void getPersonGroupe(Handler<Either<String, JsonArray>> handler);
 
+    void getPersonGroupeStudent(Handler<Either<String, JsonArray>> handler);
+
     void getEnsGroupAndClassMatiere(Handler<Either<String, JsonArray>> handler);
 
     void getInChargeOfExportData(String groupName, Handler<Either<String, JsonArray>> handler);

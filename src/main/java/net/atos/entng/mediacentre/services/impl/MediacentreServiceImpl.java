@@ -96,7 +96,7 @@ public class MediacentreServiceImpl implements MediacentreService {
     public void getGroupsExportData(Handler<Either<String, JsonArray>> handler) {
         String query = "match (s:Structure)<-[BELONGS]-(c:Class)<-[d:DEPENDS]-(pg:ProfileGroup)<-[IN]-(u:User)-[COMMUNIQUE]->(fg:FunctionalGroup)-[d2:DEPENDS]->(s2:Structure) " +
                 " where s.id = s2.id " +
-                " return distinct s.UAI, s.name, c.name, c.id, c.externalId, fg.id, fg.externalId, fg.name order by s.UAI";
+                " return distinct s.UAI, s.name, c.name, c.id, c.externalId, fg.id, fg.externalId, fg.name order by s.UAI, fg.externalId, c.externalId";
         neo4j.execute(query, new JsonObject(), validResultHandler(handler));
     }
 
@@ -113,6 +113,14 @@ public class MediacentreServiceImpl implements MediacentreService {
                 "return distinct fg.id, fg.externalId, u.id, s.UAI";
         neo4j.execute(query, new JsonObject(), validResultHandler(handler));
     }
+
+    @Override
+    public void getPersonGroupeStudent(Handler<Either<String, JsonArray>> handler) {
+        String query = "MATCH (u:User)-[IN]->(pg:ProfileGroup)-[DEPENDS]->(c:Class)-[BELONGS]->(s:Structure) return distinct pg.id, pg.externalId, u.id, s.UAI, c.id, c.externalId";
+        neo4j.execute(query, new JsonObject(), validResultHandler(handler));
+    }
+
+
 
     @Override
     public void getEnsGroupAndClassMatiere(Handler<Either<String, JsonArray>> handler) {

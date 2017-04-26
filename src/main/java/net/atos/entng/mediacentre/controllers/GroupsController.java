@@ -152,7 +152,7 @@ public class GroupsController {
                                                     garEntGroup.appendChild(garPersonGroup);
                                                     MediacentreController.insertNode("men:GARStructureUAI", doc, garPersonGroup, jObj.getString("s.UAI"));
                                                     MediacentreController.insertNode("men:GARPersonIdentifiant", doc, garPersonGroup, jObj.getString("u.id"));
-                                                    if( jObj.getString("fg.externalId") != null && "null".equals(jObj.getString("fg.externalId"))) {
+                                                    if (jObj.getString("fg.externalId") != null && !"null".equals(jObj.getString("fg.externalId"))) {
                                                         MediacentreController.insertNode("men:GARGroupeCode", doc, garPersonGroup, jObj.getString("fg.externalId"));
                                                     } else {
                                                         MediacentreController.insertNode("men:GARGroupeCode", doc, garPersonGroup, jObj.getString("fg.id"));
@@ -163,9 +163,32 @@ public class GroupsController {
                                             }
                                         }
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-                                        mediacentreService.getEnsGroupAndClassMatiere(new Handler<Either<String, JsonArray>>() {
+                                        mediacentreService.getPersonGroupeStudent(new Handler<Either<String, JsonArray>>() {
                                             @Override
                                             public void handle(Either<String, JsonArray> event) {
+                                                if (event.isRight()) {
+                                                    // write the content into xml file
+                                                    JsonArray personGroupe = event.right().getValue();
+                                                    // men:GARPersonGroup
+                                                    Element garPersonGroup = null;
+                                                    for (Object obj : personGroupe) {
+                                                        if (obj instanceof JsonObject) {
+                                                            JsonObject jObj = (JsonObject) obj;
+                                                            garPersonGroup = doc.createElement("men:GARPersonGroupe");
+                                                            garEntGroup.appendChild(garPersonGroup);
+                                                            MediacentreController.insertNode("men:GARStructureUAI", doc, garPersonGroup, jObj.getString("s.UAI"));
+                                                            MediacentreController.insertNode("men:GARPersonIdentifiant", doc, garPersonGroup, jObj.getString("u.id"));
+                                                            if (jObj.getString("c.externalId") != null && !"null".equals(jObj.getString("c.externalId"))) {
+                                                                MediacentreController.insertNode("men:GARGroupeCode", doc, garPersonGroup, jObj.getString("c.externalId"));
+                                                            } else {
+                                                                MediacentreController.insertNode("men:GARGroupeCode", doc, garPersonGroup, jObj.getString("c.id"));
+                                                            }
+                                                            counter += 4;
+                                                            doc = testNumberOfOccurrences(doc);
+                                                        }
+                                                    }
+                                                }
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
                                                 if (event.isRight()) {
                                                     // write the content into xml file
                                                     JsonArray enGroupeAndClasseMatiere = event.right().getValue();
@@ -278,17 +301,16 @@ public class GroupsController {
                                                     e.printStackTrace();*/
                                                 }
                                             }
-                                        });
+                                        }); // end getPersonGroupeStudents
                                     }
-                                });
+                                }); // end getPersonGroupe
                             }
-                        }
-                    });
+                         }
+                    }); // end getGroupsExportData
                 }
-
             }
-        });
-    }
+        }); // end getDivisionsExportData
+    } // end exportGroups
 
     private Document testNumberOfOccurrences(Document doc) {
         if (nbElem <= counter) {
