@@ -1,8 +1,6 @@
 var mediacentreBehaviours = {
 	workflow: {
 		exportXML: 'net.atos.entng.mediacentre.controllers.ResourceController|exportXML',
-		//listMyTickets: 'net.atos.entng.support.controllers.TicketController|listUserTickets',
-		//listAllTickets: 'net.atos.entng.support.controllers.TicketController|listTickets'
 	}
 };
 

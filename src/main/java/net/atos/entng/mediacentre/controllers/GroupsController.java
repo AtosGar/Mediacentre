@@ -121,7 +121,7 @@ public class GroupsController {
                                             doc = testNumberOfOccurrences(doc);
                                             garGroup = doc.createElement("men:GARGroupe");
                                             garEntGroup.appendChild(garGroup);
-                                            if( jObj.getString("fg.externalId") != null && "null".equals(jObj.getString("fg.externalId"))) {
+                                            if( jObj.getString("fg.externalId") != null && !"null".equals(jObj.getString("fg.externalId"))) {
                                                 MediacentreController.insertNode("men:GARGroupeCode", doc, garGroup, jObj.getString("fg.externalId"));
                                             } else {
                                                 MediacentreController.insertNode("men:GARGroupeCode", doc, garGroup, jObj.getString("fg.id"));
