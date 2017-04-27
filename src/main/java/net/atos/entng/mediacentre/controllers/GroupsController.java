@@ -189,117 +189,122 @@ public class GroupsController {
                                                     }
                                                 }
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-                                                if (event.isRight()) {
-                                                    // write the content into xml file
-                                                    JsonArray enGroupeAndClasseMatiere = event.right().getValue();
-                                                    // men:GARPersonGroup
-                                                    Element garEnGroupeMatiere = null;
-                                                    String lastUserId = "";
-                                                    String lastStructureId = "";
-                                                    String lastGroupeCode = "";
-                                                    // preparing hashmap for xml
+                                                mediacentreService.getEnsGroupAndClassMatiere(new Handler<Either<String, JsonArray>>() {
+                                                    @Override
+                                                    public void handle(Either<String, JsonArray> event) {
+                                                        if (event.isRight()) {
+                                                            // write the content into xml file
+                                                            JsonArray enGroupeAndClasseMatiere = event.right().getValue();
+                                                            // men:GARPersonGroup
+                                                            Element garEnGroupeMatiere = null;
+                                                            String lastUserId = "";
+                                                            String lastStructureId = "";
+                                                            String lastGroupeCode = "";
+                                                            // preparing hashmap for xml
 
-                                                    Map<GAREnsGroupeMatiereKey, Set<String>> mapGroupes = new HashMap<GAREnsGroupeMatiereKey, Set<String>>();
-                                                    Map<GAREnsGroupeMatiereKey, Set<String>> mapClasses = new HashMap<GAREnsGroupeMatiereKey, Set<String>>();
-                                                    for (Object obj : enGroupeAndClasseMatiere) {
-                                                        if (obj instanceof JsonObject) {
-                                                            JsonObject jObj = (JsonObject) obj;
-                                                            if (jObj.getArray("t.groups") != null && jObj.getArray("t.groups").size() > 0) {
-                                                                JsonArray groups = jObj.getArray("t.groups");
-                                                                for (int i = 0; i < groups.size(); i++) {
-                                                                    String group = groups.get(i).toString();
-                                                                    GAREnsGroupeMatiereKey key = new GAREnsGroupeMatiereKey(jObj.getString("s.UAI"), jObj.getString("u.id"), group);
-                                                                    //String key = jObj.getString("s.UAI") + jObj.getString("u.id") + group;
-                                                                    Set currentList = mapGroupes.get(key);
-                                                                    if (currentList == null) {
-                                                                        currentList = new HashSet<String>();
-                                                                        mapGroupes.put(key, currentList);
+                                                            Map<GAREnsGroupeMatiereKey, Set<String>> mapGroupes = new HashMap<GAREnsGroupeMatiereKey, Set<String>>();
+                                                            Map<GAREnsGroupeMatiereKey, Set<String>> mapClasses = new HashMap<GAREnsGroupeMatiereKey, Set<String>>();
+                                                            for (Object obj : enGroupeAndClasseMatiere) {
+                                                                if (obj instanceof JsonObject) {
+                                                                    JsonObject jObj = (JsonObject) obj;
+                                                                    if (jObj.getArray("t.groups") != null && jObj.getArray("t.groups").size() > 0) {
+                                                                        JsonArray groups = jObj.getArray("t.groups");
+                                                                        for (int i = 0; i < groups.size(); i++) {
+                                                                            String group = groups.get(i).toString();
+                                                                            GAREnsGroupeMatiereKey key = new GAREnsGroupeMatiereKey(jObj.getString("s.UAI"), jObj.getString("u.id"), group);
+                                                                            //String key = jObj.getString("s.UAI") + jObj.getString("u.id") + group;
+                                                                            Set currentList = mapGroupes.get(key);
+                                                                            if (currentList == null) {
+                                                                                currentList = new HashSet<String>();
+                                                                                mapGroupes.put(key, currentList);
+                                                                            }
+                                                                            currentList.add(jObj.getString("sub.code"));
+                                                                        }
                                                                     }
-                                                                    currentList.add(jObj.getString("sub.code"));
+                                                                    if (jObj.getArray("t.classes") != null && jObj.getArray("t.classes").size() > 0) {
+                                                                        JsonArray classes = jObj.getArray("t.classes");
+                                                                        for (int i = 0; i < classes.size(); i++) {
+                                                                            String classe = classes.get(i).toString();
+                                                                            GAREnsGroupeMatiereKey key = new GAREnsGroupeMatiereKey(jObj.getString("s.UAI"), jObj.getString("u.id"), classe);
+                                                                            Set currentList = mapClasses.get(key);
+                                                                            if (currentList == null) {
+                                                                                currentList = new HashSet<String>();
+                                                                                mapClasses.put(key, currentList);
+                                                                            }
+                                                                            currentList.add(jObj.getString("sub.code"));
+                                                                        }
+                                                                    }
                                                                 }
                                                             }
-                                                            if (jObj.getArray("t.classes") != null && jObj.getArray("t.classes").size() > 0) {
-                                                                JsonArray classes = jObj.getArray("t.classes");
-                                                                for (int i = 0; i < classes.size(); i++) {
-                                                                    String classe = classes.get(i).toString();
-                                                                    GAREnsGroupeMatiereKey key = new GAREnsGroupeMatiereKey(jObj.getString("s.UAI"), jObj.getString("u.id"), classe);
-                                                                    Set currentList = mapClasses.get(key);
-                                                                    if (currentList == null) {
-                                                                        currentList = new HashSet<String>();
-                                                                        mapClasses.put(key, currentList);
+
+                                                            // making xml
+                                                            for (Map.Entry<GAREnsGroupeMatiereKey, Set<String>> entry : mapGroupes.entrySet()) {
+                                                                GAREnsGroupeMatiereKey key = entry.getKey();
+                                                                Set<String> currentList = entry.getValue();
+                                                                garEnGroupeMatiere = doc.createElement("men:GAREnsGroupeMatiere");
+                                                                garEntGroup.appendChild(garEnGroupeMatiere);
+                                                                MediacentreController.insertNode("men:GARStructureUAI", doc, garEnGroupeMatiere, key.getUai());
+                                                                MediacentreController.insertNode("men:GARPersonIdentifiant", doc, garEnGroupeMatiere, key.getUid());
+                                                                MediacentreController.insertNode("men:GARGroupeCode", doc, garEnGroupeMatiere, key.getGroup());
+                                                                for (Object s : currentList) {
+                                                                    if (s instanceof String) {
+                                                                        String subject = (String) s;
+                                                                        MediacentreController.insertNode("men:GARMatiereCode", doc, garEnGroupeMatiere, subject);
+                                                                        counter++;
                                                                     }
-                                                                    currentList.add(jObj.getString("sub.code"));
                                                                 }
+                                                                counter += 5;
+                                                                doc = testNumberOfOccurrences(doc);
                                                             }
-                                                        }
-                                                    }
 
-                                                    // making xml
-                                                    for (Map.Entry<GAREnsGroupeMatiereKey, Set<String>> entry : mapGroupes.entrySet()) {
-                                                        GAREnsGroupeMatiereKey key = entry.getKey();
-                                                        Set<String> currentList = entry.getValue();
-                                                        garEnGroupeMatiere = doc.createElement("men:GAREnsGroupeMatiere");
-                                                        garEntGroup.appendChild(garEnGroupeMatiere);
-                                                        MediacentreController.insertNode("men:GARStructureUAI", doc, garEnGroupeMatiere, key.getUai());
-                                                        MediacentreController.insertNode("men:GARPersonIdentifiant", doc, garEnGroupeMatiere, key.getUid());
-                                                        MediacentreController.insertNode("men:GARGroupeCode", doc, garEnGroupeMatiere, key.getGroup());
-                                                        for (Object s : currentList) {
-                                                            if (s instanceof String) {
-                                                                String subject = (String) s;
-                                                                MediacentreController.insertNode("men:GARMatiereCode", doc, garEnGroupeMatiere, subject);
-                                                                counter++;
+                                                            for (Map.Entry<GAREnsGroupeMatiereKey, Set<String>> entry : mapClasses.entrySet()) {
+                                                                GAREnsGroupeMatiereKey key = entry.getKey();
+                                                                Set<String> currentList = entry.getValue();
+                                                                garEnGroupeMatiere = doc.createElement("men:GAREnsClasseMatiere");
+                                                                garEntGroup.appendChild(garEnGroupeMatiere);
+                                                                MediacentreController.insertNode("men:GARStructureUAI", doc, garEnGroupeMatiere, key.getUai());
+                                                                MediacentreController.insertNode("men:GARPersonIdentifiant", doc, garEnGroupeMatiere, key.getUid());
+                                                                MediacentreController.insertNode("men:GARGroupeCode", doc, garEnGroupeMatiere, key.getGroup());
+                                                                for (Object s : currentList) {
+                                                                    if (s instanceof String) {
+                                                                        String subject = (String) s;
+                                                                        MediacentreController.insertNode("men:GARMatiereCode", doc, garEnGroupeMatiere, subject);
+                                                                        counter++;
+                                                                    }
+                                                                }
+                                                                counter += 5;
+                                                                doc = testNumberOfOccurrences(doc);
                                                             }
-                                                        }
-                                                        counter += 5;
-                                                        doc = testNumberOfOccurrences(doc);
-                                                    }
 
-                                                    for (Map.Entry<GAREnsGroupeMatiereKey, Set<String>> entry : mapClasses.entrySet()) {
-                                                        GAREnsGroupeMatiereKey key = entry.getKey();
-                                                        Set<String> currentList = entry.getValue();
-                                                        garEnGroupeMatiere = doc.createElement("men:GAREnsClasseMatiere");
-                                                        garEntGroup.appendChild(garEnGroupeMatiere);
-                                                        MediacentreController.insertNode("men:GARStructureUAI", doc, garEnGroupeMatiere, key.getUai());
-                                                        MediacentreController.insertNode("men:GARPersonIdentifiant", doc, garEnGroupeMatiere, key.getUid());
-                                                        MediacentreController.insertNode("men:GARGroupeCode", doc, garEnGroupeMatiere, key.getGroup());
-                                                        for (Object s : currentList) {
-                                                            if (s instanceof String) {
-                                                                String subject = (String) s;
-                                                                MediacentreController.insertNode("men:GARMatiereCode", doc, garEnGroupeMatiere, subject);
-                                                                counter++;
-                                                            }
                                                         }
-                                                        counter += 5;
-                                                        doc = testNumberOfOccurrences(doc);
-                                                    }
-
-                                                }
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-                                                try {
-                                                    TransformerFactory transformerFactory = TransformerFactory.newInstance();
-                                                    Transformer transformer = transformerFactory.newTransformer();
-                                                    transformer.setOutputProperty(OutputKeys.INDENT, "yes");
-                                                    transformer.setOutputProperty("{http://xml.apache.org/xslt}indent-amount", "2");
-                                                    DOMSource source = new DOMSource(doc);
-                                                    StreamResult result = new StreamResult(new File(path + getExportFileName("Groupe", fileIndex)));
+                                                        try {
+                                                            TransformerFactory transformerFactory = TransformerFactory.newInstance();
+                                                            Transformer transformer = transformerFactory.newTransformer();
+                                                            transformer.setOutputProperty(OutputKeys.INDENT, "yes");
+                                                            transformer.setOutputProperty("{http://xml.apache.org/xslt}indent-amount", "2");
+                                                            DOMSource source = new DOMSource(doc);
+                                                            StreamResult result = new StreamResult(new File(path + getExportFileName("Groupe", fileIndex)));
 
-                                                    transformer.transform(source, result);
-                                                    /*boolean res = MediacentreController.isFileValid(pathExport + getExportFileName("Groupes", fileIndex));
-                                                    if( res == false ){
-                                                        System.out.println("Error on file : " + pathExport + getExportFileName("Groupes", fileIndex));
-                                                    } else {
-                                                        System.out.println("File valid : " + pathExport + getExportFileName("Groupes", fileIndex));
-                                                    }*/
+                                                            transformer.transform(source, result);
+                                                            /*boolean res = MediacentreController.isFileValid(pathExport + getExportFileName("Groupes", fileIndex));
+                                                            if( res == false ){
+                                                                System.out.println("Error on file : " + pathExport + getExportFileName("Groupes", fileIndex));
+                                                            } else {
+                                                                System.out.println("File valid : " + pathExport + getExportFileName("Groupes", fileIndex));
+                                                            }*/
 
-                                                    System.out.println("Groupes saved");
-                                                } catch (TransformerException tfe) {
-                                                    tfe.printStackTrace();
-                                              /*  } catch (SAXException e) {
-                                                    e.printStackTrace();
-                                                } catch (IOException e) {
-                                                    e.printStackTrace();*/
-                                                }
+                                                            System.out.println("Groupes saved");
+                                                        } catch (TransformerException tfe) {
+                                                            tfe.printStackTrace();
+                                                      /*  } catch (SAXException e) {
+                                                            e.printStackTrace();
+                                                        } catch (IOException e) {
+                                                            e.printStackTrace();*/
+                                                        }
+                                                    }
+                                                }); // end getEnsGroupAndClassMatiere
                                             }
                                         }); // end getPersonGroupeStudents
                                     }
