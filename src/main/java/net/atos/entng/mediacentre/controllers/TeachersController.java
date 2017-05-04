@@ -105,7 +105,7 @@ public class TeachersController {
                                             }
                                             for (String key : structProfile.keySet()) {
                                                 Element garProfil = doc.createElement("men:GARPersonProfils");
-                                                MediacentreController.insertNode("men:GARStructureUAI", doc, garProfil, key);
+                                                MediacentreController.insertNode("men:GARStructureUAI", doc, garProfil, mapStructures.get(key));
                                                 if ("Personnel".equals(jObj.getString("p.name"))) {
                                                     MediacentreController.insertNode("men:GARPersonProfil", doc, garProfil, "National_doc");
                                                 } else {
