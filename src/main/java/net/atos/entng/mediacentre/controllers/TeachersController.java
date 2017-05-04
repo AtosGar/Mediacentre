@@ -90,6 +90,7 @@ public class TeachersController {
 
                                             // GARPersonProfils - can have multiple
                                             Map<String, String> structProfile = new HashMap<String, String>();
+                                            String profilType = "National_ens";
                                             if (jObj.getArray("u.functions") != null && jObj.getArray("u.functions").size() > 0) {
                                                 JsonArray functionsArray = jObj.getArray("u.functions");
                                                 for (int i = 0; i < functionsArray.size(); i++) {
@@ -99,6 +100,9 @@ public class TeachersController {
                                                     data[0] = parts[0]; //jObj.getString("s.UAI");
                                                     data[1] = parts[2];
                                                     data[2] = parts[3];
+                                                    if( "DOC".equals(parts[1]) && "DOCUMENTATION".equals(parts[2]) ){
+                                                        profilType = "National_doc";
+                                                    }
                                                     structProfile.put(data[0].toString(),data[1]); // for  GARPersonProfils, because it can be multiple for 1 structure
                                                     listDisciplinesPostes.add(data);
                                                 }
@@ -106,11 +110,11 @@ public class TeachersController {
                                             for (String key : structProfile.keySet()) {
                                                 Element garProfil = doc.createElement("men:GARPersonProfils");
                                                 MediacentreController.insertNode("men:GARStructureUAI", doc, garProfil, mapStructures.get(key));
-                                                if ("Personnel".equals(jObj.getString("p.name"))) {
-                                                    MediacentreController.insertNode("men:GARPersonProfil", doc, garProfil, "National_doc");
-                                                } else {
+                                                //if ("Personnel".equals(jObj.getString("p.name"))) {
+                                                MediacentreController.insertNode("men:GARPersonProfil", doc, garProfil, profilType/*"National_doc"*/);
+                                                /*} else {
                                                     MediacentreController.insertNode("men:GARPersonProfil", doc, garProfil, "National_ens");
-                                                }
+                                                }*/
                                                 garEnseignant.appendChild(garProfil);
                                             }
                                             MediacentreController.insertNode("men:GARPersonNomPatro", doc, garEnseignant, jObj.getString("u.lastName"));

@@ -46,7 +46,7 @@ public class MediacentreServiceImpl implements MediacentreService {
     @Override
     public void getTeachersExportData(Handler<Either<String, JsonArray>> handler) {
         String query = "MATCH (p:Profile)<-[HAS_PROFILE]-(pg:ProfileGroup)<-[IN]-(u:User)-[ADMINISTRATIVE_ATTACHMENT]->(s:Structure) " +
-                "where p.name = 'Teacher' or p.name = 'Personnel' " +
+                "where p.name = 'Teacher'" +
                 "OPTIONAL MATCH (pg:ProfileGroup)-[DEPENDS]->(s2:Structure) " +
                 "where s.UAI <> s2.UAI " +
                 "return distinct u.id, u.lastName, u.displayName, u.firstName, u.structures, u.birthDate, s.UAI, p.name, s2.UAI, u.functions order by u.id";
