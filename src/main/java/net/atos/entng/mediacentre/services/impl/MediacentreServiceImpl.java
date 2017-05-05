@@ -45,10 +45,11 @@ public class MediacentreServiceImpl implements MediacentreService {
 
     @Override
     public void getTeachersExportData(Handler<Either<String, JsonArray>> handler) {
-        String query = "MATCH (p:Profile)<-[HAS_PROFILE]-(pg:ProfileGroup)<-[IN]-(u:User)-[ADMINISTRATIVE_ATTACHMENT]->(s:Structure) " +
-                "where p.name = 'Teacher'" +
-                "OPTIONAL MATCH (pg:ProfileGroup)-[DEPENDS]->(s2:Structure) " +
-                "where s.UAI <> s2.UAI " +
+        String query = "MATCH (p:Profile)<-[HAS_PROFILE]-(pg:ProfileGroup)<-[IN]-(u:User)" +
+                "where (p.name = 'Teacher')" +
+                "OPTIONAL MATCH (u:User)-[ADMINISTRATIVE_ATTACHMENT]->(s:Structure)" +
+                "OPTIONAL MATCH (pg:ProfileGroup)-[DEPENDS]->(s2:Structure)" +
+                "where s is null OR (s.UAI <> s2.UAI)" +
                 "return distinct u.id, u.lastName, u.displayName, u.firstName, u.structures, u.birthDate, s.UAI, p.name, s2.UAI, u.functions order by u.id";
         neo4j.execute(query, new JsonObject(), validResultHandler(handler));
     }
