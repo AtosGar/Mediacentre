@@ -78,10 +78,10 @@ public class StudentsController {
                                 MediacentreController.insertNode( "men:GARPersonCivilite"      , doc, garEleve, jObj.getString(""));
                                 MediacentreController.insertNode( "men:GARPersonStructRattach" , doc, garEleve, jObj.getString("s.UAI"));
                                 MediacentreController.insertNode( "men:GARPersonEtab"          , doc, garEleve, jObj.getString("s.UAI"));
-                                MediacentreController.insertNode("men:GARPersonDateNaissance"  , doc, garEleve, jObj.getString("u.birthDate"));
                                 if( jObj.getString("s2.UAI") != null ) {
                                     MediacentreController.insertNode( "men:GARPersonEtab"          , doc, garEleve, jObj.getString("s2.UAI"));
                                 }
+                                MediacentreController.insertNode("men:GARPersonDateNaissance"  , doc, garEleve, jObj.getString("u.birthDate"));
                                 lastStudentId = jObj.getString("u.id");
                                 counter += 14;
                             } else {
