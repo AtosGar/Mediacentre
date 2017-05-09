@@ -18,6 +18,8 @@ import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
 import java.io.File;
+import java.util.ArrayList;
+import java.util.List;
 
 import static net.atos.entng.mediacentre.controllers.MediacentreController.getExportFileName;
 
@@ -47,55 +49,86 @@ public class StudentsController {
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
                     // men:GAREleve
                     String lastStudentId = "";
+                    String lastStudentBirthDate = "";
+                    JsonObject lastjObj = null;
+                    List<String> etabs = new ArrayList<String>();
                     Element garEleve = null;
                     for( Object obj : students ){
                         if( obj instanceof JsonObject){
                             JsonObject jObj = (JsonObject) obj;
-                            if( jObj.getString("u.id") != null && jObj.getString("u.id") != lastStudentId ) {
-                                doc = testNumberOfOccurrences(doc);
-                                // new node
+                            if( jObj.getString("u.id") != null && !jObj.getString("u.id").equals(lastStudentId) ) {
+                                // test if there is a last one
+                                if( lastjObj != null ) {
+                                    // close last one
+                                    MediacentreController.insertNode("men:GARPersonNomPatro", doc, garEleve, lastjObj.getString("u.lastName"));
+                                    MediacentreController.insertNode("men:GARPersonNom", doc, garEleve, lastjObj.getString("u.lastName"));
+                                    MediacentreController.insertNode("men:GARPersonPrenom", doc, garEleve, lastjObj.getString("u.firstName"));
+                                    if (jObj.getString("u.otherNames") != null) {
+                                        MediacentreController.insertNode("men:GARPersonAutresPrenoms", doc, garEleve, lastjObj.getString("u.firstName"));
+                                    } else {
+                                        MediacentreController.insertNode("men:GARPersonAutresPrenoms", doc, garEleve, lastjObj.getString("u.otherNames"));
+                                    }
+                                    MediacentreController.insertNode("men:GARPersonCivilite", doc, garEleve, lastjObj.getString(""));
+                                    MediacentreController.insertNode("men:GARPersonStructRattach", doc, garEleve, lastjObj.getString("s.UAI"));
+                                    // add all the  GARPersonEtab
+                                    for (String etab : etabs) {
+                                        MediacentreController.insertNode("men:GARPersonEtab", doc, garEleve, etab/*jObj.getString("s.UAI")*/);
+                                    }
+                                    etabs = new ArrayList<String>();
+                                    MediacentreController.insertNode("men:GARPersonDateNaissance", doc, garEleve, lastStudentBirthDate);
+                                    doc = testNumberOfOccurrences(doc);
+                                }
+
+                                // start the new node
                                 garEleve = doc.createElement("men:GAREleve");
                                 garEntEleve.appendChild(garEleve);
 
                                 //GARPersonIdentifiant
                                 // TODO : faire le lien avec plusieurs établissements et récupérer l'UAI
-                                MediacentreController.insertNode( "men:GARPersonIdentifiant"   , doc, garEleve, jObj.getString("u.id"));
+                                MediacentreController.insertNode("men:GARPersonIdentifiant", doc, garEleve, jObj.getString("u.id"));
 
-                                    // GARPersonProfils
-                                    Element garProfil = doc.createElement("men:GARPersonProfils");
-                                    MediacentreController.insertNode( "men:GARStructureUAI"           , doc, garProfil, jObj.getString("s.UAI"));
-                                    MediacentreController.insertNode( "men:GARPersonProfil"           , doc, garProfil, "National_elv");
-                                    garEleve.appendChild(garProfil);
-
-                                MediacentreController.insertNode( "men:GARPersonNomPatro"      , doc, garEleve, jObj.getString("u.lastName"));
-                                MediacentreController.insertNode( "men:GARPersonNom"           , doc, garEleve, jObj.getString("u.lastName"));
-                                MediacentreController.insertNode( "men:GARPersonPrenom"        , doc, garEleve, jObj.getString("u.firstName"));
-                                if( jObj.getString("u.otherNames") != null ) {
-                                    MediacentreController.insertNode( "men:GARPersonAutresPrenoms" , doc, garEleve, jObj.getString("u.firstName"));
-                                } else {
-                                    MediacentreController.insertNode( "men:GARPersonAutresPrenoms" , doc, garEleve, jObj.getString("u.otherNames"));
-                                }
-                                MediacentreController.insertNode( "men:GARPersonCivilite"      , doc, garEleve, jObj.getString(""));
-                                MediacentreController.insertNode( "men:GARPersonStructRattach" , doc, garEleve, jObj.getString("s.UAI"));
-                                MediacentreController.insertNode( "men:GARPersonEtab"          , doc, garEleve, jObj.getString("s.UAI"));
+                                // GARPersonProfils
+                                Element garProfil = doc.createElement("men:GARPersonProfils");
+                                MediacentreController.insertNode("men:GARStructureUAI", doc, garProfil, jObj.getString("s.UAI"));
+                                MediacentreController.insertNode("men:GARPersonProfil", doc, garProfil, "National_elv");
+                                garEleve.appendChild(garProfil);
+                                etabs.add(jObj.getString("s.UAI"));
                                 if( jObj.getString("s2.UAI") != null ) {
-                                    MediacentreController.insertNode( "men:GARPersonEtab"          , doc, garEleve, jObj.getString("s2.UAI"));
+                                    etabs.add(jObj.getString("s2.UAI"));
                                 }
-                                MediacentreController.insertNode("men:GARPersonDateNaissance"  , doc, garEleve, jObj.getString("u.birthDate"));
                                 lastStudentId = jObj.getString("u.id");
+                                lastStudentBirthDate = jObj.getString("u.birthDate");
+                                lastjObj = jObj;
                                 counter += 14;
                             } else {
-                                // add the s2.UAI to the object.
-                                MediacentreController.insertNode( "men:GARPersonEtab"          , doc, garEleve, jObj.getString("s2.UAI"));
-                                Element garProfil = doc.createElement("men:GARPersonProfils");
-                                MediacentreController.insertNode( "men:GARStructureUAI"           , doc, garProfil, jObj.getString("s2.UAI"));
-                                MediacentreController.insertNode( "men:GARPersonProfil"           , doc, garProfil, "National_elv");
-                                garEleve.appendChild(garProfil);
-                                counter += 4;
+                                // add the GARPersonProfils
+                                if( jObj.getString("s2.UAI") != null ){
+                                    etabs.add(jObj.getString("s2.UAI"));
+                                    Element garProfil = doc.createElement("men:GARPersonProfils");
+                                    MediacentreController.insertNode("men:GARStructureUAI", doc, garProfil, jObj.getString("s2.UAI"));
+                                    MediacentreController.insertNode("men:GARPersonProfil", doc, garProfil, "National_elv");
+                                    garEleve.appendChild(garProfil);
+                                    counter += 4;
+                                }
                             }
-
                         }
                     }
+                    // close last one
+                    MediacentreController.insertNode("men:GARPersonNomPatro", doc, garEleve, lastjObj.getString("u.lastName"));
+                    MediacentreController.insertNode("men:GARPersonNom", doc, garEleve, lastjObj.getString("u.lastName"));
+                    MediacentreController.insertNode("men:GARPersonPrenom", doc, garEleve, lastjObj.getString("u.firstName"));
+                    if (lastjObj.getString("u.otherNames") != null) {
+                        MediacentreController.insertNode("men:GARPersonAutresPrenoms", doc, garEleve, lastjObj.getString("u.firstName"));
+                    } else {
+                        MediacentreController.insertNode("men:GARPersonAutresPrenoms", doc, garEleve, lastjObj.getString("u.otherNames"));
+                    }
+                    MediacentreController.insertNode("men:GARPersonCivilite", doc, garEleve, lastjObj.getString(""));
+                    MediacentreController.insertNode("men:GARPersonStructRattach", doc, garEleve, lastjObj.getString("s.UAI"));
+                    // add all the  GARPersonEtab
+                    for( String etab : etabs ) {
+                        MediacentreController.insertNode("men:GARPersonEtab", doc, garEleve, etab/*jObj.getString("s.UAI")*/);
+                    }
+                    MediacentreController.insertNode("men:GARPersonDateNaissance", doc, garEleve, lastStudentBirthDate);
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
                     mediacentreService.getPersonMef(new Handler<Either<String, JsonArray>>() {
