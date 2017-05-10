@@ -109,7 +109,8 @@ public class TeachersController {
                                             } else {
                                                 // we create an empty one, because there is no functions attribute
                                                 Element garProfil = doc.createElement("men:GARPersonProfils");
-                                                MediacentreController.insertNode("men:GARStructureUAI", doc, garProfil, jObj.getString("s.UAI"));
+
+                                                MediacentreController.insertNode("men:GARStructureUAI", doc, garProfil, jObj.getString("s2.UAI"));
                                                 //if ("Personnel".equals(jObj.getString("p.name"))) {
                                                 MediacentreController.insertNode("men:GARPersonProfil", doc, garProfil, "National_ens");
                                                 garEnseignant.appendChild(garProfil);
