@@ -106,6 +106,13 @@ public class TeachersController {
                                                     structProfile.put(data[0].toString(),data[1]); // for  GARPersonProfils, because it can be multiple for 1 structure
                                                     listDisciplinesPostes.add(data);
                                                 }
+                                            } else {
+                                                // we create an empty one, because there is no functions attribute
+                                                Element garProfil = doc.createElement("men:GARPersonProfils");
+                                                MediacentreController.insertNode("men:GARStructureUAI", doc, garProfil, jObj.getString("s.UAI"));
+                                                //if ("Personnel".equals(jObj.getString("p.name"))) {
+                                                MediacentreController.insertNode("men:GARPersonProfil", doc, garProfil, "National_ens");
+                                                garEnseignant.appendChild(garProfil);
                                             }
                                             for (String key : structProfile.keySet()) {
                                                 Element garProfil = doc.createElement("men:GARPersonProfils");
