@@ -44,6 +44,7 @@ public class MediacentreController extends BaseController {
 
     private static String exportFilePrefix = "";
     private static SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMdd_HHmmss");
+    private static String fileDate = sdf.format(new Date());
     //private static String fileDate = sdf.format(new Date());
 
     /**
@@ -109,7 +110,7 @@ public class MediacentreController extends BaseController {
         StructuresController structuresController = new StructuresController();
         GroupsController groupsController = new GroupsController();
         InChargeOfAssignementController inChargeOfAssignementController = new InChargeOfAssignementController();
-
+        fileDate = sdf.format(new Date());
         studentsController.exportStudents(mediacentreService, path, nbElementPerFile);
         teachersController.exportTeachers(mediacentreService, path, nbElementPerFile);
         structuresController.exportStructures(mediacentreService, path, nbElementPerFile);
@@ -212,7 +213,6 @@ public class MediacentreController extends BaseController {
      * @return
      */
     public static String getExportFileName(String name, int fileIndex){
-        String fileDate = sdf.format(new Date());
         String formattedIndex = String.format ("%04d", fileIndex);
         String fileName = exportFilePrefix + "_GAR-ENT_Complet_" + fileDate + "_" + name + "_" + formattedIndex + ".xml";
         return fileName;
