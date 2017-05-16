@@ -19,6 +19,9 @@ import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
 import java.io.File;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 
 import static net.atos.entng.mediacentre.controllers.MediacentreController.getExportFileName;
 
@@ -34,7 +37,17 @@ public class InChargeOfAssignementController {
             public void handle(Either<String, JsonArray> event) {
                 if( event.isRight()){
                     // write the content into xml file
-                    final JsonArray members = event.right().getValue();
+                    final JsonArray members2 = event.right().getValue();
+
+                    List<String> jsonValues = new ArrayList<String>();
+                    for (int i = 0; i < members2.size(); i++)
+                        jsonValues.add(members2.get(i).toString());
+                    Collections.sort(jsonValues);
+                    final JsonArray members = new JsonArray();
+                    for (int i = 0; i < jsonValues.size(); i++) {
+                        members.add(new JsonObject(jsonValues.get(i)));
+                    }
+
                     DocumentBuilderFactory docFactory = DocumentBuilderFactory.newInstance();
                     DocumentBuilder docBuilder = null;
                     try {
