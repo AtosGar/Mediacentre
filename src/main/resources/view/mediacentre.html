@@ -71,7 +71,7 @@
             </tr>
             </thead>
             <tbody>
-                <tr ng-repeat="ressource in ressources.listeRessources.ressource track by $index">
+            <tr ng-repeat="ressource in ressources.listeRessources.ressource | orderBy : 'nomRessource' track by $index">
                     <td>
                         <a href="[[ressource.urlAccesRessource]]" target="new"><img src="[[ressource.urlVignette]]" style="height:100px"></a>
                     </td>
