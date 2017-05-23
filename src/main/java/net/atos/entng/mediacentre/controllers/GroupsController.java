@@ -95,7 +95,10 @@ public class GroupsController {
                         garEntGroup.appendChild(garDivision);
                         if (obj instanceof JsonObject) {
                             JsonObject jObj = (JsonObject) obj;
-                            MediacentreController.insertNode("men:GARGroupeCode", doc, garDivision, jObj.getString("c.externalId"));
+                            String grpCode = jObj.getString("c.externalId");
+                            String[] parts = grpCode.split("\\$");
+
+                            MediacentreController.insertNode("men:GARGroupeCode", doc, garDivision, parts[1]);
                             MediacentreController.insertNode("men:GARStructureUAI", doc, garDivision, jObj.getString("s.UAI"));
                             MediacentreController.insertNode("men:GARGroupeLibelle", doc, garDivision, jObj.getString("c.name"));
                             MediacentreController.insertNode("men:GARGroupeStatut", doc, garDivision, "DIVISION");
@@ -122,7 +125,9 @@ public class GroupsController {
                                             garGroup = doc.createElement("men:GARGroupe");
                                             garEntGroup.appendChild(garGroup);
                                             if( jObj.getString("fg.externalId") != null && !"null".equals(jObj.getString("fg.externalId"))) {
-                                                MediacentreController.insertNode("men:GARGroupeCode", doc, garGroup, jObj.getString("fg.externalId"));
+                                                String grpCode = jObj.getString("fg.externalId");
+                                                String[] parts = grpCode.split("\\$");
+                                                MediacentreController.insertNode("men:GARGroupeCode", doc, garGroup, parts[1]);
                                             } else {
                                                 MediacentreController.insertNode("men:GARGroupeCode", doc, garGroup, jObj.getString("fg.id"));
                                             }
@@ -132,7 +137,9 @@ public class GroupsController {
                                             lastGroup = jObj.getString("fg.id");
                                         }
                                         if (jObj.getString("c.externalId") != null) {
-                                            MediacentreController.insertNode("men:GARGroupeDivAppartenance", doc, garGroup, jObj.getString("c.externalId"));
+                                            String grpCode = jObj.getString("c.externalId");
+                                            String[] parts = grpCode.split("\\$");
+                                            MediacentreController.insertNode("men:GARGroupeDivAppartenance", doc, garGroup, parts[1]);
                                         }
                                     }
                                 }
@@ -153,7 +160,9 @@ public class GroupsController {
                                                     MediacentreController.insertNode("men:GARStructureUAI", doc, garPersonGroup, jObj.getString("s.UAI"));
                                                     MediacentreController.insertNode("men:GARPersonIdentifiant", doc, garPersonGroup, jObj.getString("u.id"));
                                                     if (jObj.getString("fg.externalId") != null && !"null".equals(jObj.getString("fg.externalId"))) {
-                                                        MediacentreController.insertNode("men:GARGroupeCode", doc, garPersonGroup, jObj.getString("fg.externalId"));
+                                                        String grpCode = jObj.getString("fg.externalId");
+                                                        String[] parts = grpCode.split("\\$");
+                                                        MediacentreController.insertNode("men:GARGroupeCode", doc, garPersonGroup, parts[1]);
                                                     } else {
                                                         MediacentreController.insertNode("men:GARGroupeCode", doc, garPersonGroup, jObj.getString("fg.id"));
                                                     }
@@ -179,7 +188,9 @@ public class GroupsController {
                                                             MediacentreController.insertNode("men:GARStructureUAI", doc, garPersonGroup, jObj.getString("s.UAI"));
                                                             MediacentreController.insertNode("men:GARPersonIdentifiant", doc, garPersonGroup, jObj.getString("u.id"));
                                                             if (jObj.getString("c.externalId") != null && !"null".equals(jObj.getString("c.externalId"))) {
-                                                                MediacentreController.insertNode("men:GARGroupeCode", doc, garPersonGroup, jObj.getString("c.externalId"));
+                                                                String grpCode = jObj.getString("c.externalId");
+                                                                String[] parts = grpCode.split("\\$");
+                                                                MediacentreController.insertNode("men:GARGroupeCode", doc, garPersonGroup, parts[1]);
                                                             } else {
                                                                 MediacentreController.insertNode("men:GARGroupeCode", doc, garPersonGroup, jObj.getString("c.id"));
                                                             }
@@ -245,7 +256,9 @@ public class GroupsController {
                                                                 garEntGroup.appendChild(garEnGroupeMatiere);
                                                                 MediacentreController.insertNode("men:GARStructureUAI", doc, garEnGroupeMatiere, key.getUai());
                                                                 MediacentreController.insertNode("men:GARPersonIdentifiant", doc, garEnGroupeMatiere, key.getUid());
-                                                                MediacentreController.insertNode("men:GARGroupeCode", doc, garEnGroupeMatiere, key.getGroup());
+                                                                String grpCode = key.getGroup();
+                                                                String[] parts = grpCode.split("\\$");
+                                                                MediacentreController.insertNode("men:GARGroupeCode", doc, garEnGroupeMatiere, parts[1]);
                                                                 for (Object s : currentList) {
                                                                     if (s instanceof String) {
                                                                         String subject = (String) s;
@@ -264,7 +277,9 @@ public class GroupsController {
                                                                 garEntGroup.appendChild(garEnGroupeMatiere);
                                                                 MediacentreController.insertNode("men:GARStructureUAI", doc, garEnGroupeMatiere, key.getUai());
                                                                 MediacentreController.insertNode("men:GARPersonIdentifiant", doc, garEnGroupeMatiere, key.getUid());
-                                                                MediacentreController.insertNode("men:GARGroupeCode", doc, garEnGroupeMatiere, key.getGroup());
+                                                                String grpCode = key.getGroup();
+                                                                String[] parts = grpCode.split("\\$");
+                                                                MediacentreController.insertNode("men:GARGroupeCode", doc, garEnGroupeMatiere, parts[1]);
                                                                 for (Object s : currentList) {
                                                                     if (s instanceof String) {
                                                                         String subject = (String) s;
