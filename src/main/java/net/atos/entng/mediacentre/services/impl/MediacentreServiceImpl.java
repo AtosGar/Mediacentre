@@ -96,7 +96,7 @@ public class MediacentreServiceImpl implements MediacentreService {
     @Override
     public void getGroupsExportData(Handler<Either<String, JsonArray>> handler) {
         String query = "match (s:Structure)<-[BELONGS]-(c:Class)<-[d:DEPENDS]-(pg:ProfileGroup)<-[IN]-(u:User)-[COMMUNIQUE]->(fg:FunctionalGroup)-[d2:DEPENDS]->(s2:Structure) " +
-                " where s.id = s2.id " +
+                " where s.id = s2.id and u.profiles = ['Student'] " +
                 " return distinct s.UAI, s.name, c.name, c.id, c.externalId, fg.id, fg.externalId, fg.name order by s.UAI, fg.externalId, c.externalId";
         neo4j.execute(query, new JsonObject(), validResultHandler(handler));
     }

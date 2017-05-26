@@ -139,7 +139,8 @@ public class GroupsController {
                                         if (jObj.getString("c.externalId") != null) {
                                             String grpCode = jObj.getString("c.externalId");
                                             String[] parts = grpCode.split("\\$");
-                                            MediacentreController.insertNode("men:GARGroupeDivAppartenance", doc, garGroup, parts[1]);
+                                            String classe = parts[1];
+                                            MediacentreController.insertNode("men:GARGroupeDivAppartenance", doc, garGroup, classe);
                                         }
                                     }
                                 }
