@@ -96,10 +96,10 @@ public class MediacentreServiceImpl implements MediacentreService {
     @Override
     public void getGroupsExportData(Handler<Either<String, JsonArray>> handler) {
         String query = "match (c:Class)<-[d:DEPENDS]-(pg:ProfileGroup)<-[IN]-(u:User)-[COMMUNIQUE]->(fg:FunctionalGroup)-[d2:DEPENDS]->(s:Structure) where u.profiles = ['Student'] " +
-        "return distinct s.UAI, s.name, c.name as cname, c.id as cid, c.externalId as cexternalId, fg.id, fg.externalId, fg.name " +
+        "return distinct s.UAI, s.name, c.name as cname, c.id as cid, c.externalId as cexternalId, fg.id, fg.externalId, fg.name order by s.UAI, fg.externalId, c.externalId " +
         "union " +
         "match (u:User)-[COMMUNIQUE]->(fg:FunctionalGroup)-[d2:DEPENDS]->(s:Structure) where not u.profiles = ['Student'] " +
-        "return distinct s.UAI, s.name, null as cname, null as cid, null as cexternalId, fg.id, fg.externalId, fg.name;";
+        "return distinct s.UAI, s.name, null as cname, null as cid, null as cexternalId, fg.id, fg.externalId, fg.name order by s.UAI, fg.externalId;";
 
 /*        String query = "match (s:Structure)<-[BELONGS]-(c:Class)<-[d:DEPENDS]-(pg:ProfileGroup)<-[IN]-(u:User)-[COMMUNIQUE]->(fg:FunctionalGroup)-[d2:DEPENDS]->(s2:Structure) " +
                 " where s.id = s2.id and u.profiles = ['Student'] " +
