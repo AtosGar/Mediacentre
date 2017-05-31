@@ -18,10 +18,7 @@ import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
 import java.io.File;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 import static net.atos.entng.mediacentre.controllers.MediacentreController.getExportFileName;
 
@@ -115,26 +112,30 @@ public class GroupsController {
                                 JsonArray groups = event.right().getValue();
                                 // men:GARPersonMEF
                                 String lastGroup = "";
+                                List<String> lGroupes = new ArrayList<String>();
                                 Element garGroup = null;
                                 for (Object obj : groups) {
                                     if (obj instanceof JsonObject) {
                                         JsonObject jObj = (JsonObject) obj;
                                         if (!lastGroup.equals(jObj.getString("fg.id"))) {
-                                            counter += 6;
-                                            doc = testNumberOfOccurrences(doc);
-                                            garGroup = doc.createElement("men:GARGroupe");
-                                            garEntGroup.appendChild(garGroup);
-                                            if( jObj.getString("fg.externalId") != null && !"null".equals(jObj.getString("fg.externalId"))) {
-                                                String grpCode = jObj.getString("fg.externalId");
-                                                String[] parts = grpCode.split("\\$");
-                                                MediacentreController.insertNode("men:GARGroupeCode", doc, garGroup, parts[1]);
-                                            } else {
-                                                MediacentreController.insertNode("men:GARGroupeCode", doc, garGroup, jObj.getString("fg.id"));
+                                            if( !lGroupes.contains(jObj.getString("fg.externalId").split("\\$")[1])) {
+                                                counter += 6;
+                                                doc = testNumberOfOccurrences(doc);
+                                                garGroup = doc.createElement("men:GARGroupe");
+                                                garEntGroup.appendChild(garGroup);
+                                                if (jObj.getString("fg.externalId") != null && !"null".equals(jObj.getString("fg.externalId"))) {
+                                                    String grpCode = jObj.getString("fg.externalId");
+                                                    String[] parts = grpCode.split("\\$");
+                                                    MediacentreController.insertNode("men:GARGroupeCode", doc, garGroup, parts[1]);
+                                                } else {
+                                                    MediacentreController.insertNode("men:GARGroupeCode", doc, garGroup, jObj.getString("fg.id"));
+                                                }
+                                                MediacentreController.insertNode("men:GARStructureUAI", doc, garGroup, jObj.getString("s.UAI"));
+                                                MediacentreController.insertNode("men:GARGroupeLibelle", doc, garGroup, jObj.getString("fg.name"));
+                                                MediacentreController.insertNode("men:GARGroupeStatut", doc, garGroup, "GROUPE");
+                                                lastGroup = jObj.getString("fg.id");
+                                                lGroupes.add(jObj.getString("fg.externalId").split("\\$")[1]);
                                             }
-                                            MediacentreController.insertNode("men:GARStructureUAI", doc, garGroup, jObj.getString("s.UAI"));
-                                            MediacentreController.insertNode("men:GARGroupeLibelle", doc, garGroup, jObj.getString("fg.name"));
-                                            MediacentreController.insertNode("men:GARGroupeStatut", doc, garGroup, "GROUPE");
-                                            lastGroup = jObj.getString("fg.id");
                                         }
                                         if (jObj.getString("cexternalId") != null) {
                                             String grpCode = jObj.getString("cexternalId");
@@ -345,11 +346,11 @@ public class GroupsController {
                 StreamResult result = new StreamResult(new File(pathExport + getExportFileName("Groupe", fileIndex)));
 
                 transformer.transform(source, result);
-             /*   boolean res = MediacentreController.isFileValid(pathExport + getExportFileName("Groupes", fileIndex));
+             /*   boolean res = MediacentreController.isFileValid(pathExport + getExportFileName("Groupe", fileIndex));
                 if( res == false ){
-                    System.out.println("Error on file : " + pathExport + getExportFileName("Groupes", fileIndex));
+                    System.out.println("Error on file : " + pathExport + getExportFileName("Groupe", fileIndex));
                 } else {
-                    System.out.println("File valid : " + pathExport + getExportFileName("Groupes", fileIndex));
+                    System.out.println("File valid : " + pathExport + getExportFileName("Groupe", fileIndex));
                 }*/
 
                 System.out.println("Groupes" + fileIndex + " saved");
