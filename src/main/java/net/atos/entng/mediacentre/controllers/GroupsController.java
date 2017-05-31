@@ -118,7 +118,7 @@ public class GroupsController {
                                     if (obj instanceof JsonObject) {
                                         JsonObject jObj = (JsonObject) obj;
                                         if (!lastGroup.equals(jObj.getString("fg.id"))) {
-                                            if( !lGroupes.contains(jObj.getString("fg.externalId").split("\\$")[1])) {
+                                            if( !lGroupes.contains(jObj.getString("s.UAI") + jObj.getString("fg.externalId").split("\\$")[1])) {
                                                 counter += 6;
                                                 doc = testNumberOfOccurrences(doc);
                                                 garGroup = doc.createElement("men:GARGroupe");
@@ -134,7 +134,7 @@ public class GroupsController {
                                                 MediacentreController.insertNode("men:GARGroupeLibelle", doc, garGroup, jObj.getString("fg.name"));
                                                 MediacentreController.insertNode("men:GARGroupeStatut", doc, garGroup, "GROUPE");
                                                 lastGroup = jObj.getString("fg.id");
-                                                lGroupes.add(jObj.getString("fg.externalId").split("\\$")[1]);
+                                                lGroupes.add(jObj.getString("s.UAI") + jObj.getString("fg.externalId").split("\\$")[1]);
                                             }
                                         }
                                         if (jObj.getString("cexternalId") != null) {
