@@ -81,10 +81,10 @@ public class InChargeOfAssignementController {
                                 MediacentreController.insertNode("men:GARPersonPrenom", doc, garRespAff, jObj.getString("u.firstName"));
                                 MediacentreController.insertNode("men:GARPersonCivilite", doc, garRespAff, "");
                                 MediacentreController.insertNode("men:GARPersonMail", doc, garRespAff, jObj.getString("u.email"));
-                                MediacentreController.insertNode("men:GARRespAffEtab", doc, garRespAff, jObj.getString("s.UAI"));
+                                MediacentreController.insertNode("men:GARRespAffEtab", doc, garRespAff, jObj.getString("s2.UAI"));
                                 lastUserId = jObj.getString("u.id");
                             } else {
-                                MediacentreController.insertNode("men:GARRespAffEtab", doc, garRespAff, jObj.getString("s.UAI"));
+                                MediacentreController.insertNode("men:GARRespAffEtab", doc, garRespAff, jObj.getString("s2.UAI"));
                             }
                         }
                     }

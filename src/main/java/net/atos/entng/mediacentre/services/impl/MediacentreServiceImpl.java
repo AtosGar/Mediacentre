@@ -140,13 +140,13 @@ public class MediacentreServiceImpl implements MediacentreService {
 
     @Override
     public void getInChargeOfExportData(String groupName, Handler<Either<String, JsonArray>> handler) {
-        String query = "MATCH (s:Structure)<-[ADMINISTRATIVE_ATTACHMENT]-(u:User)-[IN]->(n:ManualGroup) " +
-                "where n.name = {groupName} " +
-                "RETURN u.id, u.lastName, u.firstName, u.email, s.UAI " +
-                "union " +
-                "match (s:Structure)<-[DEPENDS]-(pg:ProfileGroup)<-[i1:IN]-(u:User)-[i2:IN]->(n:ManualGroup) " +
-                "where n.name = {groupName}  " +
-                "RETURN u.id, u.lastName, u.firstName, u.email, s.UAI order by u.id";
+        String query = "MATCH (s:Structure)<-[ADMINISTRATIVE_ATTACHMENT]-(u:User)-[IN]->(n:ManualGroup)-[DEPENDS]->(s2:Structure)" +
+                "                where n.name = {groupName}" +
+                "                RETURN u.id, u.lastName, u.firstName, u.email, s2.UAI" +
+                "                union" +
+                "                match (s:Structure)<-[d1:DEPENDS]-(pg:ProfileGroup)<-[i1:IN]-(u:User)-[i2:IN]->(n:ManualGroup)-[d2:DEPENDS]->(s2:Structure)" +
+                "                where n.name = {groupName}" +
+                "                RETURN u.id, u.lastName, u.firstName, u.email, s2.UAI order by u.id";
 
         /*String query = "MATCH (s:Structure)<-[ADMINISTRATIVE_ATTACHMENT]-(u:User)-[IN]->(n:ManualGroup) " +
                 "where n.name = {groupName} " +
