@@ -90,7 +90,11 @@ public class StudentsController {
 
                                     // GARPersonProfils
                                     Element garProfil = doc.createElement("men:GARPersonProfils");
-                                    MediacentreController.insertNode("men:GARStructureUAI", doc, garProfil, jObj.getString("s.UAI"));
+                                    if( jObj.getString("s.UAI") != null ) {
+                                        MediacentreController.insertNode("men:GARStructureUAI", doc, garProfil, jObj.getString("s.UAI"));
+                                    } else {
+                                        MediacentreController.insertNode("men:GARStructureUAI", doc, garProfil, jObj.getString("s2.UAI"));
+                                    }
                                     MediacentreController.insertNode("men:GARPersonProfil", doc, garProfil, "National_elv");
                                     garEleve.appendChild(garProfil);
                                     etabs.add(jObj.getString("s.UAI"));
@@ -231,7 +235,7 @@ public class StudentsController {
                 System.out.println("Students" + fileIndex + " saved");
          /*       boolean res = MediacentreController.isFileValid(pathExport + getExportFileName("Eleves", fileIndex));
                 if( res == false ){
-                    System.out.println("Error on file : " + pathExport + getExportFileName("Eleves", fileIndex));
+                    System.out.println("Error on file : " + pathExport + getExportFileName("Eleve", fileIndex));
                 } else {
                     System.out.println("File valid : " + pathExport + getExportFileName("Eleves", fileIndex));
                 }*/
