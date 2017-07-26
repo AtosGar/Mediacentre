@@ -57,9 +57,9 @@ public class MediacentreServiceImpl implements MediacentreService {
 
     @Override
     public void getPersonMefTeacher(Handler<Either<String, JsonArray>> handler) {
-        String query = "MATCH  (p:Profile)<-[HAS_PROFILE]-(pg:ProfileGroup)<-[IN]-(u:User)-[ADMINISTRATIVE_ATTACHMENT]->(s:Structure) " +
+        String query = "MATCH  (p:Profile)<-[HAS_PROFILE]-(pg:ProfileGroup)<-[IN]-(u:User) " + //-[ADMINISTRATIVE_ATTACHMENT]->(s:Structure) " +
                 "where p.name = 'Teacher' " +
-                "return distinct u.id, u.modules, s.UAI order by u.id";
+                "return distinct u.id, u.modules order by u.id";
         neo4j.execute(query, new JsonObject(), validResultHandler(handler));
     }
 
