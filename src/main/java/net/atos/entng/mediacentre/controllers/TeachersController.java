@@ -38,7 +38,7 @@ public class TeachersController {
     /**
      *  export Teachers
      */
-    public void exportTeachers(final MediacentreService mediacentreService, final String path, int nbElementPerFile){
+    public void exportTeachers(final MediacentreService mediacentreService, final String path, int nbElementPerFile, final Handler<List<String>> handler){
         counter = 0;
         pathExport = path;
         nbElem = nbElementPerFile;
@@ -140,6 +140,7 @@ public class TeachersController {
                                                 } else {
                                                     if( lastjObj != null && etabs.size() >= 2) {
                                                         bannedUsers.add(lastjObj.getString("u.id"));
+                                                        etabs = new HashSet<String>();
                                                     }
                                                 }
 
@@ -324,6 +325,7 @@ public class TeachersController {
                                     e.printStackTrace();*/
                                             }
                                         }
+                                        handler.handle(bannedUsers);
                                     }
                                 });
                             }

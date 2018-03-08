@@ -27,6 +27,7 @@ import org.xml.sax.SAXException;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.List;
 import java.util.Map;
 
 
@@ -107,21 +108,32 @@ public class MediacentreController extends BaseController {
                             mapModules.put(jObj.getString("m.externalId"), jObj);
                         }
                     }*/
-                    String path = container.config().getString("export-path", "/tmp");
-                    int nbElementPerFile = container.config().getInteger("elementsPerFile", 10000);
+                    final String path = container.config().getString("export-path", "/tmp");
+                    final int nbElementPerFile = container.config().getInteger("elementsPerFile", 10000);
                     exportFilePrefix = container.config().getString("exportFilePrefix", "/tmp");
                     String inChargeOfAssignementName = container.config().getString("inChargeOfAssignementGroupName", "Responsables d'affectation");
 
-                    StudentsController studentsController = new StudentsController();
-                    TeachersController teachersController = new TeachersController();
+                    final StudentsController studentsController = new StudentsController();
                     StructuresController structuresController = new StructuresController();
-                    GroupsController groupsController = new GroupsController();
+                    final TeachersController teachersController = new TeachersController();
+                    final GroupsController groupsController = new GroupsController();
                     InChargeOfAssignementController inChargeOfAssignementController = new InChargeOfAssignementController();
                     fileDate = sdf.format(new Date());
-                    studentsController.exportStudents(mediacentreService, path, nbElementPerFile);
-                    teachersController.exportTeachers(mediacentreService, path, nbElementPerFile);
                     structuresController.exportStructures(mediacentreService, path, nbElementPerFile);
-                    groupsController.exportGroups(mediacentreService, path, nbElementPerFile);
+                    teachersController.exportTeachers(mediacentreService, path, nbElementPerFile, new Handler<List<String>>() {
+                        @Override
+                        public void handle(final List<String> bannedUsers) {
+                            studentsController.exportStudents(mediacentreService, path, nbElementPerFile, new Handler<List<String>>() {
+                                @Override
+                                public void handle(final List<String> bannedUsersStudents) {
+                                    bannedUsers.addAll(bannedUsersStudents);
+                                    groupsController.exportGroups(mediacentreService, path, nbElementPerFile, bannedUsers);
+                                }
+                            });
+                        }
+                    });
+
+
                     inChargeOfAssignementController.exportInChargeOfAssignement(mediacentreService, path, nbElementPerFile, inChargeOfAssignementName);
          /*       }
             }
@@ -236,7 +248,7 @@ public class MediacentreController extends BaseController {
 
     public static boolean isFileValid(String filePath) throws IOException, SAXException {
         //URL schemaFile = new URL("http://data.education.fr/ns/gar GAR-ENT.xsd");
-        /*File schemaFile = new File("c:\\exportXML\\GAR-ENT.xsd");
+/*        File schemaFile = new File("c:\\exportXML\\GAR-ENT.xsd");
         Source xmlFile = new StreamSource(new File(filePath));
         SchemaFactory schemaFactory = SchemaFactory
                 .newInstance(XMLConstants.W3C_XML_SCHEMA_NS_URI);

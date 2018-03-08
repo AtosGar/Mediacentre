@@ -76,7 +76,7 @@ public class GroupsController {
     /**
      * export Groups
      */
-    public void exportGroups(final MediacentreService mediacentreService, final String path, final int nbElementPerFile) {
+    public void exportGroups(final MediacentreService mediacentreService, final String path, final int nbElementPerFile, final List<String> bannedUsers) {
         counter = 0;
         pathExport = path;
         nbElem = nbElementPerFile;
@@ -163,19 +163,22 @@ public class GroupsController {
                                             for (Object obj : personGroupe) {
                                                 if (obj instanceof JsonObject) {
                                                     JsonObject jObj = (JsonObject) obj;
-                                                    garPersonGroup = doc.createElement("men:GARPersonGroupe");
-                                                    garEntGroup.appendChild(garPersonGroup);
-                                                    MediacentreController.insertNode("men:GARStructureUAI", doc, garPersonGroup, jObj.getString("s.UAI"));
-                                                    MediacentreController.insertNode("men:GARPersonIdentifiant", doc, garPersonGroup, jObj.getString("u.id"));
-                                                    if (jObj.getString("fg.externalId") != null && !"null".equals(jObj.getString("fg.externalId"))) {
-                                                        String grpCode = jObj.getString("fg.externalId");
-                                                        String[] parts = grpCode.split("\\$");
-                                                        MediacentreController.insertNode("men:GARGroupeCode", doc, garPersonGroup, MediacentreController.customSubString(parts[1], 255));
-                                                    } else {
-                                                        MediacentreController.insertNode("men:GARGroupeCode", doc, garPersonGroup, jObj.getString("fg.id"));
+                                                    // do not include persons present on multible structures
+                                                    if( !bannedUsers.contains(jObj.getString("u.id"))) {
+                                                        garPersonGroup = doc.createElement("men:GARPersonGroupe");
+                                                        garEntGroup.appendChild(garPersonGroup);
+                                                        MediacentreController.insertNode("men:GARStructureUAI", doc, garPersonGroup, jObj.getString("s.UAI"));
+                                                        MediacentreController.insertNode("men:GARPersonIdentifiant", doc, garPersonGroup, jObj.getString("u.id"));
+                                                        if (jObj.getString("fg.externalId") != null && !"null".equals(jObj.getString("fg.externalId"))) {
+                                                            String grpCode = jObj.getString("fg.externalId");
+                                                            String[] parts = grpCode.split("\\$");
+                                                            MediacentreController.insertNode("men:GARGroupeCode", doc, garPersonGroup, MediacentreController.customSubString(parts[1], 255));
+                                                        } else {
+                                                            MediacentreController.insertNode("men:GARGroupeCode", doc, garPersonGroup, jObj.getString("fg.id"));
+                                                        }
+                                                        counter += 4;
+                                                        doc = testNumberOfOccurrences(doc);
                                                     }
-                                                    counter += 4;
-                                                    doc = testNumberOfOccurrences(doc);
                                                 }
                                             }
                                         }
@@ -191,23 +194,25 @@ public class GroupsController {
                                                     for (Object obj : personGroupe) {
                                                         if (obj instanceof JsonObject) {
                                                             JsonObject jObj = (JsonObject) obj;
-                                                            garPersonGroup = doc.createElement("men:GARPersonGroupe");
-                                                            garEntGroup.appendChild(garPersonGroup);
-                                                            MediacentreController.insertNode("men:GARStructureUAI", doc, garPersonGroup, jObj.getString("s.UAI"));
-                                                            MediacentreController.insertNode("men:GARPersonIdentifiant", doc, garPersonGroup, jObj.getString("u.id"));
-                                                            if (jObj.getString("c.externalId") != null && !"null".equals(jObj.getString("c.externalId"))) {
-                                                                String grpCode = jObj.getString("c.externalId");
-                                                                String[] parts = grpCode.split("\\$");
-                                                                if( parts.length < 2 ){
-                                                                    MediacentreController.insertNode("men:GARGroupeCode", doc, garPersonGroup, "null");
+                                                            if (!bannedUsers.contains(jObj.getString("u.id"))) {
+                                                                garPersonGroup = doc.createElement("men:GARPersonGroupe");
+                                                                garEntGroup.appendChild(garPersonGroup);
+                                                                MediacentreController.insertNode("men:GARStructureUAI", doc, garPersonGroup, jObj.getString("s.UAI"));
+                                                                MediacentreController.insertNode("men:GARPersonIdentifiant", doc, garPersonGroup, jObj.getString("u.id"));
+                                                                if (jObj.getString("c.externalId") != null && !"null".equals(jObj.getString("c.externalId"))) {
+                                                                    String grpCode = jObj.getString("c.externalId");
+                                                                    String[] parts = grpCode.split("\\$");
+                                                                    if (parts.length < 2) {
+                                                                        MediacentreController.insertNode("men:GARGroupeCode", doc, garPersonGroup, "null");
+                                                                    } else {
+                                                                        MediacentreController.insertNode("men:GARGroupeCode", doc, garPersonGroup, MediacentreController.customSubString(parts[1], 255));
+                                                                    }
                                                                 } else {
-                                                                    MediacentreController.insertNode("men:GARGroupeCode", doc, garPersonGroup, MediacentreController.customSubString(parts[1], 255));
+                                                                    MediacentreController.insertNode("men:GARGroupeCode", doc, garPersonGroup, MediacentreController.customSubString(jObj.getString("c.id"), 255));
                                                                 }
-                                                            } else {
-                                                                MediacentreController.insertNode("men:GARGroupeCode", doc, garPersonGroup, MediacentreController.customSubString(jObj.getString("c.id"),255));
+                                                                counter += 4;
+                                                                doc = testNumberOfOccurrences(doc);
                                                             }
-                                                            counter += 4;
-                                                            doc = testNumberOfOccurrences(doc);
                                                         }
                                                     }
                                                 }
@@ -230,31 +235,32 @@ public class GroupsController {
                                                             for (Object obj : enGroupeAndClasseMatiere) {
                                                                 if (obj instanceof JsonObject) {
                                                                     JsonObject jObj = (JsonObject) obj;
-                                                                    if (jObj.getArray("t.groups") != null && jObj.getArray("t.groups").size() > 0) {
-                                                                        JsonArray groups = jObj.getArray("t.groups");
-                                                                        for (int i = 0; i < groups.size(); i++) {
-                                                                            String group = groups.get(i).toString();
-                                                                            GAREnsGroupeMatiereKey key = new GAREnsGroupeMatiereKey(jObj.getString("s.UAI"), jObj.getString("u.id"), group);
-                                                                            //String key = jObj.getString("s.UAI") + jObj.getString("u.id") + group;
-                                                                            Set currentList = mapGroupes.get(key);
-                                                                            if (currentList == null) {
-                                                                                currentList = new HashSet<String>();
-                                                                                mapGroupes.put(key, currentList);
+                                                                    if (!bannedUsers.contains(jObj.getString("u.id"))) {
+                                                                        if (jObj.getArray("t.groups") != null && jObj.getArray("t.groups").size() > 0) {
+                                                                            JsonArray groups = jObj.getArray("t.groups");
+                                                                            for (int i = 0; i < groups.size(); i++) {
+                                                                                String group = groups.get(i).toString();
+                                                                                GAREnsGroupeMatiereKey key = new GAREnsGroupeMatiereKey(jObj.getString("s.UAI"), jObj.getString("u.id"), group);
+                                                                                Set currentList = mapGroupes.get(key);
+                                                                                if (currentList == null) {
+                                                                                    currentList = new HashSet<String>();
+                                                                                    mapGroupes.put(key, currentList);
+                                                                                }
+                                                                                currentList.add(jObj.getString("sub.code"));
                                                                             }
-                                                                            currentList.add(jObj.getString("sub.code"));
                                                                         }
-                                                                    }
-                                                                    if (jObj.getArray("t.classes") != null && jObj.getArray("t.classes").size() > 0) {
-                                                                        JsonArray classes = jObj.getArray("t.classes");
-                                                                        for (int i = 0; i < classes.size(); i++) {
-                                                                            String classe = classes.get(i).toString();
-                                                                            GAREnsGroupeMatiereKey key = new GAREnsGroupeMatiereKey(jObj.getString("s.UAI"), jObj.getString("u.id"), classe);
-                                                                            Set currentList = mapClasses.get(key);
-                                                                            if (currentList == null) {
-                                                                                currentList = new HashSet<String>();
-                                                                                mapClasses.put(key, currentList);
+                                                                        if (jObj.getArray("t.classes") != null && jObj.getArray("t.classes").size() > 0) {
+                                                                            JsonArray classes = jObj.getArray("t.classes");
+                                                                            for (int i = 0; i < classes.size(); i++) {
+                                                                                String classe = classes.get(i).toString();
+                                                                                GAREnsGroupeMatiereKey key = new GAREnsGroupeMatiereKey(jObj.getString("s.UAI"), jObj.getString("u.id"), classe);
+                                                                                Set currentList = mapClasses.get(key);
+                                                                                if (currentList == null) {
+                                                                                    currentList = new HashSet<String>();
+                                                                                    mapClasses.put(key, currentList);
+                                                                                }
+                                                                                currentList.add(jObj.getString("sub.code"));
                                                                             }
-                                                                            currentList.add(jObj.getString("sub.code"));
                                                                         }
                                                                     }
                                                                 }

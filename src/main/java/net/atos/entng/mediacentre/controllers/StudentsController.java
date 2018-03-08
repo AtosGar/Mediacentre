@@ -38,7 +38,7 @@ public class StudentsController {
     /**
      *  export Students
      */
-    public void exportStudents(final MediacentreService mediacentreService, final String path, int nbElementPerFile){
+    public void exportStudents(final MediacentreService mediacentreService, final String path, int nbElementPerFile, final Handler<List<String>> handler){
         counter = 0;
         pathExport = path;
         nbElem = nbElementPerFile;
@@ -102,6 +102,7 @@ public class StudentsController {
                                     } else {
                                         if( lastjObj != null && etabs.size() >= 2) {
                                             bannedUsers.add(lastjObj.getString("u.id"));
+                                            etabs = new ArrayList<String>();
                                         }
                                     }
                                     etabs.add(jObj.getString("s.UAI"));
@@ -248,12 +249,14 @@ public class StudentsController {
                                                 e.printStackTrace();*/
                                             }
                                         }
+                                        handler.handle(bannedUsers);
                                     }
                                 });
                             }
                         }
                     });
                 }
+
             }
         });
     }
