@@ -43,4 +43,6 @@ public interface MediacentreService {
 
     void getAllStructures(Handler<Either<String, JsonArray>> handler);
 
+    void getAllModules(Handler<Either<String, JsonArray>> handler);
+
 }

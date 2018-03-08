@@ -7,6 +7,7 @@ import org.vertx.java.core.json.JsonArray;
 import org.vertx.java.core.json.JsonObject;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
+import org.xml.sax.SAXException;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -18,6 +19,7 @@ import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
 import java.io.File;
+import java.io.IOException;
 import java.util.*;
 
 import static net.atos.entng.mediacentre.controllers.MediacentreController.getExportFileName;
@@ -95,7 +97,11 @@ public class GroupsController {
                             String grpCode = jObj.getString("c.externalId");
                             String[] parts = grpCode.split("\\$");
 
-                            MediacentreController.insertNode("men:GARGroupeCode", doc, garDivision, parts[1]);
+                            if( parts.length >= 2 ) {
+                                MediacentreController.insertNode("men:GARGroupeCode", doc, garDivision, MediacentreController.customSubString(parts[1], 255));
+                            } else {
+                                MediacentreController.insertNode("men:GARGroupeCode", doc, garDivision, "");
+                            }
                             MediacentreController.insertNode("men:GARStructureUAI", doc, garDivision, jObj.getString("s.UAI"));
                             MediacentreController.insertNode("men:GARGroupeLibelle", doc, garDivision, jObj.getString("c.name"));
                             MediacentreController.insertNode("men:GARGroupeStatut", doc, garDivision, "DIVISION");
@@ -126,7 +132,7 @@ public class GroupsController {
                                                 if (jObj.getString("fg.externalId") != null && !"null".equals(jObj.getString("fg.externalId"))) {
                                                     String grpCode = jObj.getString("fg.externalId");
                                                     String[] parts = grpCode.split("\\$");
-                                                    MediacentreController.insertNode("men:GARGroupeCode", doc, garGroup, parts[1]);
+                                                    MediacentreController.insertNode("men:GARGroupeCode", doc, garGroup, MediacentreController.customSubString(parts[1],255));
                                                 } else {
                                                     MediacentreController.insertNode("men:GARGroupeCode", doc, garGroup, jObj.getString("fg.id"));
                                                 }
@@ -164,7 +170,7 @@ public class GroupsController {
                                                     if (jObj.getString("fg.externalId") != null && !"null".equals(jObj.getString("fg.externalId"))) {
                                                         String grpCode = jObj.getString("fg.externalId");
                                                         String[] parts = grpCode.split("\\$");
-                                                        MediacentreController.insertNode("men:GARGroupeCode", doc, garPersonGroup, parts[1]);
+                                                        MediacentreController.insertNode("men:GARGroupeCode", doc, garPersonGroup, MediacentreController.customSubString(parts[1], 255));
                                                     } else {
                                                         MediacentreController.insertNode("men:GARGroupeCode", doc, garPersonGroup, jObj.getString("fg.id"));
                                                     }
@@ -192,9 +198,13 @@ public class GroupsController {
                                                             if (jObj.getString("c.externalId") != null && !"null".equals(jObj.getString("c.externalId"))) {
                                                                 String grpCode = jObj.getString("c.externalId");
                                                                 String[] parts = grpCode.split("\\$");
-                                                                MediacentreController.insertNode("men:GARGroupeCode", doc, garPersonGroup, parts[1]);
+                                                                if( parts.length < 2 ){
+                                                                    MediacentreController.insertNode("men:GARGroupeCode", doc, garPersonGroup, "null");
+                                                                } else {
+                                                                    MediacentreController.insertNode("men:GARGroupeCode", doc, garPersonGroup, MediacentreController.customSubString(parts[1], 255));
+                                                                }
                                                             } else {
-                                                                MediacentreController.insertNode("men:GARGroupeCode", doc, garPersonGroup, jObj.getString("c.id"));
+                                                                MediacentreController.insertNode("men:GARGroupeCode", doc, garPersonGroup, MediacentreController.customSubString(jObj.getString("c.id"),255));
                                                             }
                                                             counter += 4;
                                                             doc = testNumberOfOccurrences(doc);
@@ -260,11 +270,11 @@ public class GroupsController {
                                                                 MediacentreController.insertNode("men:GARPersonIdentifiant", doc, garEnGroupeMatiere, key.getUid());
                                                                 String grpCode = key.getGroup();
                                                                 String[] parts = grpCode.split("\\$");
-                                                                MediacentreController.insertNode("men:GARGroupeCode", doc, garEnGroupeMatiere, parts[1]);
+                                                                MediacentreController.insertNode("men:GARGroupeCode", doc, garEnGroupeMatiere, MediacentreController.customSubString(parts[1], 255));
                                                                 for (Object s : currentList) {
                                                                     if (s instanceof String) {
                                                                         String subject = (String) s;
-                                                                        MediacentreController.insertNode("men:GARMatiereCode", doc, garEnGroupeMatiere, subject);
+                                                                        MediacentreController.insertNode("men:GARMatiereCode", doc, garEnGroupeMatiere, MediacentreController.customSubString(subject, 255));
                                                                         counter++;
                                                                     }
                                                                 }
@@ -281,11 +291,11 @@ public class GroupsController {
                                                                 MediacentreController.insertNode("men:GARPersonIdentifiant", doc, garEnGroupeMatiere, key.getUid());
                                                                 String grpCode = key.getGroup();
                                                                 String[] parts = grpCode.split("\\$");
-                                                                MediacentreController.insertNode("men:GARGroupeCode", doc, garEnGroupeMatiere, parts[1]);
+                                                                MediacentreController.insertNode("men:GARGroupeCode", doc, garEnGroupeMatiere, MediacentreController.customSubString(parts[1], 255));
                                                                 for (Object s : currentList) {
                                                                     if (s instanceof String) {
                                                                         String subject = (String) s;
-                                                                        MediacentreController.insertNode("men:GARMatiereCode", doc, garEnGroupeMatiere, subject);
+                                                                        MediacentreController.insertNode("men:GARMatiereCode", doc, garEnGroupeMatiere, MediacentreController.customSubString(subject, 255));
                                                                         counter++;
                                                                     }
                                                                 }
@@ -305,12 +315,19 @@ public class GroupsController {
                                                             StreamResult result = new StreamResult(new File(path + getExportFileName("Groupe", fileIndex)));
 
                                                             transformer.transform(source, result);
-                                                            /*boolean res = MediacentreController.isFileValid(pathExport + getExportFileName("Groupes", fileIndex));
+                                                            boolean res = false;
+                                                            try {
+                                                                res = MediacentreController.isFileValid(pathExport + getExportFileName("Groupe", fileIndex));
+                                                            } catch (IOException e) {
+                                                                e.printStackTrace();
+                                                            } catch (SAXException e) {
+                                                                e.printStackTrace();
+                                                            }
                                                             if( res == false ){
                                                                 System.out.println("Error on file : " + pathExport + getExportFileName("Groupes", fileIndex));
                                                             } else {
                                                                 System.out.println("File valid : " + pathExport + getExportFileName("Groupes", fileIndex));
-                                                            }*/
+                                                            }
 
                                                             System.out.println("Groupes saved");
                                                         } catch (TransformerException tfe) {
@@ -346,12 +363,19 @@ public class GroupsController {
                 StreamResult result = new StreamResult(new File(pathExport + getExportFileName("Groupe", fileIndex)));
 
                 transformer.transform(source, result);
-             /*   boolean res = MediacentreController.isFileValid(pathExport + getExportFileName("Groupe", fileIndex));
+                boolean res = false;
+                try {
+                    res = MediacentreController.isFileValid(pathExport + getExportFileName("Groupe", fileIndex));
+                } catch (IOException e) {
+                    e.printStackTrace();
+                } catch (SAXException e) {
+                    e.printStackTrace();
+                }
                 if( res == false ){
                     System.out.println("Error on file : " + pathExport + getExportFileName("Groupe", fileIndex));
                 } else {
                     System.out.println("File valid : " + pathExport + getExportFileName("Groupe", fileIndex));
-                }*/
+                }
 
                 System.out.println("Groupes" + fileIndex + " saved");
                 fileIndex++;

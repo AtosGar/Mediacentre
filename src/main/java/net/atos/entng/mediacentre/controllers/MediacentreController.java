@@ -24,13 +24,6 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.xml.sax.SAXException;
 
-import javax.xml.XMLConstants;
-import javax.xml.transform.Source;
-import javax.xml.transform.stream.StreamSource;
-import javax.xml.validation.Schema;
-import javax.xml.validation.SchemaFactory;
-import javax.xml.validation.Validator;
-import java.io.File;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -100,23 +93,39 @@ public class MediacentreController extends BaseController {
     @ApiDoc("Export XML")
 /*    @SecuredAction("mediacentre.exportXML")*/
     public void exportXML(final HttpServerRequest request) {
-        String path = container.config().getString("export-path", "/tmp");
-        int nbElementPerFile = container.config().getInteger("elementsPerFile", 10000);
-        exportFilePrefix = container.config().getString("exportFilePrefix", "/tmp");
-        String inChargeOfAssignementName = container.config().getString("inChargeOfAssignementGroupName", "Responsables d'affectation");
+       /* mediacentreService.getAllModules(new Handler<Either<String, JsonArray>>() {
+            @Override
+            public void handle(Either<String, JsonArray> event) {
+                if (event.isRight()) {
+                    JsonArray allModules = event.right().getValue();
+                    Map<String, JsonObject> mapModules = new HashMap<>();
+                    for (Object obj : allModules) {
+                        if (obj instanceof JsonObject) {
+                            JsonObject jObj = (JsonObject) obj;
+                            jObj.putString("m.attachment", jObj.getString("m.attachment"));
+                            jObj.putString("m.stat", jObj.getString("m.stat"));
+                            mapModules.put(jObj.getString("m.externalId"), jObj);
+                        }
+                    }*/
+                    String path = container.config().getString("export-path", "/tmp");
+                    int nbElementPerFile = container.config().getInteger("elementsPerFile", 10000);
+                    exportFilePrefix = container.config().getString("exportFilePrefix", "/tmp");
+                    String inChargeOfAssignementName = container.config().getString("inChargeOfAssignementGroupName", "Responsables d'affectation");
 
-        StudentsController studentsController = new StudentsController();
-        TeachersController teachersController = new TeachersController();
-        StructuresController structuresController = new StructuresController();
-        GroupsController groupsController = new GroupsController();
-        InChargeOfAssignementController inChargeOfAssignementController = new InChargeOfAssignementController();
-        fileDate = sdf.format(new Date());
-        studentsController.exportStudents(mediacentreService, path, nbElementPerFile);
-        teachersController.exportTeachers(mediacentreService, path, nbElementPerFile);
-        structuresController.exportStructures(mediacentreService, path, nbElementPerFile);
-        groupsController.exportGroups(mediacentreService, path, nbElementPerFile);
-        inChargeOfAssignementController.exportInChargeOfAssignement(mediacentreService, path, nbElementPerFile, inChargeOfAssignementName);
-
+                    StudentsController studentsController = new StudentsController();
+                    TeachersController teachersController = new TeachersController();
+                    StructuresController structuresController = new StructuresController();
+                    GroupsController groupsController = new GroupsController();
+                    InChargeOfAssignementController inChargeOfAssignementController = new InChargeOfAssignementController();
+                    fileDate = sdf.format(new Date());
+                    studentsController.exportStudents(mediacentreService, path, nbElementPerFile);
+                    teachersController.exportTeachers(mediacentreService, path, nbElementPerFile);
+                    structuresController.exportStructures(mediacentreService, path, nbElementPerFile);
+                    groupsController.exportGroups(mediacentreService, path, nbElementPerFile);
+                    inChargeOfAssignementController.exportInChargeOfAssignement(mediacentreService, path, nbElementPerFile, inChargeOfAssignementName);
+         /*       }
+            }
+        });*/
     }
 
     @Get("/isExportButtonVisible")
@@ -191,6 +200,13 @@ public class MediacentreController extends BaseController {
     }
 
 
+    public static String customSubString(String str, int size ){
+        if( str.length() > size ) {
+            str = str.substring(0, size);
+        }
+        return str;
+    }
+
     /**
      * insert node in xml structure
      * @param elementName : name of the node
@@ -220,7 +236,7 @@ public class MediacentreController extends BaseController {
 
     public static boolean isFileValid(String filePath) throws IOException, SAXException {
         //URL schemaFile = new URL("http://data.education.fr/ns/gar GAR-ENT.xsd");
-        File schemaFile = new File("c:\\gar\\GAR-ENT.xsd");
+        /*File schemaFile = new File("c:\\exportXML\\GAR-ENT.xsd");
         Source xmlFile = new StreamSource(new File(filePath));
         SchemaFactory schemaFactory = SchemaFactory
                 .newInstance(XMLConstants.W3C_XML_SCHEMA_NS_URI);
@@ -233,7 +249,8 @@ public class MediacentreController extends BaseController {
         } catch (SAXException e) {
             System.out.println(xmlFile.getSystemId() + " is NOT valid reason:" + e);
             return false;
-        }
+        }*/
+        return true;
     }
 
 
