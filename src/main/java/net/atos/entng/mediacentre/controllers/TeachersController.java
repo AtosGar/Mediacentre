@@ -84,7 +84,7 @@ public class TeachersController {
 
                                                     garEnseignant = doc.createElement("men:GAREnseignant");
                                                     garEntEnseignant.appendChild(garEnseignant);
-                                                    MediacentreController.insertNode("men:GARPersonIdentifiant", doc, garEnseignant, jObj.getString("u.id"));
+                                                    MediacentreController.insertNode("men:GARPersonIdentifiant", doc, garEnseignant, lastjObj.getString("u.id"));
 
                                                     while (it.hasNext()) {
                                                         Map.Entry pair = (Map.Entry)it.next();
