@@ -86,9 +86,9 @@ public class StudentsController {
                                         MediacentreController.insertNode("men:GARPersonNom", doc, garEleve, lastjObj.getString("u.lastName"));
                                         MediacentreController.insertNode("men:GARPersonPrenom", doc, garEleve, lastjObj.getString("u.firstName"));
                                         if (lastjObj.getString("u.otherNames") != null) {
-                                            MediacentreController.insertNode("men:GARPersonAutresPrenoms", doc, garEleve, lastjObj.getString("u.firstName"));
-                                        } else {
                                             MediacentreController.insertNode("men:GARPersonAutresPrenoms", doc, garEleve, lastjObj.getString("u.otherNames"));
+                                        } else {
+                                            MediacentreController.insertNode("men:GARPersonAutresPrenoms", doc, garEleve, lastjObj.getString("u.firstName"));
                                         }
                                         MediacentreController.insertNode("men:GARPersonCivilite", doc, garEleve, lastjObj.getString(""));
                                         MediacentreController.insertNode("men:GARPersonStructRattach", doc, garEleve, lastjObj.getString("s.UAI"));
@@ -150,9 +150,9 @@ public class StudentsController {
                         MediacentreController.insertNode("men:GARPersonNom", doc, garEleve, lastjObj.getString("u.lastName"));
                         MediacentreController.insertNode("men:GARPersonPrenom", doc, garEleve, lastjObj.getString("u.firstName"));
                         if (lastjObj.getString("u.otherNames") != null) {
-                            MediacentreController.insertNode("men:GARPersonAutresPrenoms", doc, garEleve, lastjObj.getString("u.firstName"));
-                        } else {
                             MediacentreController.insertNode("men:GARPersonAutresPrenoms", doc, garEleve, lastjObj.getString("u.otherNames"));
+                        } else {
+                            MediacentreController.insertNode("men:GARPersonAutresPrenoms", doc, garEleve, lastjObj.getString("u.firstName"));
                         }
                         MediacentreController.insertNode("men:GARPersonCivilite", doc, garEleve, lastjObj.getString(""));
                         MediacentreController.insertNode("men:GARPersonStructRattach", doc, garEleve, lastjObj.getString("s.UAI"));
