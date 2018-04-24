@@ -133,8 +133,8 @@ public class MediacentreController extends BaseController {
                         }
                     });
 
-
-                    inChargeOfAssignementController.exportInChargeOfAssignement(mediacentreService, path, nbElementPerFile, inChargeOfAssignementName);
+                    final String emailDefault = container.config().getString("emailDefault", "noreply@noreply.fr");
+                    inChargeOfAssignementController.exportInChargeOfAssignement(mediacentreService, path, nbElementPerFile, inChargeOfAssignementName, emailDefault);
          /*       }
             }
         });*/
