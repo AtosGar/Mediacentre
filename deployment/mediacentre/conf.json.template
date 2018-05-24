@@ -18,6 +18,7 @@
 	"inChargeOfAssignementGroupName" : "GARRESPAFFECTATION",
     "idEnt" : "Z0",
     "userExportXML" : "admin.xmlgar",
+    "emailDefault" : "noreply@gar.education.fr",
     "hostWS" : "list-ressource.gar.as8677.net",
     "headerWSX-Id-Ent" : "simulent.validation.test-gar.education.fr"
     }

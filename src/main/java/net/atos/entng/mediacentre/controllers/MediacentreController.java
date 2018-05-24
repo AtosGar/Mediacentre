@@ -144,8 +144,12 @@ public class MediacentreController extends BaseController {
                     });
 
 
+
                     inChargeOfAssignementController.exportInChargeOfAssignement(mediacentreService, path, nbElementPerFile, inChargeOfAssignementName);
-                    System.out.println("Enf of export XML");
+
+                    final String emailDefault = container.config().getString("emailDefault", "noreply@noreply.fr");
+                    inChargeOfAssignementController.exportInChargeOfAssignement(mediacentreService, path, nbElementPerFile, inChargeOfAssignementName, emailDefault);
+
          /*       }
             }
         });*/

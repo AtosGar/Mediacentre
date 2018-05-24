@@ -30,7 +30,7 @@ public class InChargeOfAssignementController {
     /**
      *  export Structures
      */
-    public void exportInChargeOfAssignement(final MediacentreService mediacentreService, final String path, int nbElementPerFile, String inChargeOfAssignementName){
+    public void exportInChargeOfAssignement(final MediacentreService mediacentreService, final String path, int nbElementPerFile, String inChargeOfAssignementName, final String defaultEmail){
         String groupName = "Responsables d'affectation";
         mediacentreService.getInChargeOfExportData(inChargeOfAssignementName, new Handler<Either<String, JsonArray>>() {
             @Override
@@ -80,7 +80,12 @@ public class InChargeOfAssignementController {
                                 MediacentreController.insertNode("men:GARPersonNom", doc, garRespAff, jObj.getString("u.lastName"));
                                 MediacentreController.insertNode("men:GARPersonPrenom", doc, garRespAff, jObj.getString("u.firstName"));
                                 MediacentreController.insertNode("men:GARPersonCivilite", doc, garRespAff, "");
-                                MediacentreController.insertNode("men:GARPersonMail", doc, garRespAff, jObj.getString("u.email"));
+                                if( jObj.getString("u.email") != null && !"".equals(jObj.getString("u.email"))  ){
+                                    MediacentreController.insertNode("men:GARPersonMail", doc, garRespAff, jObj.getString("u.email"));
+                                } else {
+                                    // put the default email from parameter in ent-core.json
+                                    MediacentreController.insertNode("men:GARPersonMail", doc, garRespAff, defaultEmail);
+                                }
                                 MediacentreController.insertNode("men:GARRespAffEtab", doc, garRespAff, jObj.getString("s2.UAI"));
                                 lastUserId = jObj.getString("u.id");
                             } else {
