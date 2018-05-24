@@ -65,7 +65,8 @@ public class MediacentreController extends BaseController {
 
     /**
      * Creates a new controller.
-     *  @param collection Name of the collection stored in the mongoDB database.
+     *
+     * @param collection Name of the collection stored in the mongoDB database.
      */
     public MediacentreController(String collection) {
         super();
@@ -92,7 +93,7 @@ public class MediacentreController extends BaseController {
 
     @Get("/exportXML")
     @ApiDoc("Export XML")
-/*    @SecuredAction("mediacentre.exportXML")*/
+    /*    @SecuredAction("mediacentre.exportXML")*/
     public void exportXML(final HttpServerRequest request) {
        /* mediacentreService.getAllModules(new Handler<Either<String, JsonArray>>() {
             @Override
@@ -108,48 +109,33 @@ public class MediacentreController extends BaseController {
                             mapModules.put(jObj.getString("m.externalId"), jObj);
                         }
                     }*/
-                    final String path = container.config().getString("export-path", "/tmp");
+        final String path = container.config().getString("export-path", "/tmp");
+        final int nbElementPerFile = container.config().getInteger("elementsPerFile", 10000);
+        exportFilePrefix = container.config().getString("exportFilePrefix", "/tmp");
+        String inChargeOfAssignementName = container.config().getString("inChargeOfAssignementGroupName", "Responsables d'affectation");
 
-                    final int nbElementPerFile = container.config().getInteger("elementsPerFile", 10000);
+        final StudentsController studentsController = new StudentsController();
+        StructuresController structuresController = new StructuresController();
+        final TeachersController teachersController = new TeachersController();
+        final GroupsController groupsController = new GroupsController();
+        InChargeOfAssignementController inChargeOfAssignementController = new InChargeOfAssignementController();
+        fileDate = sdf.format(new Date());
+        structuresController.exportStructures(mediacentreService, path, nbElementPerFile);
+        teachersController.exportTeachers(mediacentreService, path, nbElementPerFile, new Handler<List<String>>() {
+            @Override
+            public void handle(final List<String> bannedUsers) {
+                studentsController.exportStudents(mediacentreService, path, nbElementPerFile, new Handler<List<String>>() {
+                    @Override
+                    public void handle(final List<String> bannedUsersStudents) {
+                        bannedUsers.addAll(bannedUsersStudents);
+                        groupsController.exportGroups(mediacentreService, path, nbElementPerFile, bannedUsers);
+                    }
+                });
+            }
+        });
 
-                    exportFilePrefix = container.config().getString("exportFilePrefix", "/tmp");
-
-                    String inChargeOfAssignementName = container.config().getString("inChargeOfAssignementGroupName", "Responsables d'affectation");
-
-                    final StudentsController studentsController = new StudentsController();
-
-                    StructuresController structuresController = new StructuresController();
-
-                    final TeachersController teachersController = new TeachersController();
-
-                    final GroupsController groupsController = new GroupsController();
-
-                    InChargeOfAssignementController inChargeOfAssignementController = new InChargeOfAssignementController();
-
-                    fileDate = sdf.format(new Date());
-
-                    structuresController.exportStructures(mediacentreService, path, nbElementPerFile);
-
-                    teachersController.exportTeachers(mediacentreService, path, nbElementPerFile, new Handler<List<String>>() {
-                        @Override
-                        public void handle(final List<String> bannedUsers) {
-                            studentsController.exportStudents(mediacentreService, path, nbElementPerFile, new Handler<List<String>>() {
-                                @Override
-                                public void handle(final List<String> bannedUsersStudents) {
-                                    bannedUsers.addAll(bannedUsersStudents);
-                                    groupsController.exportGroups(mediacentreService, path, nbElementPerFile, bannedUsers);
-                                }
-                            });
-                        }
-                    });
-
-
-
-                    inChargeOfAssignementController.exportInChargeOfAssignement(mediacentreService, path, nbElementPerFile, inChargeOfAssignementName);
-
-                    final String emailDefault = container.config().getString("emailDefault", "noreply@noreply.fr");
-                    inChargeOfAssignementController.exportInChargeOfAssignement(mediacentreService, path, nbElementPerFile, inChargeOfAssignementName, emailDefault);
-
+        final String emailDefault = container.config().getString("emailDefault", "noreply@noreply.fr");
+        inChargeOfAssignementController.exportInChargeOfAssignement(mediacentreService, path, nbElementPerFile, inChargeOfAssignementName, emailDefault);
          /*       }
             }
         });*/
@@ -209,7 +195,6 @@ public class MediacentreController extends BaseController {
     }
 
 
-
     @Get("/getUserStructures/:userId")
     @ApiDoc("Get user main structure")
     public void getUserStructures(final HttpServerRequest request) {
@@ -227,8 +212,8 @@ public class MediacentreController extends BaseController {
     }
 
 
-    public static String customSubString(String str, int size ){
-        if( str.length() > size ) {
+    public static String customSubString(String str, int size) {
+        if (str.length() > size) {
             str = str.substring(0, size);
         }
         return str;
@@ -236,13 +221,14 @@ public class MediacentreController extends BaseController {
 
     /**
      * insert node in xml structure
+     *
      * @param elementName : name of the node
-     * @param doc : document that is created
-     * @param source : parent node
-     * @param value : value of the node
+     * @param doc         : document that is created
+     * @param source      : parent node
+     * @param value       : value of the node
      */
-    public static void insertNode(String elementName, Document doc, Element source, String value ){
-        if( value != null ) {
+    public static void insertNode(String elementName, Document doc, Element source, String value) {
+        if (value != null) {
             Element elem = doc.createElement(elementName);
             elem.appendChild(doc.createTextNode(value));
             source.appendChild(elem);
@@ -250,13 +236,12 @@ public class MediacentreController extends BaseController {
     }
 
     /**
-     *
-     * @param name : name of the type of export
+     * @param name      : name of the type of export
      * @param fileIndex : it is a number put at the end
      * @return
      */
-    public static String getExportFileName(String name, int fileIndex){
-        String formattedIndex = String.format ("%04d", fileIndex);
+    public static String getExportFileName(String name, int fileIndex) {
+        String formattedIndex = String.format("%04d", fileIndex);
         String fileName = exportFilePrefix + "_GAR-ENT_Complet_" + fileDate + "_" + name + "_" + formattedIndex + ".xml";
         return fileName;
     }
