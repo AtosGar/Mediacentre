@@ -109,17 +109,27 @@ public class MediacentreController extends BaseController {
                         }
                     }*/
                     final String path = container.config().getString("export-path", "/tmp");
+
                     final int nbElementPerFile = container.config().getInteger("elementsPerFile", 10000);
+
                     exportFilePrefix = container.config().getString("exportFilePrefix", "/tmp");
+
                     String inChargeOfAssignementName = container.config().getString("inChargeOfAssignementGroupName", "Responsables d'affectation");
 
                     final StudentsController studentsController = new StudentsController();
+
                     StructuresController structuresController = new StructuresController();
+
                     final TeachersController teachersController = new TeachersController();
+
                     final GroupsController groupsController = new GroupsController();
+
                     InChargeOfAssignementController inChargeOfAssignementController = new InChargeOfAssignementController();
+
                     fileDate = sdf.format(new Date());
+
                     structuresController.exportStructures(mediacentreService, path, nbElementPerFile);
+
                     teachersController.exportTeachers(mediacentreService, path, nbElementPerFile, new Handler<List<String>>() {
                         @Override
                         public void handle(final List<String> bannedUsers) {
@@ -135,6 +145,7 @@ public class MediacentreController extends BaseController {
 
 
                     inChargeOfAssignementController.exportInChargeOfAssignement(mediacentreService, path, nbElementPerFile, inChargeOfAssignementName);
+                    System.out.println("Enf of export XML");
          /*       }
             }
         });*/
