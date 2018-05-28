@@ -173,10 +173,10 @@ public class MediacentreServiceImpl implements MediacentreService {
     public void getUserStructures(String userId, Handler<Either<String, JsonArray>> handler){
         String query = "match (s:Structure)<-[ADMINISTRATIVE_ATTACHMENT]-(u:User) " +
                 "where u.id = {id} " +
-                "return substring(s.UAI, 0, 44) as `s.UAI`, s.name as name " +
+                "return substring(s.UAI, 0, 44) as UAI, s.name as name " +
                 "UNION match (s2:Structure)<-[DEPENDS]-(g:Group)<-[IN]-(u:User) " +
                 "where u.id = {id} " +
-                "return substring(s2.UAI, 0, 44) as `s.UAI`, s2.name as name;";
+                "return substring(s2.UAI, 0, 44) as UAI, s2.name as name;";
         JsonObject params = new JsonObject().putString("id", userId);
         neo4j.execute(query, params, validResultHandler(handler));
     }
