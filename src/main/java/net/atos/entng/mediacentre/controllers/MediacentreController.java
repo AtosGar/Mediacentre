@@ -30,6 +30,12 @@ import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
+import java.io.BufferedReader;
+import java.io.FileReader;
+import java.io.IOException;
+import java.util.ArrayList;
+
+
 
 /**
  * Vert.x backend controller for the application using Mongodb.
@@ -109,10 +115,14 @@ public class MediacentreController extends BaseController {
                             mapModules.put(jObj.getString("m.externalId"), jObj);
                         }
                     }*/
+
         final String path = container.config().getString("export-path", "/tmp");
         final int nbElementPerFile = container.config().getInteger("elementsPerFile", 10000);
         exportFilePrefix = container.config().getString("exportFilePrefix", "/tmp");
         String inChargeOfAssignementName = container.config().getString("inChargeOfAssignementGroupName", "Responsables d'affectation");
+
+        String uaiList1DPath= container.config().getString("uai-2D-list-path");
+        final String exportUAIList2D = getExportUAIListFromFile(uaiList1DPath);
 
         final StudentsController studentsController = new StudentsController();
         StructuresController structuresController = new StructuresController();
@@ -139,6 +149,70 @@ public class MediacentreController extends BaseController {
          /*       }
             }
         });*/
+    }
+
+    /**
+     * Juin 2018
+     * fonction d'export des fichiers XML GAR pour le premier degré
+     * @param request
+     */
+    @Get("/exportXML_1D")
+    @ApiDoc("Export XML_1D")
+    public void exportXML_1D(final HttpServerRequest request) {
+
+        final String path = container.config().getString("export-path", "/tmp");
+
+        final int nbElementPerFile = container.config().getInteger("elementsPerFile", 10000);
+
+        exportFilePrefix = container.config().getString("exportFilePrefix", "/tmp");
+
+        String uaiList1DPath= container.config().getString("uai-1D-list-path");
+
+        final String exportUAIList1D = getExportUAIListFromFile(uaiList1DPath);
+
+        String inChargeOfAssignementName = container.config().getString("inChargeOfAssignementGroupName", "Responsables d'affectation");
+
+        final StudentsController studentsController = new StudentsController();
+
+        StructuresController structuresController = new StructuresController();
+
+        final TeachersController teachersController = new TeachersController();
+
+        final GroupsController groupsController = new GroupsController();
+
+        InChargeOfAssignementController inChargeOfAssignementController = new InChargeOfAssignementController();
+
+        fileDate = sdf.format(new Date());
+
+        /**
+         * Begin export
+         */
+        structuresController.exportStructures_1D(mediacentreService, path, nbElementPerFile, exportUAIList1D);
+
+        groupsController.exportGroups_1D(mediacentreService, path, nbElementPerFile, exportUAIList1D);
+
+        teachersController.exportTeachers_1D(mediacentreService, path, nbElementPerFile, exportUAIList1D, new Handler<List<String>>() {
+
+            @Override
+            public void handle(final List<String> bannedUsers) {
+
+                studentsController.exportStudents_1D(mediacentreService, path, nbElementPerFile, exportUAIList1D, new Handler<List<String>>() {
+
+                    @Override
+                    public void handle(final List<String> bannedUsersStudents) {
+
+                        groupsController.exportGroups_1D(mediacentreService, path, nbElementPerFile, exportUAIList1D);
+
+                    }
+                });
+            }
+
+        });
+
+        final String emailDefault = container.config().getString("emailDefault", "noreply@noreply.fr");
+
+        inChargeOfAssignementController.exportInChargeOfAssignement_1D(mediacentreService, path, nbElementPerFile,
+                inChargeOfAssignementName, emailDefault, exportUAIList1D);
     }
 
     @Get("/isExportButtonVisible")
@@ -264,6 +338,24 @@ public class MediacentreController extends BaseController {
         }*/
         return true;
     }
+
+    public String getExportUAIListFromFile(String pathFile){
+        ArrayList<String> uaiList = new ArrayList<String>();
+        try (BufferedReader br = new BufferedReader(new FileReader(pathFile)))
+        {
+            String sCurrentLine;
+
+            while ((sCurrentLine = br.readLine()) != null) {
+                uaiList.add("'" + sCurrentLine + "'");
+            }
+
+        } catch (IOException e){
+            e.printStackTrace();
+        }
+
+        return uaiList.toString();
+    }
+
 
 
 }

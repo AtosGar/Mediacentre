@@ -365,6 +365,134 @@ public class StructuresController {
         });
     }
 
+
+    /**
+     * Export des établissements 1D
+     * @param mediacentreService
+     * @param path
+     * @param nbElementPerFile
+     */
+    public void exportStructures_1D(final MediacentreService mediacentreService, final String path,
+                                    int nbElementPerFile, final String exportUAIList1D){
+        counter = 0;
+        pathExport = path;
+        nbElem = nbElementPerFile;
+
+        mediacentreService.getAllModules(new Handler<Either<String, JsonArray>>() {
+            @Override
+            public void handle(Either<String, JsonArray> event) {
+                if (event.isRight()) {
+                    JsonArray allModules = event.right().getValue();
+                    for (Object obj : allModules) {
+                        if (obj instanceof JsonObject) {
+                            JsonObject jObj = (JsonObject) obj;
+                            jObj.putString("m.attachment", jObj.getString("m.attachment"));
+                            jObj.putString("m.stat", jObj.getString("m.stat"));
+                            mapModules.put(jObj.getString("m.externalId"), jObj);
+                        }
+                    }
+
+                    mediacentreService.getAllStructures_1D(exportUAIList1D, new Handler<Either<String, JsonArray>>() {
+                        @Override
+                        public void handle(Either<String, JsonArray> event) {
+                            if (event.isRight()) {
+                                // construct hashmap association between UAI and externalId
+                                final Map<String, String> mapStructures = new HashMap<String, String>();
+                                JsonArray allStructures = event.right().getValue();
+                                for (Object obj : allStructures) {
+                                    if (obj instanceof JsonObject) {
+                                        JsonObject jObj = (JsonObject) obj;
+                                        mapStructures.put(jObj.getString("s.externalId"), jObj.getString("s.UAI"));
+                                    }
+                                }
+                                //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+                                mediacentreService.getEtablissement_1D(exportUAIList1D, new Handler<Either<String, JsonArray>>() {
+                                    @Override
+                                    public void handle(Either<String, JsonArray> event) {
+                                        if (event.isRight()) {
+                                            // write the content into xml file
+                                            final JsonArray structures = event.right().getValue();
+                                            doc = fileHeader();
+                                            //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+                                            // men:GAREtab
+                                            String lastStructureId = "none";
+                                            String lastContract = "";
+                                            String lastPhone = "";
+                                            Element garEtab = null;
+                                            for (Object obj : structures) {
+                                                if (obj instanceof JsonObject) {
+                                                    JsonObject jObj = (JsonObject) obj;
+
+                                                    if (jObj.getString("s.UAI") != null && !jObj.getString("s.UAI").equals(lastStructureId)) {
+
+                                                        // we finish the precedent node, if exists
+                                                        if (!"none".equals(lastStructureId)) {
+                                                            MediacentreController.insertNode("men:GARStructureContrat", doc, garEtab, lastContract);
+                                                            MediacentreController.insertNode("men:GARStructureTelephone", doc, garEtab, lastPhone);
+                                                            //MediacentreController.insertNode("men:GARStructureEmail", doc, garEtab, "null");
+                                                        }
+                                                        doc = testNumberOfOccurrences(doc);
+                                                        lastStructureId = jObj.getString("s.UAI");
+                                                        garEtab = doc.createElement("men:GAREtab");
+                                                        garEntEtablissement.appendChild(garEtab);
+
+                                                        //GARPersonIdentifiant
+                                                        MediacentreController.insertNode("men:GARStructureUAI", doc, garEtab, jObj.getString("s.UAI"));
+                                                        MediacentreController.insertNode("men:GARStructureNomCourant", doc, garEtab, jObj.getString("s.name"));
+                                                        counter += 5;
+                                                    }
+                                                    lastContract = jObj.getString("s.sector");
+                                                    lastPhone = jObj.getString("s.phone");
+                                                }
+                                            }
+                                            // we finish the last node
+                                            if (!"none".equals(lastStructureId)) {
+                                                MediacentreController.insertNode("men:GARStructureContrat", doc, garEtab, lastContract);
+                                                MediacentreController.insertNode("men:GARStructureTelephone", doc, garEtab, lastPhone);
+                                                MediacentreController.insertNode("men:GARStructureEmail", doc, garEtab, "null");
+                                            }
+
+                                            //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+                                            try {
+                                                TransformerFactory transformerFactory = TransformerFactory.newInstance();
+                                                Transformer transformer = transformerFactory.newTransformer();
+                                                transformer.setOutputProperty(OutputKeys.INDENT, "yes");
+                                                transformer.setOutputProperty("{http://xml.apache.org/xslt}indent-amount", "2");
+                                                DOMSource source = new DOMSource(doc);
+                                                StreamResult result = new StreamResult(new File(path + getExportFileName("Etab", fileIndex)));
+                                                transformer.transform(source, result);
+
+                                                System.out.println("Structures saved");
+                                                boolean res = false;
+                                                try {
+                                                    res = MediacentreController.isFileValid(pathExport + getExportFileName("Etab", fileIndex));
+                                                } catch (IOException e) {
+                                                    e.printStackTrace();
+                                                } catch (SAXException e) {
+                                                    e.printStackTrace();
+                                                }
+                                                if( res == false ){
+                                                    System.out.println("Error on file : " + pathExport + getExportFileName("Etab", fileIndex));
+                                                } else {
+                                                    System.out.println("File valid : " + pathExport + getExportFileName("Etab", fileIndex));
+                                                }
+                                            } catch (TransformerException tfe) {
+                                                tfe.printStackTrace();
+
+                                            }
+
+                                        }
+                                    }
+                                });
+                            }
+                        };
+                    });
+                }
+            };
+        });
+    }
+
+
     private Document testNumberOfOccurrences(Document doc) {
         if (nbElem <= counter) {
             // close the full file
@@ -428,7 +556,22 @@ public class StructuresController {
         garEntEtablissement.setAttribute("xsi:schemaLocation", "http://data.education.fr/ns/gar GAR-ENT.xsd");
         return doc;
     }
-
+/*
+    public static List<String> loadLines(File file) throws IOException {
+        List<String> lines = new ArrayList<>();
+        InputStream is = new FileInputStream(file);
+        Reader tmpReader = new InputStreamReader(is, "utf-8");
+        BufferedReader reader = new BufferedReader(tmpReader);
+        try {
+            for(String line = reader.readLine(); line != null; line = reader.readLine()) {
+                lines.add(line);
+            }
+            return lines;
+        } finally {
+            reader.close();
+        }
+    }
+*/
 }
 
 

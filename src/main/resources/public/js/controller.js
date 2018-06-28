@@ -37,6 +37,12 @@ function MediacentreController($scope, template, model, route, $location) {
         });
     }
 
+    $scope.exportXML_1D = function(){
+        model.exportXML_1D(function(result) {
+            notify.info('mediacentre.export1D.launched');
+        });
+    }
+
     $scope.getRessources = function (struct) {
        model.getRessources(struct, function(result) {
            //result = {"Erreur":{"Code":"Bad Request","Message":"L\u0027établissement n\u0027existe pas ou n\u0027est pas associé au projet ENT","Resource":"/ressources/ENTTEST1/666-ET6/5577102-ET6"}};

@@ -31,12 +31,44 @@ public class MediacentreServiceImpl implements MediacentreService {
     }
 
     @Override
+    public void getStudentExportData_1D(String uaiExportList, Handler<Either<String, JsonArray>> handler) {
+         String query = "MATCH (p:Profile)<-[HAS_PROFILE]-(pg:ProfileGroup)<-[IN]-(u:User) " +
+                "where p.name = 'Student'  AND u.source = 'AAF1D'" +
+                "OPTIONAL MATCH (u:User)-[ADMINISTRATIVE_ATTACHMENT]->(s:Structure) " +
+                "OPTIONAL MATCH (pg:ProfileGroup)-[DEPENDS]->(s2:Structure) " +
+                "where s is null or s.UAI <> s2.UAI and s.UAI in " + uaiExportList +" " +
+                "return distinct substring(u.id, 0, 63) as `u.id`, substring(u.lastName, 0, 499) as `u.lastName`, u.displayName, " +
+                " substring(u.firstName, 0, 499) as `u.firstName`, u.structures, u.birthDate, " +
+                "substring(s.UAI, 0, 44) as `s.UAI`, substring(s2.UAI, 0, 44) as `s2.UAI` order by `u.id` ";
+        neo4j.execute(query, new JsonObject(), validResultHandler(handler));
+    }
+
+
+    @Override
     public void getPersonMef(Handler<Either<String, JsonArray>> handler) {
         String query = "MATCH  (p:Profile)<-[HAS_PROFILE]-(pg:ProfileGroup)<-[IN]-(u:User)-[ADMINISTRATIVE_ATTACHMENT]->(s:Structure) " +
                 "where p.name = 'Student' " +
                 "return distinct substring(u.id, 0, 63) as `u.id`, substring(u.module, 0, 254) as `u.module`, substring(s.UAI, 0, 44) as `s.UAI` order by `u.id`";
         neo4j.execute(query, new JsonObject(), validResultHandler(handler));
     }
+
+    @Override
+    public void getPersonMefStat4_1D(String uaiExportList, Handler<Either<String, JsonArray>> handler) {
+        String query = "MATCH  (p:Profile)<-[HAS_PROFILE]-(pg:ProfileGroup)<-[IN]-(u:User)-[ADMINISTRATIVE_ATTACHMENT]->(s:Structure) " +
+                "where p.name = 'Student'  AND u.source = 'AAF1D'" +
+                "return distinct substring(u.id, 0, 63) as `u.id`, substring(u.level, 0, 4) as `u.level`, substring(s.UAI, 0, 44) as `s.UAI` order by `u.id`";
+        neo4j.execute(query, new JsonObject(), validResultHandler(handler));
+    }
+
+    @Override
+    public void getPersonStudentClasseMefStat4_1D(String uaiExportList, Handler<Either<String, JsonArray>> handler) {
+        String query = "MATCH  (p:Profile)<-[HAS_PROFILE]-(pg:ProfileGroup)<-[IN]-(u:User)-[ADMINISTRATIVE_ATTACHMENT]->(s:Structure) " +
+                "where p.name = 'Student'  AND u.source = 'AAF1D'" +
+                "return distinct substring(u.level, 0, 4) as `u.level`, substring(s.UAI, 0, 44) as `s.UAI` order by `u.id`, u.classes";
+        neo4j.execute(query, new JsonObject(), validResultHandler(handler));
+    }
+
+
 
     @Override
     public void getEleveEnseignement(Handler<Either<String, JsonArray>> handler) {
@@ -59,10 +91,30 @@ public class MediacentreServiceImpl implements MediacentreService {
     }
 
     @Override
+    public void getTeachersExportData_1D(String uaiExportList, Handler<Either<String, JsonArray>> handler) {
+        String query = "MATCH (p:Profile)<-[HAS_PROFILE]-(pg:ProfileGroup)<-[IN]-(u:User)" +
+                "where (p.name = 'Teacher') AND u.source = 'AAF1D' " +
+                "OPTIONAL MATCH (u:User)-[ADMINISTRATIVE_ATTACHMENT]->(s:Structure)" +
+                "OPTIONAL MATCH (pg:ProfileGroup)-[DEPENDS]->(s2:Structure)" +
+                "where s is null OR (s.UAI <> s2.UAI) and s.UAI in " + uaiExportList + " " +
+                "return distinct substring(u.id, 0, 63) as `u.id`, substring(u.lastName, 0, 499) as `u.lastName`, u.displayName, substring(u.firstName, 0, 499) as `u.firstName`, u.structures, u.birthDate, " +
+                "substring(s.UAI, 0, 44) as `s.UAI`, p.name, substring(s2.UAI, 0, 44) as `s2.UAI`, u.functions order by `u.id`";
+        neo4j.execute(query, new JsonObject(), validResultHandler(handler));
+    }
+
+    @Override
     public void getPersonMefTeacher(Handler<Either<String, JsonArray>> handler) {
         String query = "MATCH  (p:Profile)<-[HAS_PROFILE]-(pg:ProfileGroup)<-[IN]-(u:User) " + //-[ADMINISTRATIVE_ATTACHMENT]->(s:Structure) " +
                 "where p.name = 'Teacher' " +
                 "return distinct substring(u.id, 0, 63) as `u.id`, u.modules order by `u.id`";
+        neo4j.execute(query, new JsonObject(), validResultHandler(handler));
+    }
+
+    @Override
+    public void getPersonMefstat4Teacher_1D(String uaiExportList, Handler<Either<String, JsonArray>> handler) {
+        String query = "MATCH  (p:Profile)<-[HAS_PROFILE]-(pg:ProfileGroup)<-[IN]-(u:User) " + //-[ADMINISTRATIVE_ATTACHMENT]->(s:Structure) " +
+                "where p.name = 'Teacher' AND u.source = 'AAF1D' AND s.UAI in " + uaiExportList + " " +
+                "return distinct substring(u.id, 0, 63) as `u.id` order by `u.id`";
         neo4j.execute(query, new JsonObject(), validResultHandler(handler));
     }
 
@@ -72,6 +124,18 @@ public class MediacentreServiceImpl implements MediacentreService {
         String query = "MATCH (s:Structure) OPTIONAL MATCH (s2:Structure)<-[HAS_ATTACHMENT]-(s:Structure)  RETURN " +
                 "distinct substring(s.UAI, 0, 44) as `s.UAI`,  substring(s.contract, 0, 44) as `s.contract`, substring(s.name, 0, 499) as `s.name`, " +
                 " substring(s.phone, 0, 44) as `s.phone`, substring(s2.UAI, 0, 44) as `s2.UAI` order by `s.UAI`";
+        // MATCH (s:Structure), (s2:Structure)-[HAS_ATTACHMENT]->(s3:Structure) where s.UAI = s2.UAI or s2 is null  return  s.UAI, s.contract, s.name, s.phone, s3.UAI LIMIT 25
+        neo4j.execute(query, new JsonObject(), validResultHandler(handler));
+    }
+
+    @Override
+    public void getEtablissement_1D(String uaiExportList, Handler<Either<String, JsonArray>> handler) {
+        // the link with group and user is there to ensure we don't export structures without users in there.
+        String query = "MATCH (s:Structure)" +
+                "WHERE s.UAI in " + uaiExportList + " " +
+                " RETURN " +
+                "distinct substring(s.UAI, 0, 44) as `s.UAI`,  substring(s.sector, 0, 44) as `s.sector`, substring(s.name, 0, 499) as `s.name`, " +
+                " substring(s.phone, 0, 44) as `s.phone` order by `s.UAI`";
         // MATCH (s:Structure), (s2:Structure)-[HAS_ATTACHMENT]->(s3:Structure) where s.UAI = s2.UAI or s2 is null  return  s.UAI, s.contract, s.name, s.phone, s3.UAI LIMIT 25
         neo4j.execute(query, new JsonObject(), validResultHandler(handler));
     }
@@ -111,16 +175,33 @@ public class MediacentreServiceImpl implements MediacentreService {
                 "match (u:User)-[COMMUNIQUE]->(fg:FunctionalGroup)-[d2:DEPENDS]->(s:Structure) where not u.profiles = ['Student'] " +
                 "return distinct substring(s.UAI, 0, 44) as `s.UAI`, s.name, null as cname, null as cid, null as cexternalId, substring(fg.id, 0, 254) as `fg.id`, fg.externalId, fg.name " +
                 "order by `s.UAI`, fg.externalId;";
+        neo4j.execute(query, new JsonObject(), validResultHandler(handler));
+    }
 
-/*        String query = "match (s:Structure)<-[BELONGS]-(c:Class)<-[d:DEPENDS]-(pg:ProfileGroup)<-[IN]-(u:User)-[COMMUNIQUE]->(fg:FunctionalGroup)-[d2:DEPENDS]->(s2:Structure) " +
-                " where s.id = s2.id and u.profiles = ['Student'] " +
-                " return distinct s.UAI, s.name, c.name, c.id, c.externalId, fg.id, fg.externalId, fg.name order by s.UAI, fg.externalId, c.externalId";*/
+    @Override
+    public void getGroupsExportData_1D(String uaiExportList, Handler<Either<String, JsonArray>> handler) {
+        String query = "match (c:Class)<-[d:DEPENDS]-(pg:ProfileGroup)<-[IN]-(u:User)-[COMMUNIQUE]->(s:Structure) where u.profiles = ['Student'] and " +
+                "u.source = 'AAF1D' and s.UAI in " + uaiExportList + " " +
+                "return distinct substring(s.UAI, 0, 44) as `s.UAI`, s.name, c.name as cname, c.id as cid, c.externalId as cexternalId " +
+                "order by `s.UAI`, c.externalId " +
+                "union " +
+                "match (u:User)-[COMMUNIQUE]->(s:Structure) where not u.profiles = ['Student'] and " +
+                " u.source = 'AAF1D' and s.UAI in " + uaiExportList + " " +
+                "return distinct substring(s.UAI, 0, 44) as `s.UAI`, s.name, null as cname, null as cid, null as cexternalId  " +
+                "order by `s.UAI`;";
         neo4j.execute(query, new JsonObject(), validResultHandler(handler));
     }
 
     @Override
     public void getDivisionsExportData(Handler<Either<String, JsonArray>> handler) {
         String query = "MATCH (s:Structure)<-[BELONGS]-(c:Class) " +
+                "return distinct substring(s.UAI, 0, 44) as `s.UAI`, s.name, substring(c.name, 0, 254) as `c.name`, c.id, c.externalId";
+        neo4j.execute(query, new JsonObject(), validResultHandler(handler));
+    }
+
+    @Override
+    public void getDivisionsExportData_1D(String uaiExportList, Handler<Either<String, JsonArray>> handler) {
+        String query = "MATCH (s:Structure)<-[BELONGS]-(c:Class) WHERE s.UAI in " + uaiExportList + " " +
                 "return distinct substring(s.UAI, 0, 44) as `s.UAI`, s.name, substring(c.name, 0, 254) as `c.name`, c.id, c.externalId";
         neo4j.execute(query, new JsonObject(), validResultHandler(handler));
     }
@@ -133,12 +214,27 @@ public class MediacentreServiceImpl implements MediacentreService {
     }
 
     @Override
+    public void getPersonGroupe_1D(String uaiExportList,Handler<Either<String, JsonArray>> handler) {
+        String query = "MATCH (u:User)-[BELONGS]->(s:Structure) " +
+                "WHERE u.source = 'AAF1D' AND s.UAI in " + uaiExportList + " " +
+                "return distinct substring(u.id, 0, 63) as `u.id`, substring(s.UAI, 0, 44) as `s.UAI`";
+        neo4j.execute(query, new JsonObject(), validResultHandler(handler));
+    }
+
+    @Override
     public void getPersonGroupeStudent(Handler<Either<String, JsonArray>> handler) {
         String query = "MATCH (u:User)-[IN]->(pg:ProfileGroup)-[DEPENDS]->(c:Class)-[BELONGS]->(s:Structure) " +
                 "return distinct pg.id, pg.externalId, substring(u.id, 0, 63) as `u.id`, substring(s.UAI, 0, 44) as `s.UAI`, c.id, c.externalId";
         neo4j.execute(query, new JsonObject(), validResultHandler(handler));
     }
 
+    @Override
+    public void getPersonGroupeStudent_1D(String uaiExportList, Handler<Either<String, JsonArray>> handler) {
+        String query = "MATCH (u:User)-[IN]->(pg:ProfileGroup)-[DEPENDS]->(c:Class)-[BELONGS]->(s:Structure) " +
+                "WHERE u.source = 'AAF1D' AND s.UAI in " + uaiExportList + " " +
+                "return distinct pg.id, pg.externalId, substring(u.id, 0, 63) as `u.id`, substring(s.UAI, 0, 44) as `s.UAI`, c.id, c.externalId";
+        neo4j.execute(query, new JsonObject(), validResultHandler(handler));
+    }
 
 
     @Override
@@ -170,6 +266,26 @@ public class MediacentreServiceImpl implements MediacentreService {
     }
 
     @Override
+    public void getInChargeOfExportData_1D(String uaiExportList, String groupName, Handler<Either<String, JsonArray>> handler) {
+        String query = "MATCH (s:Structure)<-[ADMINISTRATIVE_ATTACHMENT]-(u:User)-[IN]->(n:ManualGroup)-[DEPENDS]->(s2:Structure)" +
+                "                where n.name = {groupName} and u.source = 'AAF1D' and s.UAI in " + uaiExportList + " " +
+                "                RETURN substring(u.id, 0, 63) as `u.id`, substring(u.lastName, 0, 499) as `u.lastName`, substring(u.firstName, 0, 499) as `u.firstName`, " +
+                "                substring(u.email, 0, 254) as `u.email`, substring(s2.UAI, 0, 44) as `s2.UAI`" +
+                "                union" +
+                "                match (s:Structure)<-[d1:DEPENDS]-(pg:ProfileGroup)<-[i1:IN]-(u:User)-[i2:IN]->(n:ManualGroup)-[d2:DEPENDS]->(s2:Structure)" +
+                "                where n.name = {groupName} " +
+                "                RETURN substring(u.id, 0, 63) as `u.id`, substring(u.lastName, 0, 499) as `u.lastName`, substring(u.firstName, 0, 499) as `u.firstName`, " +
+                "                substring(u.email, 0, 254) as `u.email`, substring(s2.UAI, 0, 44) as `s2.UAI` order by `u.id`";
+
+        /*String query = "MATCH (s:Structure)<-[ADMINISTRATIVE_ATTACHMENT]-(u:User)-[IN]->(n:ManualGroup) " +
+                "where n.name = {groupName} " +
+                "RETURN u.id, u.lastName, u.firstName, u.email, s.UAI";*/
+        JsonObject params = new JsonObject().putString("groupName", groupName);
+        neo4j.execute(query, params, validResultHandler(handler));
+    }
+
+
+    @Override
     public void getUserStructures(String userId, Handler<Either<String, JsonArray>> handler){
         String query = "match (s:Structure)<-[ADMINISTRATIVE_ATTACHMENT]-(u:User) " +
                 "where u.id = {id} " +
@@ -184,6 +300,12 @@ public class MediacentreServiceImpl implements MediacentreService {
     @Override
     public void getAllStructures(Handler<Either<String, JsonArray>> handler) {
         String query = "match (s:Structure) return substring(s.UAI, 0, 44) as `s.UAI`, s.externalId";
+        neo4j.execute(query, new JsonObject(), validResultHandler(handler));
+    }
+
+    @Override
+    public void getAllStructures_1D(String uaiExportList, Handler<Either<String, JsonArray>> handler) {
+        String query = "match (s:Structure) WHERE s.UAI in " + uaiExportList + " return substring(s.UAI, 0, 44) as `s.UAI`, s.externalId";
         neo4j.execute(query, new JsonObject(), validResultHandler(handler));
     }
 

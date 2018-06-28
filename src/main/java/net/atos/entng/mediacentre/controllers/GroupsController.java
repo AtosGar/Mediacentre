@@ -357,6 +357,223 @@ public class GroupsController {
         }); // end getDivisionsExportData
     } // end exportGroups
 
+
+    /**
+     * Export des groupes 1D
+     * @param mediacentreService
+     * @param path
+     * @param nbElementPerFile
+     * @param exportUAIList1D
+     */
+    public void exportGroups_1D(final MediacentreService mediacentreService, final String path,
+                                final int nbElementPerFile, final String exportUAIList1D) {
+
+
+        System.out.println("ICI 0");
+        counter = 0;
+        pathExport = path;
+        nbElem = nbElementPerFile;
+        mediacentreService.getDivisionsExportData_1D(exportUAIList1D, new Handler<Either<String, JsonArray>>() {
+            @Override
+            public void handle(Either<String, JsonArray> event) {
+                System.out.println("ICI 1");
+                if (event.isRight()) {
+                    // write the content into xml file
+                    final JsonArray divisions = event.right().getValue();
+                    doc = fileHeader();
+
+                    System.out.println("ICI 2");
+
+                    // men:GAREleve
+                    for (Object obj : divisions) {
+                        Element garDivision = doc.createElement("men:GARGroupe");
+                        garEntGroup.appendChild(garDivision);
+                        if (obj instanceof JsonObject) {
+                            JsonObject jObj = (JsonObject) obj;
+                            String grpCode = jObj.getString("c.externalId");
+                            String[] parts = grpCode.split("\\$");
+
+                            if( parts.length >= 2 ) {
+                                MediacentreController.insertNode("men:GARGroupeCode", doc, garDivision, MediacentreController.customSubString(parts[1], 255));
+                            } else {
+                                MediacentreController.insertNode("men:GARGroupeCode", doc, garDivision, "");
+                            }
+                            MediacentreController.insertNode("men:GARStructureUAI", doc, garDivision, jObj.getString("s.UAI"));
+                            MediacentreController.insertNode("men:GARGroupeLibelle", doc, garDivision, jObj.getString("c.name"));
+                            MediacentreController.insertNode("men:GARGroupeStatut", doc, garDivision, "DIVISION");
+                            counter += 5;
+                            doc = testNumberOfOccurrences(doc);
+                        }
+                    }
+
+
+                    mediacentreService.getGroupsExportData_1D(exportUAIList1D, new Handler<Either<String, JsonArray>>() {
+                        @Override
+                        public void handle(Either<String, JsonArray> event) {
+                            System.out.println("ICI 3");
+
+                            if (event.isRight()) {
+                                System.out.println("ICI 4");
+
+                                // write the content into xml file
+                                JsonArray groups = event.right().getValue();
+                                // men:GARPersonMEF
+                                String lastGroup = "";
+                                List<String> lGroupes = new ArrayList<String>();
+                                Element garGroup = null;
+
+                                /* GARGroupe */
+                                for (Object obj : groups) {
+                                    if (obj instanceof JsonObject) {
+
+                                        JsonObject jObj = (JsonObject) obj;
+
+                                        if (!lastGroup.equals(jObj.getString("cid"))) {
+
+                                            if( !lGroupes.contains(jObj.getString("s.UAI") + jObj.getString("c.externalId"))) {
+                                                counter += 6;
+                                                doc = testNumberOfOccurrences(doc);
+                                                garGroup = doc.createElement("men:GARGroupe");
+                                                garEntGroup.appendChild(garGroup);
+
+                                                if (jObj.getString("c.externalId") != null && !"null".equals(jObj.getString("c.externalId"))) {
+                                                    String grpCode = jObj.getString("c.externalId");
+
+                                                    MediacentreController.insertNode("men:GARGroupeCode", doc, garGroup, grpCode);
+
+                                                } else {
+                                                    MediacentreController.insertNode("men:GARGroupeCode", doc, garGroup, jObj.getString("fg.id"));
+                                                }
+
+                                                MediacentreController.insertNode("men:GARStructureUAI", doc, garGroup, jObj.getString("s.UAI"));
+                                                MediacentreController.insertNode("men:GARGroupeLibelle", doc, garGroup, jObj.getString("fg.name"));
+                                                MediacentreController.insertNode("men:GARGroupeStatut", doc, garGroup, "GROUPE");
+                                                lastGroup = jObj.getString("cid");
+                                                lGroupes.add(jObj.getString("s.UAI") + jObj.getString("c.externalId"));
+                                            }
+                                        }
+
+                                        if (jObj.getString("cexternalId") != null) {
+                                            String grpCode = jObj.getString("cexternalId");
+                                            //String[] parts = grpCode.split("\\$");
+                                            //String classe = parts[1];
+                                            MediacentreController.insertNode("men:GARGroupeDivAppartenance", doc, garGroup, grpCode);
+                                        }
+                                    }
+                                }
+
+                                /* GARPersonGroupe */
+                                mediacentreService.getPersonGroupe_1D(exportUAIList1D, new Handler<Either<String, JsonArray>>() {
+                                    @Override
+                                    public void handle(Either<String, JsonArray> event) {
+                                        if (event.isRight()) {
+                                            // write the content into xml file
+                                            JsonArray personGroupe = event.right().getValue();
+                                            // men:GARPersonGroup
+                                            Element garPersonGroup = null;
+                                            for (Object obj : personGroupe) {
+                                                if (obj instanceof JsonObject) {
+                                                    JsonObject jObj = (JsonObject) obj;
+
+                                                    garPersonGroup = doc.createElement("men:GARPersonGroupe");
+                                                    garEntGroup.appendChild(garPersonGroup);
+                                                    MediacentreController.insertNode("men:GARStructureUAI", doc, garPersonGroup, jObj.getString("s.UAI"));
+                                                    MediacentreController.insertNode("men:GARPersonIdentifiant", doc, garPersonGroup, jObj.getString("u.id"));
+
+                                                    if (jObj.getString("c.externalId") != null && !"null".equals(jObj.getString("c.externalId"))) {
+                                                        String grpCode = jObj.getString("c.externalId");
+                                                        String[] parts = grpCode.split("\\$");
+                                                        MediacentreController.insertNode("men:GARGroupeCode", doc, garPersonGroup,grpCode);
+                                                    } else {
+                                                        MediacentreController.insertNode("men:GARGroupeCode", doc, garPersonGroup, jObj.getString("c.id"));
+                                                    }
+
+                                                    counter += 4;
+                                                    doc = testNumberOfOccurrences(doc);
+                                                }
+                                            }
+                                        }
+
+                                        mediacentreService.getPersonGroupeStudent_1D(exportUAIList1D, new Handler<Either<String, JsonArray>>() {
+                                            @Override
+                                            public void handle(Either<String, JsonArray> event) {
+                                                if (event.isRight()) {
+                                                    // write the content into xml file
+                                                    JsonArray personGroupe = event.right().getValue();
+                                                    // men:GARPersonGroup
+                                                    Element garPersonGroup = null;
+                                                    for (Object obj : personGroupe) {
+                                                        if (obj instanceof JsonObject) {
+                                                            JsonObject jObj = (JsonObject) obj;
+
+                                                            garPersonGroup = doc.createElement("men:GARPersonGroupe");
+                                                            garEntGroup.appendChild(garPersonGroup);
+                                                            MediacentreController.insertNode("men:GARStructureUAI", doc, garPersonGroup, jObj.getString("s.UAI"));
+                                                            MediacentreController.insertNode("men:GARPersonIdentifiant", doc, garPersonGroup, jObj.getString("u.id"));
+
+                                                            if (jObj.getString("c.externalId") != null && !"null".equals(jObj.getString("c.externalId"))) {
+                                                                String grpCode = jObj.getString("c.externalId");
+                                                                String[] parts = grpCode.split("\\$");
+                                                                if (parts.length < 2) {
+                                                                    MediacentreController.insertNode("men:GARGroupeCode", doc, garPersonGroup, "null");
+                                                                } else {
+                                                                    MediacentreController.insertNode("men:GARGroupeCode", doc, garPersonGroup, MediacentreController.customSubString(parts[1], 255));
+                                                                }
+                                                            } else {
+                                                                MediacentreController.insertNode("men:GARGroupeCode", doc, garPersonGroup, MediacentreController.customSubString(jObj.getString("c.id"), 255));
+                                                            }
+
+                                                            counter += 4;
+                                                            doc = testNumberOfOccurrences(doc);
+
+                                                        }
+                                                    }
+                                                }
+
+                                                /* Génération du fichier */
+                                                try {
+                                                    TransformerFactory transformerFactory = TransformerFactory.newInstance();
+                                                    Transformer transformer = transformerFactory.newTransformer();
+                                                    transformer.setOutputProperty(OutputKeys.INDENT, "yes");
+                                                    transformer.setOutputProperty("{http://xml.apache.org/xslt}indent-amount", "2");
+                                                    DOMSource source = new DOMSource(doc);
+                                                    StreamResult result = new StreamResult(new File(path + getExportFileName("Groupe", fileIndex)));
+
+                                                    transformer.transform(source, result);
+                                                    boolean res = false;
+                                                    try {
+                                                        res = MediacentreController.isFileValid(pathExport + getExportFileName("Groupe", fileIndex));
+                                                    } catch (IOException e) {
+                                                        e.printStackTrace();
+                                                    } catch (SAXException e) {
+                                                        e.printStackTrace();
+                                                    }
+                                                    if( res == false ){
+                                                        System.out.println("Error on file : " + pathExport + getExportFileName("Groupes", fileIndex));
+                                                    } else {
+                                                        System.out.println("File valid : " + pathExport + getExportFileName("Groupes", fileIndex));
+                                                    }
+
+                                                    System.out.println("Groupes saved");
+                                                } catch (TransformerException tfe) {
+                                                    tfe.printStackTrace();
+
+                                                }
+
+                                            }
+                                        }); // end getPersonGroupeStudents
+                                    }
+                                }); // end getPersonGroupe
+                            }
+                        }
+                    }); // end getGroupsExportData
+                }
+            }
+        }); // end getDivisionsExportData
+    } // end exportGroups
+
+
+
     private Document testNumberOfOccurrences(Document doc) {
         if (nbElem <= counter) {
             // close the full file
