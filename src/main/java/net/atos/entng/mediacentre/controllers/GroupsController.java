@@ -367,22 +367,17 @@ public class GroupsController {
      */
     public void exportGroups_1D(final MediacentreService mediacentreService, final String path,
                                 final int nbElementPerFile, final String exportUAIList1D) {
-
-
-        System.out.println("ICI 0");
         counter = 0;
         pathExport = path;
         nbElem = nbElementPerFile;
         mediacentreService.getDivisionsExportData_1D(exportUAIList1D, new Handler<Either<String, JsonArray>>() {
             @Override
             public void handle(Either<String, JsonArray> event) {
-                System.out.println("ICI 1");
+
                 if (event.isRight()) {
                     // write the content into xml file
                     final JsonArray divisions = event.right().getValue();
                     doc = fileHeader();
-
-                    System.out.println("ICI 2");
 
                     // men:GAREleve
                     for (Object obj : divisions) {
@@ -410,10 +405,8 @@ public class GroupsController {
                     mediacentreService.getGroupsExportData_1D(exportUAIList1D, new Handler<Either<String, JsonArray>>() {
                         @Override
                         public void handle(Either<String, JsonArray> event) {
-                            System.out.println("ICI 3");
 
                             if (event.isRight()) {
-                                System.out.println("ICI 4");
 
                                 // write the content into xml file
                                 JsonArray groups = event.right().getValue();
@@ -422,7 +415,8 @@ public class GroupsController {
                                 List<String> lGroupes = new ArrayList<String>();
                                 Element garGroup = null;
 
-                                /* GARGroupe */
+                                /* GARGroupe non récupéré par OPEN ENT NG */
+                                /*
                                 for (Object obj : groups) {
                                     if (obj instanceof JsonObject) {
 
@@ -460,10 +454,10 @@ public class GroupsController {
                                             MediacentreController.insertNode("men:GARGroupeDivAppartenance", doc, garGroup, grpCode);
                                         }
                                     }
-                                }
+                                }*/
 
                                 /* GARPersonGroupe */
-                                mediacentreService.getPersonGroupe_1D(exportUAIList1D, new Handler<Either<String, JsonArray>>() {
+                                mediacentreService.getTeacherClasse_1D(exportUAIList1D, new Handler<Either<String, JsonArray>>() {
                                     @Override
                                     public void handle(Either<String, JsonArray> event) {
                                         if (event.isRight()) {
@@ -479,14 +473,7 @@ public class GroupsController {
                                                     garEntGroup.appendChild(garPersonGroup);
                                                     MediacentreController.insertNode("men:GARStructureUAI", doc, garPersonGroup, jObj.getString("s.UAI"));
                                                     MediacentreController.insertNode("men:GARPersonIdentifiant", doc, garPersonGroup, jObj.getString("u.id"));
-
-                                                    if (jObj.getString("c.externalId") != null && !"null".equals(jObj.getString("c.externalId"))) {
-                                                        String grpCode = jObj.getString("c.externalId");
-                                                        String[] parts = grpCode.split("\\$");
-                                                        MediacentreController.insertNode("men:GARGroupeCode", doc, garPersonGroup,grpCode);
-                                                    } else {
-                                                        MediacentreController.insertNode("men:GARGroupeCode", doc, garPersonGroup, jObj.getString("c.id"));
-                                                    }
+                                                    MediacentreController.insertNode("men:GARGroupeCode", doc, garPersonGroup, jObj.getString("c.externalId"));
 
                                                     counter += 4;
                                                     doc = testNumberOfOccurrences(doc);
@@ -510,18 +497,7 @@ public class GroupsController {
                                                             garEntGroup.appendChild(garPersonGroup);
                                                             MediacentreController.insertNode("men:GARStructureUAI", doc, garPersonGroup, jObj.getString("s.UAI"));
                                                             MediacentreController.insertNode("men:GARPersonIdentifiant", doc, garPersonGroup, jObj.getString("u.id"));
-
-                                                            if (jObj.getString("c.externalId") != null && !"null".equals(jObj.getString("c.externalId"))) {
-                                                                String grpCode = jObj.getString("c.externalId");
-                                                                String[] parts = grpCode.split("\\$");
-                                                                if (parts.length < 2) {
-                                                                    MediacentreController.insertNode("men:GARGroupeCode", doc, garPersonGroup, "null");
-                                                                } else {
-                                                                    MediacentreController.insertNode("men:GARGroupeCode", doc, garPersonGroup, MediacentreController.customSubString(parts[1], 255));
-                                                                }
-                                                            } else {
-                                                                MediacentreController.insertNode("men:GARGroupeCode", doc, garPersonGroup, MediacentreController.customSubString(jObj.getString("c.id"), 255));
-                                                            }
+                                                            MediacentreController.insertNode("men:GARGroupeCode", doc, garPersonGroup, jObj.getString("c.externalId"));
 
                                                             counter += 4;
                                                             doc = testNumberOfOccurrences(doc);

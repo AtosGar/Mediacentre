@@ -268,7 +268,7 @@ public class StudentsController {
      * @param handler
      */
     public void exportStudents_1D(final MediacentreService mediacentreService, final String path, int nbElementPerFile,
-                                  final String uaiExportList, final Handler<List<String>> handler) {
+                                  final String uaiExportList) {
         counter = 0;
         pathExport = path;
         nbElem = nbElementPerFile;

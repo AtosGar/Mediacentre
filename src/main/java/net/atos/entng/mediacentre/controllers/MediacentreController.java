@@ -164,6 +164,8 @@ public class MediacentreController extends BaseController {
 
         final int nbElementPerFile = container.config().getInteger("elementsPerFile", 10000);
 
+        final String emailDefault = container.config().getString("emailDefault", "noreply@noreply.fr");
+
         exportFilePrefix = container.config().getString("exportFilePrefix", "/tmp");
 
         String uaiList1DPath= container.config().getString("uai-1D-list-path");
@@ -187,32 +189,22 @@ public class MediacentreController extends BaseController {
         /**
          * Begin export
          */
+        // GAR-ENT-Etab
         structuresController.exportStructures_1D(mediacentreService, path, nbElementPerFile, exportUAIList1D);
 
+        // GAR-ENT-Groupe
         groupsController.exportGroups_1D(mediacentreService, path, nbElementPerFile, exportUAIList1D);
 
-        teachersController.exportTeachers_1D(mediacentreService, path, nbElementPerFile, exportUAIList1D, new Handler<List<String>>() {
-
-            @Override
-            public void handle(final List<String> bannedUsers) {
-
-                studentsController.exportStudents_1D(mediacentreService, path, nbElementPerFile, exportUAIList1D, new Handler<List<String>>() {
-
-                    @Override
-                    public void handle(final List<String> bannedUsersStudents) {
-
-                        groupsController.exportGroups_1D(mediacentreService, path, nbElementPerFile, exportUAIList1D);
-
-                    }
-                });
-            }
-
-        });
-
-        final String emailDefault = container.config().getString("emailDefault", "noreply@noreply.fr");
-
+        // GAR-ENT-RespAff
         inChargeOfAssignementController.exportInChargeOfAssignement_1D(mediacentreService, path, nbElementPerFile,
                 inChargeOfAssignementName, emailDefault, exportUAIList1D);
+
+        //GAR-ENT-Enseignant
+        teachersController.exportTeachers_1D(mediacentreService, path, nbElementPerFile, exportUAIList1D);
+
+        // GAR-ENT-Eleve
+        studentsController.exportStudents_1D(mediacentreService, path, nbElementPerFile, exportUAIList1D);
+
     }
 
     @Get("/isExportButtonVisible")

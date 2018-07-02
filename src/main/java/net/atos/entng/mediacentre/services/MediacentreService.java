@@ -16,19 +16,21 @@ public interface MediacentreService {
 
     void getPersonMef(Handler<Either<String, JsonArray>> handler);
 
-    void getPersonMefStat4_1D(String uaiExportList, Handler<Either<String, JsonArray>> handler);
-
-    void getPersonStudentClasseMefStat4_1D(String uaiExportList, Handler<Either<String, JsonArray>> handler);
+    void getClasseMefStat4_1D(String uaiExportList, Handler<Either<String, JsonArray>> handler);
 
     void getEleveEnseignement(Handler<Either<String, JsonArray>> handler);
 
     void getPersonMefTeacher(Handler<Either<String, JsonArray>> handler);
 
-    void getPersonMefstat4Teacher_1D(String uaiExportList, Handler<Either<String, JsonArray>> handler);
+    void getPersonMefStat4_1D(String uaiExportList, Handler<Either<String, JsonArray>> handler);
+
+    void getTeacherClasse_1D(String uaiExportList, Handler<Either<String, JsonArray>> handler) ;
 
     void getEtablissement(Handler<Either<String, JsonArray>> handler);
 
     void getEtablissement_1D(String uaiExportList, Handler<Either<String, JsonArray>> handler);
+
+    void getEtablissement_2D(String uaiExportList, Handler<Either<String, JsonArray>> handler);
 
     void getEtablissementMef(Handler<Either<String, JsonArray>> handler);
 
@@ -48,7 +50,7 @@ public interface MediacentreService {
 
     void getPersonGroupe(Handler<Either<String, JsonArray>> handler);
 
-    void getPersonGroupe_1D(String uaiExportList, Handler<Either<String, JsonArray>> handler);
+    //void getPersonGroupe_1D(String uaiExportList, Handler<Either<String, JsonArray>> handler);
 
     void getPersonGroupeStudent(Handler<Either<String, JsonArray>> handler);
 
