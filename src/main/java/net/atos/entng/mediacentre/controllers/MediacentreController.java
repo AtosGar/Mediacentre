@@ -45,7 +45,10 @@ public class MediacentreController extends BaseController {
     private static String exportFilePrefix = "";
     private static SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMdd_HHmmss");
     private static String fileDate = sdf.format(new Date());
-    //private static String fileDate = sdf.format(new Date());
+
+    private final String PROJECT_TYPE_MIXTE_VALUE = "MIXTE";
+    private final String PROJECT_TYPE_1D_VALUE = "1D";
+    private final String PROJECT_TYPE_2D_VALUE = "2D";
 
     /**
      * Computation service
@@ -207,6 +210,65 @@ public class MediacentreController extends BaseController {
 
     }
 
+    /**
+     * Juin 2018
+     * fonction d'export des fichiers XML GAR pour le premier degré
+     * @param request
+     */
+    @Get("/exportXML_2D")
+    @ApiDoc("Export XML_2D")
+    public void exportXML_2D(final HttpServerRequest request) {
+
+        final String path = container.config().getString("export-path", "/tmp");
+
+        final int nbElementPerFile = container.config().getInteger("elementsPerFile", 10000);
+
+        final String emailDefault = container.config().getString("emailDefault", "noreply@noreply.fr");
+
+        exportFilePrefix = container.config().getString("exportFilePrefix", "/tmp");
+
+        String uaiList1DPath= container.config().getString("uai-1D-list-path");
+
+        final String exportUAIList1D = getExportUAIListFromFile(uaiList1DPath);
+
+        String inChargeOfAssignementName = container.config().getString("inChargeOfAssignementGroupName", "Responsables d'affectation");
+
+        final StudentsController studentsController = new StudentsController();
+
+        StructuresController structuresController = new StructuresController();
+
+        final TeachersController teachersController = new TeachersController();
+
+        final GroupsController groupsController = new GroupsController();
+
+        InChargeOfAssignementController inChargeOfAssignementController = new InChargeOfAssignementController();
+
+        fileDate = sdf.format(new Date());
+
+        /**
+         * Begin export
+         */
+        // GAR-ENT-Etab
+        structuresController.exportStructures_1D(mediacentreService, path, nbElementPerFile, exportUAIList1D);
+
+        // GAR-ENT-Groupe
+        groupsController.exportGroups_1D(mediacentreService, path, nbElementPerFile, exportUAIList1D);
+
+        // GAR-ENT-RespAff
+        inChargeOfAssignementController.exportInChargeOfAssignement_1D(mediacentreService, path, nbElementPerFile,
+                inChargeOfAssignementName, emailDefault, exportUAIList1D);
+
+        //GAR-ENT-Enseignant
+        teachersController.exportTeachers_1D(mediacentreService, path, nbElementPerFile, exportUAIList1D);
+
+        // GAR-ENT-Eleve
+        studentsController.exportStudents_1D(mediacentreService, path, nbElementPerFile, exportUAIList1D);
+
+    }
+
+
+
+
     @Get("/isExportButtonVisible")
     @ApiDoc("Returns true if user is authorized to display export button")
     public void isExportButtonVisible(final HttpServerRequest request) {
@@ -223,6 +285,40 @@ public class MediacentreController extends BaseController {
             }
         });
     }
+
+    @Get("/isExportMixte")
+    @ApiDoc("Returns true if user is export mixte")
+    public void isExportMixte(final HttpServerRequest request) {
+        final String projectType = container.config().getString("ProjectType");
+
+        JsonObject obj = new JsonObject();
+        obj.putBoolean("isExportMixte", projectType.equals(PROJECT_TYPE_MIXTE_VALUE));
+
+        renderJson(request, obj);
+    }
+
+    @Get("/isExport1D")
+    @ApiDoc("Returns true if user is export 1D")
+    public void isExport1D(final HttpServerRequest request) {
+        final String projectType = container.config().getString("ProjectType");
+
+        JsonObject obj = new JsonObject();
+        obj.putBoolean("isExport1D", projectType.equals(PROJECT_TYPE_1D_VALUE));
+
+        renderJson(request, obj);
+    }
+
+    @Get("/isExport2D")
+    @ApiDoc("Returns true if user is export 2D")
+    public void isExport2D(final HttpServerRequest request) {
+        final String projectType = container.config().getString("ProjectType");
+
+        JsonObject obj = new JsonObject();
+        obj.putBoolean("isExport2D", projectType.equals(PROJECT_TYPE_2D_VALUE));
+
+        renderJson(request, obj);
+    }
+
 
     @Get("/getRessources/:structureUAI")
     @ApiDoc("Get user main structure")

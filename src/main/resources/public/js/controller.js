@@ -10,6 +10,20 @@ function MediacentreController($scope, template, model, route, $location) {
             $scope.isDisplayExportXmlButton = result.isAuthorized;
         });
 
+        model.isExportMixte( function(result) {
+            $scope.isExportMixte = result.isExportMixte;
+            });
+
+        model.isExport1D( function(result) {
+            $scope.isExport1D = result.isExport1D;
+            });
+
+         model.isExport2D( function(result) {
+            $scope.isExport2D = result.isExport2D;
+            });
+
+
+
         model.getStructures(model.me.userId, function(result) {
             $scope.schools = result.structures;
             if( $scope.schools.length == 1){
@@ -19,6 +33,8 @@ function MediacentreController($scope, template, model, route, $location) {
                 $scope.display.listSchools = true;
             }
         });
+
+
     }
     
     

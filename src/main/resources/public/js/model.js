@@ -38,4 +38,28 @@ model.isExportButtonVisible = function(callback) {
     });
 }
 
+model.isExportMixte = function(callback) {
+    http().get('/mediacentre/isExportMixte').done(function(result) {
+        if(typeof callback === 'function'){
+            callback(result);
+        }
+    });
+}
+
+model.isExport1D= function(callback) {
+    http().get('/mediacentre/isExport1D').done(function(result) {
+        if(typeof callback === 'function'){
+            callback(result);
+        }
+    });
+}
+
+model.isExport2D = function(callback) {
+    http().get('/mediacentre/isExport2D').done(function(result) {
+        if(typeof callback === 'function'){
+            callback(result);
+        }
+    });
+}
+
 
