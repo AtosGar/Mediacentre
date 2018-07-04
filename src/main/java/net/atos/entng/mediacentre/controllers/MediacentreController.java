@@ -167,7 +167,7 @@ public class MediacentreController extends BaseController {
     @ApiDoc("Export XML_1D")
     public void exportXML_1D(final HttpServerRequest request) {
 
-        final String path = container.config().getString("export-path", "/tmp") + "/1D";
+        final String path = container.config().getString("export-path", "/tmp") + "/1D/";
 
         final int nbElementPerFile = container.config().getInteger("elementsPerFile", 10000);
 
@@ -175,7 +175,9 @@ public class MediacentreController extends BaseController {
 
         exportFilePrefix = container.config().getString("exportFilePrefix", "/tmp");
 
-        String uaiList1DPath = path + "/" + UAI_1D_LIST_FILE;
+        String uaiList1DPath = path + UAI_1D_LIST_FILE;
+
+        System.out.println(" PATH 1D : "+uaiList1DPath);
 
         final String exportUAIList1D = getExportUAIListFromFile(uaiList1DPath);
 
@@ -223,7 +225,7 @@ public class MediacentreController extends BaseController {
     @ApiDoc("Export XML_2D")
     public void exportXML_2D(final HttpServerRequest request) {
 
-        final String path = container.config().getString("export-path", "/tmp") + "/2D";
+        final String path = container.config().getString("export-path", "/tmp") + "/2D/";
 
         final int nbElementPerFile = container.config().getInteger("elementsPerFile", 10000);
 
@@ -231,7 +233,9 @@ public class MediacentreController extends BaseController {
 
         exportFilePrefix = container.config().getString("exportFilePrefix", "/tmp");
 
-        String uaiList2DPath = path + "/" + UAI_2D_LIST_FILE;
+        String uaiList2DPath = path + UAI_2D_LIST_FILE;
+
+        System.out.println(" PATH 2D : "+uaiList2DPath);
 
         final String exportUAIList2D = getExportUAIListFromFile(uaiList2DPath);
 
