@@ -163,7 +163,7 @@ public class MediacentreController extends BaseController {
     @ApiDoc("Export XML_1D")
     public void exportXML_1D(final HttpServerRequest request) {
 
-        final String path = container.config().getString("export-path", "/tmp");
+        final String path = container.config().getString("export-path", "/tmp")+"/1D";
 
         final int nbElementPerFile = container.config().getInteger("elementsPerFile", 10000);
 
@@ -219,7 +219,7 @@ public class MediacentreController extends BaseController {
     @ApiDoc("Export XML_2D")
     public void exportXML_2D(final HttpServerRequest request) {
 
-        final String path = container.config().getString("export-path", "/tmp");
+        final String path = container.config().getString("export-path", "/tmp")+"/2D";
 
         final int nbElementPerFile = container.config().getInteger("elementsPerFile", 10000);
 
