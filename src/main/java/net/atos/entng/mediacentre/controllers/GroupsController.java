@@ -549,6 +549,306 @@ public class GroupsController {
     } // end exportGroups
 
 
+    /**
+     * export Groups
+     */
+    public void exportGroups_2D(final MediacentreService mediacentreService, final String path,
+                                final int nbElementPerFile, final String exportUAIList2D) {
+        counter = 0;
+        pathExport = path;
+        nbElem = nbElementPerFile;
+
+        // ---------------------
+        // GARGroupe
+        // ---------------------
+        mediacentreService.getDivisionsExportData_2D(exportUAIList2D, new Handler<Either<String, JsonArray>>() {
+            @Override
+            public void handle(Either<String, JsonArray> event) {
+                if (event.isRight()) {
+                    // write the content into xml file
+                    final JsonArray divisions = event.right().getValue();
+                    doc = fileHeader();
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+                    // men:GAREleve
+                    for (Object obj : divisions) {
+                        Element garDivision = doc.createElement("men:GARGroupe");
+                        garEntGroup.appendChild(garDivision);
+                        if (obj instanceof JsonObject) {
+                            JsonObject jObj = (JsonObject) obj;
+                            String grpCode = jObj.getString("c.externalId");
+                            String[] parts = grpCode.split("\\$");
+
+                            if( parts.length >= 2 ) {
+                                MediacentreController.insertNode("men:GARGroupeCode", doc, garDivision, MediacentreController.customSubString(parts[1], 255));
+                            } else {
+                                MediacentreController.insertNode("men:GARGroupeCode", doc, garDivision, "");
+                            }
+                            MediacentreController.insertNode("men:GARStructureUAI", doc, garDivision, jObj.getString("s.UAI"));
+                            MediacentreController.insertNode("men:GARGroupeLibelle", doc, garDivision, jObj.getString("c.name"));
+                            MediacentreController.insertNode("men:GARGroupeStatut", doc, garDivision, "DIVISION");
+                            counter += 5;
+                            doc = testNumberOfOccurrences(doc);
+                        }
+                    }
+
+                    // ---------------------
+                    // GARPersonGroupe
+                    // ---------------------
+                    mediacentreService.getGroupsExportData_2D(exportUAIList2D, new Handler<Either<String, JsonArray>>() {
+                        @Override
+                        public void handle(Either<String, JsonArray> event) {
+                            if (event.isRight()) {
+                                // write the content into xml file
+                                JsonArray groups = event.right().getValue();
+                                // men:GARPersonMEF
+                                String lastGroup = "";
+                                List<String> lGroupes = new ArrayList<String>();
+                                Element garGroup = null;
+                                for (Object obj : groups) {
+                                    if (obj instanceof JsonObject) {
+                                        JsonObject jObj = (JsonObject) obj;
+                                        if (!lastGroup.equals(jObj.getString("fg.id"))) {
+                                            if( !lGroupes.contains(jObj.getString("s.UAI") + jObj.getString("fg.externalId").split("\\$")[1])) {
+                                                counter += 6;
+                                                doc = testNumberOfOccurrences(doc);
+                                                garGroup = doc.createElement("men:GARGroupe");
+                                                garEntGroup.appendChild(garGroup);
+                                                if (jObj.getString("fg.externalId") != null && !"null".equals(jObj.getString("fg.externalId"))) {
+                                                    String grpCode = jObj.getString("fg.externalId");
+                                                    String[] parts = grpCode.split("\\$");
+                                                    MediacentreController.insertNode("men:GARGroupeCode", doc, garGroup, MediacentreController.customSubString(parts[1],255));
+                                                } else {
+                                                    MediacentreController.insertNode("men:GARGroupeCode", doc, garGroup, jObj.getString("fg.id"));
+                                                }
+                                                MediacentreController.insertNode("men:GARStructureUAI", doc, garGroup, jObj.getString("s.UAI"));
+                                                MediacentreController.insertNode("men:GARGroupeLibelle", doc, garGroup, jObj.getString("fg.name"));
+                                                MediacentreController.insertNode("men:GARGroupeStatut", doc, garGroup, "GROUPE");
+                                                lastGroup = jObj.getString("fg.id");
+                                                lGroupes.add(jObj.getString("s.UAI") + jObj.getString("fg.externalId").split("\\$")[1]);
+                                            }
+                                        }
+                                        if (jObj.getString("cexternalId") != null) {
+                                            String grpCode = jObj.getString("cexternalId");
+                                            String[] parts = grpCode.split("\\$");
+                                            String classe = parts[1];
+                                            MediacentreController.insertNode("men:GARGroupeDivAppartenance", doc, garGroup, classe);
+                                        }
+                                    }
+                                }
+                                // ---------------------
+                                // GARPersonGroupe
+                                // ---------------------
+                                mediacentreService.getPersonGroupe_2D(exportUAIList2D, new Handler<Either<String, JsonArray>>() {
+                                    @Override
+                                    public void handle(Either<String, JsonArray> event) {
+                                        if (event.isRight()) {
+                                            // write the content into xml file
+                                            JsonArray personGroupe = event.right().getValue();
+                                            // men:GARPersonGroup
+                                            Element garPersonGroup = null;
+                                            for (Object obj : personGroupe) {
+                                                if (obj instanceof JsonObject) {
+                                                    JsonObject jObj = (JsonObject) obj;
+                                                    // do not include persons present on multible structures
+
+                                                        garPersonGroup = doc.createElement("men:GARPersonGroupe");
+                                                        garEntGroup.appendChild(garPersonGroup);
+                                                        MediacentreController.insertNode("men:GARStructureUAI", doc, garPersonGroup, jObj.getString("s.UAI"));
+                                                        MediacentreController.insertNode("men:GARPersonIdentifiant", doc, garPersonGroup, jObj.getString("u.id"));
+                                                        if (jObj.getString("fg.externalId") != null && !"null".equals(jObj.getString("fg.externalId"))) {
+                                                            String grpCode = jObj.getString("fg.externalId");
+                                                            String[] parts = grpCode.split("\\$");
+                                                            MediacentreController.insertNode("men:GARGroupeCode", doc, garPersonGroup, MediacentreController.customSubString(parts[1], 255));
+                                                        } else {
+                                                            MediacentreController.insertNode("men:GARGroupeCode", doc, garPersonGroup, jObj.getString("fg.id"));
+                                                        }
+                                                        counter += 4;
+                                                        doc = testNumberOfOccurrences(doc);
+
+                                                }
+                                            }
+                                        }
+
+                                        // ----------------------------
+                                        // GARPersonGroupe (Student)
+                                        // ----------------------------
+                                       mediacentreService.getPersonGroupeStudent_2D(exportUAIList2D, new Handler<Either<String, JsonArray>>() {
+                                            @Override
+                                            public void handle(Either<String, JsonArray> event) {
+                                                if (event.isRight()) {
+                                                    // write the content into xml file
+                                                    JsonArray personGroupe = event.right().getValue();
+                                                    // men:GARPersonGroup
+                                                    Element garPersonGroup = null;
+                                                    for (Object obj : personGroupe) {
+                                                        if (obj instanceof JsonObject) {
+                                                            JsonObject jObj = (JsonObject) obj;
+
+                                                                garPersonGroup = doc.createElement("men:GARPersonGroupe");
+                                                                garEntGroup.appendChild(garPersonGroup);
+                                                                MediacentreController.insertNode("men:GARStructureUAI", doc, garPersonGroup, jObj.getString("s.UAI"));
+                                                                MediacentreController.insertNode("men:GARPersonIdentifiant", doc, garPersonGroup, jObj.getString("u.id"));
+                                                                if (jObj.getString("c.externalId") != null && !"null".equals(jObj.getString("c.externalId"))) {
+                                                                    String grpCode = jObj.getString("c.externalId");
+                                                                    String[] parts = grpCode.split("\\$");
+                                                                    if (parts.length < 2) {
+                                                                        MediacentreController.insertNode("men:GARGroupeCode", doc, garPersonGroup, "null");
+                                                                    } else {
+                                                                        MediacentreController.insertNode("men:GARGroupeCode", doc, garPersonGroup, MediacentreController.customSubString(parts[1], 255));
+                                                                    }
+                                                                } else {
+                                                                    MediacentreController.insertNode("men:GARGroupeCode", doc, garPersonGroup, MediacentreController.customSubString(jObj.getString("c.id"), 255));
+                                                                }
+                                                                counter += 4;
+                                                                doc = testNumberOfOccurrences(doc);
+
+                                                        }
+                                                    }
+                                                }
+
+                                                // --------------------------------------------
+                                                // GAREnsGroupeMatiere & GAREnsClasseMatiere
+                                                // --------------------------------------------
+                                                mediacentreService.getEnsGroupAndClassMatiere_2D(exportUAIList2D,  new Handler<Either<String, JsonArray>>() {
+                                                    @Override
+                                                    public void handle(Either<String, JsonArray> event) {
+                                                        if (event.isRight()) {
+                                                            // write the content into xml file
+                                                            JsonArray enGroupeAndClasseMatiere = event.right().getValue();
+                                                            // men:GARPersonGroup
+                                                            Element garEnGroupeMatiere = null;
+                                                            String lastUserId = "";
+                                                            String lastStructureId = "";
+                                                            String lastGroupeCode = "";
+                                                            // preparing hashmap for xml
+
+                                                            Map<GAREnsGroupeMatiereKey, Set<String>> mapGroupes = new HashMap<GAREnsGroupeMatiereKey, Set<String>>();
+                                                            Map<GAREnsGroupeMatiereKey, Set<String>> mapClasses = new HashMap<GAREnsGroupeMatiereKey, Set<String>>();
+                                                            for (Object obj : enGroupeAndClasseMatiere) {
+                                                                if (obj instanceof JsonObject) {
+                                                                    JsonObject jObj = (JsonObject) obj;
+
+                                                                        if (jObj.getArray("t.groups") != null && jObj.getArray("t.groups").size() > 0) {
+                                                                            JsonArray groups = jObj.getArray("t.groups");
+                                                                            for (int i = 0; i < groups.size(); i++) {
+                                                                                String group = groups.get(i).toString();
+                                                                                GAREnsGroupeMatiereKey key = new GAREnsGroupeMatiereKey(jObj.getString("s.UAI"), jObj.getString("u.id"), group);
+                                                                                Set currentList = mapGroupes.get(key);
+                                                                                if (currentList == null) {
+                                                                                    currentList = new HashSet<String>();
+                                                                                    mapGroupes.put(key, currentList);
+                                                                                }
+                                                                                currentList.add(jObj.getString("sub.code"));
+                                                                            }
+                                                                        }
+                                                                        if (jObj.getArray("t.classes") != null && jObj.getArray("t.classes").size() > 0) {
+                                                                            JsonArray classes = jObj.getArray("t.classes");
+                                                                            for (int i = 0; i < classes.size(); i++) {
+                                                                                String classe = classes.get(i).toString();
+                                                                                GAREnsGroupeMatiereKey key = new GAREnsGroupeMatiereKey(jObj.getString("s.UAI"), jObj.getString("u.id"), classe);
+                                                                                Set currentList = mapClasses.get(key);
+                                                                                if (currentList == null) {
+                                                                                    currentList = new HashSet<String>();
+                                                                                    mapClasses.put(key, currentList);
+                                                                                }
+                                                                                currentList.add(jObj.getString("sub.code"));
+                                                                            }
+                                                                        }
+
+                                                                }
+                                                            }
+
+                                                            // making xml
+                                                            for (Map.Entry<GAREnsGroupeMatiereKey, Set<String>> entry : mapGroupes.entrySet()) {
+                                                                GAREnsGroupeMatiereKey key = entry.getKey();
+                                                                Set<String> currentList = entry.getValue();
+                                                                garEnGroupeMatiere = doc.createElement("men:GAREnsGroupeMatiere");
+                                                                garEntGroup.appendChild(garEnGroupeMatiere);
+                                                                MediacentreController.insertNode("men:GARStructureUAI", doc, garEnGroupeMatiere, key.getUai());
+                                                                MediacentreController.insertNode("men:GARPersonIdentifiant", doc, garEnGroupeMatiere, key.getUid());
+                                                                String grpCode = key.getGroup();
+                                                                String[] parts = grpCode.split("\\$");
+                                                                MediacentreController.insertNode("men:GARGroupeCode", doc, garEnGroupeMatiere, MediacentreController.customSubString(parts[1], 255));
+                                                                for (Object s : currentList) {
+                                                                    if (s instanceof String) {
+                                                                        String subject = (String) s;
+                                                                        MediacentreController.insertNode("men:GARMatiereCode", doc, garEnGroupeMatiere, MediacentreController.customSubString(subject, 255));
+                                                                        counter++;
+                                                                    }
+                                                                }
+                                                                counter += 5;
+                                                                doc = testNumberOfOccurrences(doc);
+                                                            }
+
+                                                            for (Map.Entry<GAREnsGroupeMatiereKey, Set<String>> entry : mapClasses.entrySet()) {
+                                                                GAREnsGroupeMatiereKey key = entry.getKey();
+                                                                Set<String> currentList = entry.getValue();
+                                                                garEnGroupeMatiere = doc.createElement("men:GAREnsClasseMatiere");
+                                                                garEntGroup.appendChild(garEnGroupeMatiere);
+                                                                MediacentreController.insertNode("men:GARStructureUAI", doc, garEnGroupeMatiere, key.getUai());
+                                                                MediacentreController.insertNode("men:GARPersonIdentifiant", doc, garEnGroupeMatiere, key.getUid());
+                                                                String grpCode = key.getGroup();
+                                                                String[] parts = grpCode.split("\\$");
+                                                                MediacentreController.insertNode("men:GARGroupeCode", doc, garEnGroupeMatiere, MediacentreController.customSubString(parts[1], 255));
+                                                                for (Object s : currentList) {
+                                                                    if (s instanceof String) {
+                                                                        String subject = (String) s;
+                                                                        MediacentreController.insertNode("men:GARMatiereCode", doc, garEnGroupeMatiere, MediacentreController.customSubString(subject, 255));
+                                                                        counter++;
+                                                                    }
+                                                                }
+                                                                counter += 5;
+                                                                doc = testNumberOfOccurrences(doc);
+                                                            }
+
+                                                        }
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+                                                        try {
+                                                            TransformerFactory transformerFactory = TransformerFactory.newInstance();
+                                                            Transformer transformer = transformerFactory.newTransformer();
+                                                            transformer.setOutputProperty(OutputKeys.INDENT, "yes");
+                                                            transformer.setOutputProperty("{http://xml.apache.org/xslt}indent-amount", "2");
+                                                            DOMSource source = new DOMSource(doc);
+                                                            StreamResult result = new StreamResult(new File(path + getExportFileName("Groupe", fileIndex)));
+
+                                                            transformer.transform(source, result);
+                                                            boolean res = false;
+                                                            try {
+                                                                res = MediacentreController.isFileValid(pathExport + getExportFileName("Groupe", fileIndex));
+                                                            } catch (IOException e) {
+                                                                e.printStackTrace();
+                                                            } catch (SAXException e) {
+                                                                e.printStackTrace();
+                                                            }
+                                                            if( res == false ){
+                                                                System.out.println("Error on file : " + pathExport + getExportFileName("Groupes", fileIndex));
+                                                            } else {
+                                                                System.out.println("File valid : " + pathExport + getExportFileName("Groupes", fileIndex));
+                                                            }
+
+                                                            System.out.println("Groupes saved");
+                                                        } catch (TransformerException tfe) {
+                                                            tfe.printStackTrace();
+                                                      /*  } catch (SAXException e) {
+                                                            e.printStackTrace();
+                                                        } catch (IOException e) {
+                                                            e.printStackTrace();*/
+                                                        }
+                                                    }
+                                                }); // end getEnsGroupAndClassMatiere
+                                            }
+                                        }); // end getPersonGroupeStudents
+                                    }
+                                }); // end getPersonGroupe
+                            }
+                        }
+                    }); // end getGroupsExportData
+                }
+            }
+        }); // end getDivisionsExportData
+    } // end exportGroups
+
 
     private Document testNumberOfOccurrences(Document doc) {
         if (nbElem <= counter) {

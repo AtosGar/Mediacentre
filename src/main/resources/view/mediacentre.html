@@ -17,19 +17,21 @@
     <i18n>mediacentre.texte.test</i18n>
 </portal>
 
-<div class="contextual-buttons eight cell">
-    <div ng-if="isDisplayExportXmlButton && (isExport1D  || isExportMixte)">
-        <br><br><button ng-click="exportXML_1D()" class="cell right-magnet">
-            <i18n>mediacentre.export1D</i18n>
-        </button>
+
+    <div class="contextual-buttons seven cell">
+        <div ng-if="isDisplayExportXmlButton && (isExport1D  || isExportMixte)">
+            <br><br><button ng-click="exportXML_1D()" class="cell right-magnet">
+                <i18n>mediacentre.export1D</i18n>
+            </button>
+        </div>
+
+        <div ng-if="isDisplayExportXmlButton && (isExport2D  || isExportMixte)">
+            <button ng-click="exportXML_2D()" class="cell right-magnet">
+            <i18n>mediacentre.export2D</i18n>
+            </button>
+        </div>
     </div>
 
-    <div ng-if="isDisplayExportXmlButton && (isExport2D  || isExportMixte)">
-        <button ng-click="exportXML()" class="cell right-magnet">
-        <i18n>mediacentre.export2D</i18n>
-        </button>
-    </div>
-</div>
 
 <div class="material main wrapper">
     <section ng-if="display.detail">

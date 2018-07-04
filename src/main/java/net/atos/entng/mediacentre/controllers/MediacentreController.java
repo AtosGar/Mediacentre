@@ -227,9 +227,9 @@ public class MediacentreController extends BaseController {
 
         exportFilePrefix = container.config().getString("exportFilePrefix", "/tmp");
 
-        String uaiList1DPath= container.config().getString("uai-1D-list-path");
+        String uaiList2DPath= container.config().getString("uai-2D-list-path");
 
-        final String exportUAIList1D = getExportUAIListFromFile(uaiList1DPath);
+        final String exportUAIList2D = getExportUAIListFromFile(uaiList2DPath);
 
         String inChargeOfAssignementName = container.config().getString("inChargeOfAssignementGroupName", "Responsables d'affectation");
 
@@ -249,20 +249,20 @@ public class MediacentreController extends BaseController {
          * Begin export
          */
         // GAR-ENT-Etab
-        structuresController.exportStructures_1D(mediacentreService, path, nbElementPerFile, exportUAIList1D);
+        structuresController.exportStructures_2D(mediacentreService, path, nbElementPerFile, exportUAIList2D);
 
         // GAR-ENT-Groupe
-        groupsController.exportGroups_1D(mediacentreService, path, nbElementPerFile, exportUAIList1D);
+        groupsController.exportGroups_2D(mediacentreService, path, nbElementPerFile, exportUAIList2D);
 
         // GAR-ENT-RespAff
-        inChargeOfAssignementController.exportInChargeOfAssignement_1D(mediacentreService, path, nbElementPerFile,
-                inChargeOfAssignementName, emailDefault, exportUAIList1D);
+        inChargeOfAssignementController.exportInChargeOfAssignement_2D(mediacentreService, path, nbElementPerFile,
+                inChargeOfAssignementName, emailDefault, exportUAIList2D);
 
         //GAR-ENT-Enseignant
-        teachersController.exportTeachers_1D(mediacentreService, path, nbElementPerFile, exportUAIList1D);
+        teachersController.exportTeachers_2D(mediacentreService, path, nbElementPerFile, exportUAIList2D);
 
         // GAR-ENT-Eleve
-        studentsController.exportStudents_1D(mediacentreService, path, nbElementPerFile, exportUAIList1D);
+        studentsController.exportStudents_2D(mediacentreService, path, nbElementPerFile, exportUAIList2D);
 
     }
 
