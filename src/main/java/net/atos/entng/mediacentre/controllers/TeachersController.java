@@ -924,43 +924,45 @@ public class TeachersController {
                                 //close last one
                                 // add all the GARPersonProfils
 
-                                garEnseignant = doc.createElement("men:GAREnseignant");
-                                garEntEnseignant.appendChild(garEnseignant);
-                                MediacentreController.insertNode("men:GARPersonIdentifiant", doc, garEnseignant, lastjObj.getString("u.id"));
+                                if(lastjObj != null) {
+                                    garEnseignant = doc.createElement("men:GAREnseignant");
+                                    garEntEnseignant.appendChild(garEnseignant);
+                                    MediacentreController.insertNode("men:GARPersonIdentifiant", doc, garEnseignant, lastjObj.getString("u.id"));
 
-                                for (String etab : etabs) {
-                                    Element garProfil = doc.createElement("men:GARPersonProfils");
-                                    MediacentreController.insertNode("men:GARStructureUAI", doc, garProfil, etab);
-                                    //if ("Personnel".equals(jObj.getString("p.name"))) {
-                                    MediacentreController.insertNode("men:GARPersonProfil", doc, garProfil, profilType);
-                                    garEnseignant.appendChild(garProfil);
-                                }
+                                    for (String etab : etabs) {
+                                        Element garProfil = doc.createElement("men:GARPersonProfils");
+                                        MediacentreController.insertNode("men:GARStructureUAI", doc, garProfil, etab);
+                                        //if ("Personnel".equals(jObj.getString("p.name"))) {
+                                        MediacentreController.insertNode("men:GARPersonProfil", doc, garProfil, profilType);
+                                        garEnseignant.appendChild(garProfil);
+                                    }
 
-                                MediacentreController.insertNode("men:GARPersonNomPatro", doc, garEnseignant, lastjObj.getString("u.lastName"));
-                                MediacentreController.insertNode("men:GARPersonNom", doc, garEnseignant, lastjObj.getString("u.lastName"));
-                                MediacentreController.insertNode("men:GARPersonPrenom", doc, garEnseignant, lastjObj.getString("u.firstName"));
-                                if (lastjObj.getString("u.otherNames") != null) {
-                                    MediacentreController.insertNode("men:GARPersonAutresPrenoms", doc, garEnseignant, lastjObj.getString("u.otherNames"));
-                                } else {
-                                    MediacentreController.insertNode("men:GARPersonAutresPrenoms", doc, garEnseignant, lastjObj.getString("u.firstName"));
-                                }
-                                MediacentreController.insertNode("men:GARPersonCivilite", doc, garEnseignant, lastjObj.getString(""));
-                                MediacentreController.insertNode("men:GARPersonStructRattach", doc, garEnseignant, lastjObj.getString("s.UAI"));
+                                    MediacentreController.insertNode("men:GARPersonNomPatro", doc, garEnseignant, lastjObj.getString("u.lastName"));
+                                    MediacentreController.insertNode("men:GARPersonNom", doc, garEnseignant, lastjObj.getString("u.lastName"));
+                                    MediacentreController.insertNode("men:GARPersonPrenom", doc, garEnseignant, lastjObj.getString("u.firstName"));
+                                    if (lastjObj.getString("u.otherNames") != null) {
+                                        MediacentreController.insertNode("men:GARPersonAutresPrenoms", doc, garEnseignant, lastjObj.getString("u.otherNames"));
+                                    } else {
+                                        MediacentreController.insertNode("men:GARPersonAutresPrenoms", doc, garEnseignant, lastjObj.getString("u.firstName"));
+                                    }
+                                    MediacentreController.insertNode("men:GARPersonCivilite", doc, garEnseignant, lastjObj.getString(""));
+                                    MediacentreController.insertNode("men:GARPersonStructRattach", doc, garEnseignant, lastjObj.getString("s.UAI"));
 
-                                // add all the  GARPersonEtab
-                                for (String etab : etabs) {
-                                    MediacentreController.insertNode("men:GARPersonEtab", doc, garEnseignant, etab/*jObj.getString("s.UAI")*/);
-                                }
+                                    // add all the  GARPersonEtab
+                                    for (String etab : etabs) {
+                                        MediacentreController.insertNode("men:GARPersonEtab", doc, garEnseignant, etab/*jObj.getString("s.UAI")*/);
+                                    }
 
-                                MediacentreController.insertNode("men:GARPersonDateNaissance", doc, garEnseignant, lastTeacherBirthDate);
+                                    MediacentreController.insertNode("men:GARPersonDateNaissance", doc, garEnseignant, lastTeacherBirthDate);
 
-                                for (String[] data : listDisciplinesPostes) {
-                                    if (data[2] != null) { // field men:GAREnsDisciplinePosteCode is mandatory
-                                        Element garEnsDisciplinesPostes = doc.createElement("men:GAREnsDisciplinesPostes");
-                                        MediacentreController.insertNode("men:GARStructureUAI", doc, garEnsDisciplinesPostes, mapStructures.get(data[0]));
-                                        MediacentreController.insertNode("men:GAREnsDisciplinePosteCode", doc, garEnsDisciplinesPostes, MediacentreController.customSubString(data[2], 255));
-                                        garEnseignant.appendChild(garEnsDisciplinesPostes);
-                                        counter += 3;
+                                    for (String[] data : listDisciplinesPostes) {
+                                        if (data[2] != null) { // field men:GAREnsDisciplinePosteCode is mandatory
+                                            Element garEnsDisciplinesPostes = doc.createElement("men:GAREnsDisciplinesPostes");
+                                            MediacentreController.insertNode("men:GARStructureUAI", doc, garEnsDisciplinesPostes, mapStructures.get(data[0]));
+                                            MediacentreController.insertNode("men:GAREnsDisciplinePosteCode", doc, garEnsDisciplinesPostes, MediacentreController.customSubString(data[2], 255));
+                                            garEnseignant.appendChild(garEnsDisciplinesPostes);
+                                            counter += 3;
+                                        }
                                     }
                                 }
                                 doc = testNumberOfOccurrences(doc);
