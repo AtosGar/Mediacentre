@@ -50,6 +50,9 @@ public class MediacentreController extends BaseController {
     private final String PROJECT_TYPE_1D_VALUE = "1D";
     private final String PROJECT_TYPE_2D_VALUE = "2D";
 
+    private final String UAI_1D_LIST_FILE = "ListeUAIExportGAR_1D.txt";
+    private final String UAI_2D_LIST_FILE = "ListeUAIExportGAR_2D.txt";
+
     /**
      * Computation service
      */
@@ -124,7 +127,8 @@ public class MediacentreController extends BaseController {
         exportFilePrefix = container.config().getString("exportFilePrefix", "/tmp");
         String inChargeOfAssignementName = container.config().getString("inChargeOfAssignementGroupName", "Responsables d'affectation");
 
-        String uaiList1DPath= container.config().getString("uai-2D-list-path");
+        String uaiList1DPath = container.config().getString("uai-2D-list-path");
+
         final String exportUAIList2D = getExportUAIListFromFile(uaiList1DPath);
 
         final StudentsController studentsController = new StudentsController();
@@ -163,7 +167,7 @@ public class MediacentreController extends BaseController {
     @ApiDoc("Export XML_1D")
     public void exportXML_1D(final HttpServerRequest request) {
 
-        final String path = container.config().getString("export-path", "/tmp")+"/1D";
+        final String path = container.config().getString("export-path", "/tmp") + "/1D";
 
         final int nbElementPerFile = container.config().getInteger("elementsPerFile", 10000);
 
@@ -171,7 +175,7 @@ public class MediacentreController extends BaseController {
 
         exportFilePrefix = container.config().getString("exportFilePrefix", "/tmp");
 
-        String uaiList1DPath= container.config().getString("uai-1D-list-path");
+        String uaiList1DPath = path + "/" + UAI_1D_LIST_FILE;
 
         final String exportUAIList1D = getExportUAIListFromFile(uaiList1DPath);
 
@@ -219,7 +223,7 @@ public class MediacentreController extends BaseController {
     @ApiDoc("Export XML_2D")
     public void exportXML_2D(final HttpServerRequest request) {
 
-        final String path = container.config().getString("export-path", "/tmp")+"/2D";
+        final String path = container.config().getString("export-path", "/tmp") + "/2D";
 
         final int nbElementPerFile = container.config().getInteger("elementsPerFile", 10000);
 
@@ -227,7 +231,7 @@ public class MediacentreController extends BaseController {
 
         exportFilePrefix = container.config().getString("exportFilePrefix", "/tmp");
 
-        String uaiList2DPath= container.config().getString("uai-2D-list-path");
+        String uaiList2DPath = path + "/" + UAI_2D_LIST_FILE;
 
         final String exportUAIList2D = getExportUAIListFromFile(uaiList2DPath);
 
