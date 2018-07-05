@@ -533,7 +533,7 @@ public class TeachersController {
                                             if (jObj.getString("s2.UAI") != null) {
                                                 etabs.add(jObj.getString("s2.UAI"));
                                                 if (!structProfile.containsKey(jObj.getString("s2.UAI"))) {
-                                                    structProfile.put(mapStructures.get(data[0].toString()), "National_ens");
+                                                    structProfile.put(mapStructures.get(data[0].toString()), "National_ens_1");
                                                 }
                                             }
                                             listDisciplinesPostes.add(data);
@@ -543,13 +543,13 @@ public class TeachersController {
                                         if (jObj.getString("s.UAI") != null) {
                                             etabs.add(jObj.getString("s.UAI"));
                                             if (!structProfile.containsKey(jObj.getString("s2.UAI"))) {
-                                                structProfile.put(jObj.getString("s2.UAI"), "National_ens");
+                                                structProfile.put(jObj.getString("s2.UAI"), "National_ens_2");
                                             }
                                         }
                                         if (jObj.getString("s2.UAI") != null) {
                                             etabs.add(jObj.getString("s2.UAI"));
                                             if (!structProfile.containsKey(jObj.getString("s2.UAI"))) {
-                                                structProfile.put(jObj.getString("s2.UAI"), "National_ens");
+                                                structProfile.put(jObj.getString("s2.UAI"), "National_ens_3");
                                             }
                                         }
                                     }
@@ -560,7 +560,7 @@ public class TeachersController {
                                     if (jObj.getString("s2.UAI") != null) {
                                         etabs.add(jObj.getString("s2.UAI"));
                                         if (!structProfile.containsKey(jObj.getString("s2.UAI"))) {
-                                            structProfile.put(jObj.getString("s2.UAI"), "National_ens");
+                                            structProfile.put(jObj.getString("s2.UAI"), "National_ens_4");
                                         }
                                     }
                                     counter += 9;
