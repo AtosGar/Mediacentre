@@ -429,41 +429,6 @@ public class TeachersController {
                     for (Object obj : teachers) {
                         if (obj instanceof JsonObject) {
 
-                            /*
-                            JsonObject currentjObj = (JsonObject) obj;
-                            String currentUid = currentjObj.getString("u.id");
-
-                            if(previousUid.equals(currentUid) || previousUid.equals("")){
-                                // If it is the first jObj or if currentUid equals the previous Uid
-
-                                // List of structures
-                                etabs.add(currentjObj.getString("s.UAI"));
-                                if(currentjObj.getString("s2.UAI")!=null){
-                                    etabs.add(currentjObj.getString("s2.UAI"));
-                                }
-
-                                previousUid = currentUid;
-                                previousObj = currentjObj;
-
-                            }else {
-                                // If current jObj is a new GAR-ENSEIGNANT
-                                // Print previous GAR-ENSEIGNANT
-                                generateNodesGarEnseignant(previousObj,garEnseignant,etabs );
-
-                                // List of structures
-                                etabs = new HashSet<String>();
-                                etabs.add(currentjObj.getString("s.UAI"));
-                                if(currentjObj.getString("s2.UAI")!=null){
-                                    etabs.add(currentjObj.getString("s2.UAI"));
-                                }
-
-                                // Init variable for new GAR-ENSEIGNANT
-                                previousObj = currentjObj;
-                                previousUid = currentUid;
-                            }*/
-
-
-
                             JsonObject jObj = (JsonObject) obj;
                             if (jObj.getString("s.UAI") != null || jObj.getString("s2.UAI") != null) {
                                 if (jObj.getString("u.id") != null && !lastTeacherId.equals(jObj.getString("u.id"))) {
@@ -492,7 +457,7 @@ public class TeachersController {
                                             } else {
                                                 //1 profile for 1 structure
                                                 Element garProfil = doc.createElement("men:GARPersonProfils");
-                                                //System.out.println(" key : "+pair.getKey()+" | value : "+ pair.getValue());
+                                                System.out.println(" key : "+pair.getKey()+" | value : "+ pair.getValue());
                                                 MediacentreController.insertNode("men:GARStructureUAI", doc, garProfil, pair.getKey().toString());
                                                 MediacentreController.insertNode("men:GARPersonProfil", doc, garProfil, pair.getValue().toString());
                                                 garEnseignant.appendChild(garProfil);
