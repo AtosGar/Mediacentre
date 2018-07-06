@@ -454,7 +454,7 @@ public class MediacentreServiceImpl implements MediacentreService {
     public void getEtablissement_1D(String uaiExportList, Handler<Either<String, JsonArray>> handler) {
         String query = "MATCH (s:Structure) WHERE s.UAI in " + uaiExportList +
                 " OPTIONAL MATCH (s2:Structure)<-[HAS_ATTACHMENT]-(s:Structure) " +
-                "RETURN distinct substring(s.UAI, 0, 44) as `s.UAI`,  substring(s.contract, 0, 44) as `s.contract`, substring(s.name, 0, 499) as `s.name`, " +
+                "RETURN distinct substring(s.UAI, 0, 44) as `s.UAI`,  substring(s.sector, 0, 44) as `s.contract`, substring(s.name, 0, 499) as `s.name`, " +
                 " substring(s.phone, 0, 44) as `s.phone`, substring(s2.UAI, 0, 44) as `s2.UAI` order by `s.UAI`";
         neo4j.execute(query, new JsonObject(), validResultHandler(handler));
     }

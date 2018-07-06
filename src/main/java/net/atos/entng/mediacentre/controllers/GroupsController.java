@@ -388,11 +388,12 @@ public class GroupsController {
                             String grpCode = jObj.getString("c.externalId");
                             String[] parts = grpCode.split("\\$");
 
-                            if( parts.length >= 2 ) {
+                            /*if( parts.length >= 2 ) {
                                 MediacentreController.insertNode("men:GARGroupeCode", doc, garDivision, MediacentreController.customSubString(parts[1], 255));
                             } else {
                                 MediacentreController.insertNode("men:GARGroupeCode", doc, garDivision, "");
-                            }
+                            }*/
+                            MediacentreController.insertNode("men:GARGroupeCode", doc, garDivision,grpCode);
                             MediacentreController.insertNode("men:GARStructureUAI", doc, garDivision, jObj.getString("s.UAI"));
                             MediacentreController.insertNode("men:GARGroupeLibelle", doc, garDivision, jObj.getString("c.name"));
                             MediacentreController.insertNode("men:GARGroupeStatut", doc, garDivision, "DIVISION");
