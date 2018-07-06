@@ -441,7 +441,7 @@ public class StructuresController {
                                                         MediacentreController.insertNode("men:GARStructureNomCourant", doc, garEtab, jObj.getString("s.name"));
                                                         counter += 5;
                                                     }
-                                                    lastContract = jObj.getString("s.sector");
+                                                    lastContract = jObj.getString("s.contract");
                                                     lastPhone = jObj.getString("s.phone");
                                                 }
                                             }
