@@ -412,7 +412,7 @@ public class StructuresController {
                                         if (event.isRight()) {
                                             // write the content into xml file
                                             final JsonArray structures = event.right().getValue();
-                                            doc = fileHeader();
+                                            doc = fileHeader_1D();
                                             //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
                                             // men:GAREtab
                                             String lastStructureId = "none";
@@ -499,6 +499,7 @@ public class StructuresController {
         nbElem = nbElementPerFile;
 
         mediacentreService.getAllModules(new Handler<Either<String, JsonArray>>() {
+
             @Override
             public void handle(Either<String, JsonArray> event) {
                 if (event.isRight()) {
@@ -853,6 +854,27 @@ public class StructuresController {
         garEntEtablissement = doc.createElement("men:GAR-ENT-Etab");
         doc.appendChild(garEntEtablissement);
         garEntEtablissement.setAttribute("xmlns:men", "http://data.education.fr/ns/gar");
+        garEntEtablissement.setAttribute("xmlns:xalan", "http://xml.apache.org/xalan");
+        garEntEtablissement.setAttribute("xmlns:xslFormatting", "urn:xslFormatting");
+        garEntEtablissement.setAttribute("xmlns:xsi", "http://www.w3.org/2001/XMLSchema-instance");
+        garEntEtablissement.setAttribute("Version", "1.0");
+        garEntEtablissement.setAttribute("xsi:schemaLocation", "http://data.education.fr/ns/gar GAR-ENT.xsd");
+        return doc;
+    }
+
+    private Document fileHeader_1D(){
+        DocumentBuilderFactory docFactory = DocumentBuilderFactory.newInstance();
+        DocumentBuilder docBuilder = null;
+        try {
+            docBuilder = docFactory.newDocumentBuilder();
+        } catch (ParserConfigurationException e) {
+            e.printStackTrace();
+        }
+        // root elements
+        final Document doc = docBuilder.newDocument();
+        garEntEtablissement = doc.createElement("men:GAR-ENT-Etab");
+        doc.appendChild(garEntEtablissement);
+        garEntEtablissement.setAttribute("xmlns:men", "http://data.education.fr/ns/gar/1d");
         garEntEtablissement.setAttribute("xmlns:xalan", "http://xml.apache.org/xalan");
         garEntEtablissement.setAttribute("xmlns:xslFormatting", "urn:xslFormatting");
         garEntEtablissement.setAttribute("xmlns:xsi", "http://www.w3.org/2001/XMLSchema-instance");

@@ -177,8 +177,6 @@ public class MediacentreController extends BaseController {
 
         String uaiList1DPath = path + UAI_1D_LIST_FILE;
 
-        System.out.println(" PATH 1D : "+uaiList1DPath);
-
         final String exportUAIList1D = getExportUAIListFromFile(uaiList1DPath);
 
         String inChargeOfAssignementName = container.config().getString("inChargeOfAssignementGroupName", "Responsables d'affectation");
@@ -234,8 +232,6 @@ public class MediacentreController extends BaseController {
         exportFilePrefix = container.config().getString("exportFilePrefix", "/tmp");
 
         String uaiList2DPath = path + UAI_2D_LIST_FILE;
-
-        System.out.println(" PATH 2D : "+uaiList2DPath);
 
         final String exportUAIList2D = getExportUAIListFromFile(uaiList2DPath);
 

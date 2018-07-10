@@ -410,7 +410,7 @@ public class TeachersController {
                 if (event.isRight()) {
                     // write the content into xml file
                     final JsonArray teachers = event.right().getValue();
-                    doc = fileHeader();
+                    doc = fileHeader_1D();
 
                     // GAREnseignant
                     String lastTeacherId = "";
@@ -639,6 +639,7 @@ public class TeachersController {
                                         String garStructureUai = jObj.getString("s.UAI");
                                         String classeExternalId = jObj.getString("c.externalId");
                                         String garPersonIdentifiant = jObj.getString("u.id");
+
                                         String garMefstat4Code = associationsClasseMefMap.get(classeExternalId);
 
                                         Element garPersonMefstat4 = doc.createElement("men:GARPersonMEFSTAT4");
@@ -1129,6 +1130,27 @@ public class TeachersController {
         garEntEnseignant = doc.createElement("men:GAR-ENT-Enseignant");
         doc.appendChild(garEntEnseignant);
         garEntEnseignant.setAttribute("xmlns:men", "http://data.education.fr/ns/gar");
+        garEntEnseignant.setAttribute("xmlns:xalan", "http://xml.apache.org/xalan");
+        garEntEnseignant.setAttribute("xmlns:xslFormatting", "urn:xslFormatting");
+        garEntEnseignant.setAttribute("xmlns:xsi", "http://www.w3.org/2001/XMLSchema-instance");
+        garEntEnseignant.setAttribute("Version", "1.0");
+        garEntEnseignant.setAttribute("xsi:schemaLocation", "http://data.education.fr/ns/gar GAR-ENT.xsd");
+        return doc;
+    }
+
+    private Document fileHeader_1D() {
+        DocumentBuilderFactory docFactory = DocumentBuilderFactory.newInstance();
+        DocumentBuilder docBuilder = null;
+        try {
+            docBuilder = docFactory.newDocumentBuilder();
+        } catch (ParserConfigurationException e) {
+            e.printStackTrace();
+        }
+        // root elements
+        final Document doc = docBuilder.newDocument();
+        garEntEnseignant = doc.createElement("men:GAR-ENT-Enseignant");
+        doc.appendChild(garEntEnseignant);
+        garEntEnseignant.setAttribute("xmlns:men", "http://data.education.fr/ns/gar/1d");
         garEntEnseignant.setAttribute("xmlns:xalan", "http://xml.apache.org/xalan");
         garEntEnseignant.setAttribute("xmlns:xslFormatting", "urn:xslFormatting");
         garEntEnseignant.setAttribute("xmlns:xsi", "http://www.w3.org/2001/XMLSchema-instance");

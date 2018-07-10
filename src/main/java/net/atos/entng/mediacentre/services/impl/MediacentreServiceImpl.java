@@ -178,6 +178,7 @@ public class MediacentreServiceImpl implements MediacentreService {
                 "order by `s.UAI`, fg.externalId, c.externalId " +
                 "union " +
                 "match (u:User)-[COMMUNIQUE]->(fg:FunctionalGroup)-[d2:DEPENDS]->(s:Structure) where not u.profiles = ['Student'] " +
+                "AND u.source = 'AAF' and s.UAI in " + uaiExportList + " " +
                 "return distinct substring(s.UAI, 0, 44) as `s.UAI`, s.name, null as cname, null as cid, null as cexternalId, substring(fg.id, 0, 254) as `fg.id`, fg.externalId, fg.name " +
                 "order by `s.UAI`, fg.externalId";
         neo4j.execute(query, new JsonObject(), validResultHandler(handler));
@@ -349,7 +350,7 @@ public class MediacentreServiceImpl implements MediacentreService {
     @Override
     public void getClasseMefStat4_1D(String uaiExportList, Handler<Either<String, JsonArray>> handler) {
         String query = "MATCH (c:Class)<-[d:DEPENDS]-(pg:ProfileGroup)<-[IN]-(u:User)-[ADMINISTRATIVE_ATTACHMENT]->(s:Structure)  " +
-                "WHERE  str(u.profiles) CONTAINS 'Student' AND exists(c.externalId) " +
+                "WHERE  str(u.profiles) CONTAINS 'Student' AND exists(c.externalId) AND u.source = 'AAF1D' " +
                 "AND s.UAI in " + uaiExportList + "  RETURN distinct c.externalId,  substring(u.level, 0, 4) as mefstat4Code";
         neo4j.execute(query, new JsonObject(), validResultHandler(handler));
     }

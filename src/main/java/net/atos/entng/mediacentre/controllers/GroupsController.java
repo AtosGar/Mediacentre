@@ -377,12 +377,14 @@ public class GroupsController {
                 if (event.isRight()) {
                     // write the content into xml file
                     final JsonArray divisions = event.right().getValue();
-                    doc = fileHeader();
+                    doc = fileHeader_1D();
 
                     // men:GAREleve
                     for (Object obj : divisions) {
                         Element garDivision = doc.createElement("men:GARGroupe");
+
                         garEntGroup.appendChild(garDivision);
+
                         if (obj instanceof JsonObject) {
                             JsonObject jObj = (JsonObject) obj;
                             String grpCode = jObj.getString("c.externalId");
@@ -907,6 +909,27 @@ public class GroupsController {
         garEntGroup = doc.createElement("men:GAR-ENT-Groupe");
         doc.appendChild(garEntGroup);
         garEntGroup.setAttribute("xmlns:men", "http://data.education.fr/ns/gar");
+        garEntGroup.setAttribute("xmlns:xalan", "http://xml.apache.org/xalan");
+        garEntGroup.setAttribute("xmlns:xslFormatting", "urn:xslFormatting");
+        garEntGroup.setAttribute("xmlns:xsi", "http://www.w3.org/2001/XMLSchema-instance");
+        garEntGroup.setAttribute("Version", "1.0");
+        garEntGroup.setAttribute("xsi:schemaLocation", "http://data.education.fr/ns/gar GAR-ENT.xsd");
+        return doc;
+    }
+
+    private Document fileHeader_1D(){
+        DocumentBuilderFactory docFactory = DocumentBuilderFactory.newInstance();
+        DocumentBuilder docBuilder = null;
+        try {
+            docBuilder = docFactory.newDocumentBuilder();
+        } catch (ParserConfigurationException e) {
+            e.printStackTrace();
+        }
+        // root elements
+        final Document doc = docBuilder.newDocument();
+        garEntGroup = doc.createElement("men:GAR-ENT-Groupe");
+        doc.appendChild(garEntGroup);
+        garEntGroup.setAttribute("xmlns:men", "http://data.education.fr/ns/gar/1d");
         garEntGroup.setAttribute("xmlns:xalan", "http://xml.apache.org/xalan");
         garEntGroup.setAttribute("xmlns:xslFormatting", "urn:xslFormatting");
         garEntGroup.setAttribute("xmlns:xsi", "http://www.w3.org/2001/XMLSchema-instance");

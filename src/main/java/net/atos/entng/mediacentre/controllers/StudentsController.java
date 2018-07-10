@@ -279,7 +279,7 @@ public class StudentsController {
                 if (event.isRight()) {
                     // write the content into xml file
                     final JsonArray students = event.right().getValue();
-                    doc = fileHeader();
+                    doc = fileHeader_1D();
 
                     String lastStudentId = "";
                     String lastStudentBirthDate = "";
@@ -761,4 +761,24 @@ public class StudentsController {
         return doc;
     }
 
+    private Document fileHeader_1D() {
+        DocumentBuilderFactory docFactory = DocumentBuilderFactory.newInstance();
+        DocumentBuilder docBuilder = null;
+        try {
+            docBuilder = docFactory.newDocumentBuilder();
+        } catch (ParserConfigurationException e) {
+            e.printStackTrace();
+        }
+        // root elements
+        final Document doc = docBuilder.newDocument();
+        garEntEleve = doc.createElement("men:GAR-ENT-Eleve");
+        doc.appendChild(garEntEleve);
+        garEntEleve.setAttribute("xmlns:men", "http://data.education.fr/ns/gar/1d");
+        garEntEleve.setAttribute("xmlns:xalan", "http://xml.apache.org/xalan");
+        garEntEleve.setAttribute("xmlns:xslFormatting", "urn:xslFormatting");
+        garEntEleve.setAttribute("xmlns:xsi", "http://www.w3.org/2001/XMLSchema-instance");
+        garEntEleve.setAttribute("Version", "1.0");
+        garEntEleve.setAttribute("xsi:schemaLocation", "http://data.education.fr/ns/gar GAR-ENT.xsd");
+        return doc;
+    }
 }

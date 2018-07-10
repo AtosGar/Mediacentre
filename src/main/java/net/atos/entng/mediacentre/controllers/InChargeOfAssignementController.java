@@ -152,7 +152,7 @@ public class InChargeOfAssignementController {
                     final Document doc = docBuilder.newDocument();
                     final Element garEntRespAff = doc.createElement("men:GAR-ENT-RespAff");
                     doc.appendChild(garEntRespAff);
-                    garEntRespAff.setAttribute("xmlns:men", "http://data.education.fr/ns/gar");
+                    garEntRespAff.setAttribute("xmlns:men", "http://data.education.fr/ns/gar/1d");
                     garEntRespAff.setAttribute("xmlns:xalan", "http://xml.apache.org/xalan");
                     garEntRespAff.setAttribute("xmlns:xslFormatting", "urn:xslFormatting");
                     garEntRespAff.setAttribute("xmlns:xsi", "http://www.w3.org/2001/XMLSchema-instance");
