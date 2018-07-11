@@ -421,6 +421,18 @@ public class MediacentreController extends BaseController {
         return fileName;
     }
 
+    public static String getExportFileName_1D(String name, int fileIndex) {
+        String formattedIndex = String.format("%04d", fileIndex);
+        String fileName = exportFilePrefix + "_GAR-ENT_Complet_" + fileDate + "_1D_" + name + "_" + formattedIndex + ".xml";
+        return fileName;
+    }
+
+    public static String getExportFileName_2D(String name, int fileIndex) {
+        String formattedIndex = String.format("%04d", fileIndex);
+        String fileName = exportFilePrefix + "_GAR-ENT_Complet_" + fileDate + "_2D_" + name + "_" + formattedIndex + ".xml";
+        return fileName;
+    }
+
     public static boolean isFileValid(String filePath) throws IOException, SAXException {
         //URL schemaFile = new URL("http://data.education.fr/ns/gar GAR-ENT.xsd");
 /*        File schemaFile = new File("c:\\exportXML\\GAR-ENT.xsd");

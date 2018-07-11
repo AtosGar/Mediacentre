@@ -31,6 +31,8 @@ import java.util.Set;
 
 
 import static net.atos.entng.mediacentre.controllers.MediacentreController.getExportFileName;
+import static net.atos.entng.mediacentre.controllers.MediacentreController.getExportFileName_1D;
+import static net.atos.entng.mediacentre.controllers.MediacentreController.getExportFileName_2D;
 
 public class TeachersController {
 
@@ -664,21 +666,21 @@ public class TeachersController {
                                     transformer.setOutputProperty(OutputKeys.INDENT, "yes");
                                     transformer.setOutputProperty("{http://xml.apache.org/xslt}indent-amount", "2");
                                     DOMSource source = new DOMSource(doc);
-                                    StreamResult result = new StreamResult(new File(path + getExportFileName("Enseignant", fileIndex)));
+                                    StreamResult result = new StreamResult(new File(path + getExportFileName_1D("Enseignant", fileIndex)));
 
                                     transformer.transform(source, result);
                                     boolean res = false;
                                     try {
-                                        res = MediacentreController.isFileValid(pathExport + getExportFileName("Enseignant", fileIndex));
+                                        res = MediacentreController.isFileValid(pathExport + getExportFileName_1D("Enseignant", fileIndex));
                                     } catch (IOException e) {
                                         e.printStackTrace();
                                     } catch (SAXException e) {
                                         e.printStackTrace();
                                     }
                                     if (res == false) {
-                                        System.out.println("Error on file : " + pathExport + getExportFileName("Enseignant", fileIndex));
+                                        System.out.println("Error on file : " + pathExport + getExportFileName_1D("Enseignant", fileIndex));
                                     } else {
-                                        System.out.println("File valid : " + pathExport + getExportFileName("Enseignant", fileIndex));
+                                        System.out.println("File valid : " + pathExport + getExportFileName_1D("Enseignant", fileIndex));
                                     }
 
                                     System.out.println("Teachers saved");
@@ -983,21 +985,21 @@ public class TeachersController {
                                                 transformer.setOutputProperty(OutputKeys.INDENT, "yes");
                                                 transformer.setOutputProperty("{http://xml.apache.org/xslt}indent-amount", "2");
                                                 DOMSource source = new DOMSource(doc);
-                                                StreamResult result = new StreamResult(new File(path + getExportFileName("Enseignant", fileIndex)));
+                                                StreamResult result = new StreamResult(new File(path + getExportFileName_2D("Enseignant", fileIndex)));
 
                                                 transformer.transform(source, result);
                                                 boolean res = false;
                                                 try {
-                                                    res = MediacentreController.isFileValid(pathExport + getExportFileName("Enseignant", fileIndex));
+                                                    res = MediacentreController.isFileValid(pathExport + getExportFileName_2D("Enseignant", fileIndex));
                                                 } catch (IOException e) {
                                                     e.printStackTrace();
                                                 } catch (SAXException e) {
                                                     e.printStackTrace();
                                                 }
                                                 if (res == false) {
-                                                    System.out.println("Error on file : " + pathExport + getExportFileName("Enseignant", fileIndex));
+                                                    System.out.println("Error on file : " + pathExport + getExportFileName_2D("Enseignant", fileIndex));
                                                 } else {
-                                                    System.out.println("File valid : " + pathExport + getExportFileName("Enseignant", fileIndex));
+                                                    System.out.println("File valid : " + pathExport + getExportFileName_2D("Enseignant", fileIndex));
                                                 }
 
                                                 System.out.println("Teachers saved");
@@ -1094,21 +1096,43 @@ public class TeachersController {
                 transformer.setOutputProperty(OutputKeys.INDENT, "yes");
                 transformer.setOutputProperty("{http://xml.apache.org/xslt}indent-amount", "2");
                 DOMSource source = new DOMSource(doc);
-                StreamResult result = new StreamResult(new File(pathExport + getExportFileName("Enseignant", fileIndex)));
+
+                StreamResult result  ;
+
+                if(is1D){
+                    result = new StreamResult(new File(pathExport + getExportFileName_1D("Enseignant", fileIndex)));
+                }else{
+                    result = new StreamResult(new File(pathExport + getExportFileName_2D("Enseignant", fileIndex)));
+                }
 
                 transformer.transform(source, result);
                 boolean res = false;
                 try {
-                    res = MediacentreController.isFileValid(pathExport + getExportFileName("Enseignant", fileIndex));
+
+                    if(is1D){
+                        res = MediacentreController.isFileValid(pathExport + getExportFileName_1D("Enseignant", fileIndex));
+                    }else{
+                        res = MediacentreController.isFileValid(pathExport + getExportFileName_2D("Enseignant", fileIndex));
+                    }
+
                 } catch (IOException e) {
                     e.printStackTrace();
                 } catch (SAXException e) {
                     e.printStackTrace();
                 }
                 if (res == false) {
-                    System.out.println("Error on file : " + pathExport + getExportFileName("Enseignant", fileIndex));
+                    if(is1D){
+                        System.out.println("Error on file : " + pathExport + getExportFileName_1D("Enseignant", fileIndex));
+                    }else{
+                        System.out.println("Error on file : " + pathExport + getExportFileName_2D("Enseignant", fileIndex));
+                    }
                 } else {
-                    System.out.println("File valid : " + pathExport + getExportFileName("Enseignant", fileIndex));
+
+                    if(is1D){
+                        System.out.println("File valid : " + pathExport + getExportFileName_1D("Enseignant", fileIndex));
+                    }else{
+                        System.out.println("File valid : " + pathExport + getExportFileName_2D("Enseignant", fileIndex));
+                    }
                 }
                 System.out.println("Teachers" + fileIndex + " saved");
                 fileIndex++;

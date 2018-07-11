@@ -24,6 +24,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 import static net.atos.entng.mediacentre.controllers.MediacentreController.getExportFileName;
+import static net.atos.entng.mediacentre.controllers.MediacentreController.getExportFileName_1D;
+import static net.atos.entng.mediacentre.controllers.MediacentreController.getExportFileName_2D;
 
 public class StudentsController {
 
@@ -423,20 +425,20 @@ public class StudentsController {
                                     transformer.setOutputProperty("{http://xml.apache.org/xslt}indent-amount", "2");
                                     DOMSource source = new DOMSource(doc);
 
-                                    StreamResult result = new StreamResult(new File(path + getExportFileName("Eleve", fileIndex)));
+                                    StreamResult result = new StreamResult(new File(path + getExportFileName_1D("Eleve", fileIndex)));
                                     transformer.transform(source, result);
                                     boolean res = false;
                                     try {
-                                        res = MediacentreController.isFileValid(pathExport + getExportFileName("Eleve", fileIndex));
+                                        res = MediacentreController.isFileValid(pathExport + getExportFileName_1D("Eleve", fileIndex));
                                     } catch (IOException e) {
                                         e.printStackTrace();
                                     } catch (SAXException e) {
                                         e.printStackTrace();
                                     }
                                     if (res == false) {
-                                        System.out.println("Error on file : " + pathExport + getExportFileName("Eleves", fileIndex));
+                                        System.out.println("Error on file : " + pathExport + getExportFileName_1D("Eleves", fileIndex));
                                     } else {
-                                        System.out.println("File valid : " + pathExport + getExportFileName("Eleves", fileIndex));
+                                        System.out.println("File valid : " + pathExport + getExportFileName_1D("Eleves", fileIndex));
                                     }
 
                                     System.out.println("Students saved");
@@ -660,7 +662,7 @@ public class StudentsController {
 
                                                 DOMSource source = new DOMSource(doc);
 
-                                                StreamResult result = new StreamResult(new File(path + getExportFileName("Eleve", fileIndex)));
+                                                StreamResult result = new StreamResult(new File(path + getExportFileName_2D("Eleve", fileIndex)));
 
                                                 transformer.transform(source, result);
 
@@ -668,7 +670,7 @@ public class StudentsController {
 
                                                 try {
 
-                                                    res = MediacentreController.isFileValid(pathExport + getExportFileName("Eleve", fileIndex));
+                                                    res = MediacentreController.isFileValid(pathExport + getExportFileName_2D("Eleve", fileIndex));
 
                                                 } catch (IOException e) {
 
@@ -681,11 +683,11 @@ public class StudentsController {
                                                 }
                                                 if (res == false) {
 
-                                                    System.out.println("Error on file : " + pathExport + getExportFileName("Eleves", fileIndex));
+                                                    System.out.println("Error on file : " + pathExport + getExportFileName_2D("Eleves", fileIndex));
 
                                                 } else {
 
-                                                    System.out.println("File valid : " + pathExport + getExportFileName("Eleves", fileIndex));
+                                                    System.out.println("File valid : " + pathExport + getExportFileName_2D("Eleves", fileIndex));
                                                 }
 
                                                 System.out.println("Students saved");
@@ -723,22 +725,47 @@ public class StudentsController {
                 transformer.setOutputProperty(OutputKeys.INDENT, "yes");
                 transformer.setOutputProperty("{http://xml.apache.org/xslt}indent-amount", "2");
                 DOMSource source = new DOMSource(doc);
-                StreamResult result = new StreamResult(new File(pathExport + getExportFileName("Eleve", fileIndex)));
+
+                StreamResult result  ;
+
+                if(is1D){
+                    result = new StreamResult(new File(pathExport + getExportFileName_1D("Eleve", fileIndex)));
+                }else{
+                    result = new StreamResult(new File(pathExport + getExportFileName_2D("Eleve", fileIndex)));
+                }
+
                 transformer.transform(source, result);
 
                 System.out.println("Students" + fileIndex + " saved");
                 boolean res = false;
                 try {
-                    res = MediacentreController.isFileValid(pathExport + getExportFileName("Eleve", fileIndex));
+
+                    if(is1D){
+                        res = MediacentreController.isFileValid(pathExport + getExportFileName_1D("Eleve", fileIndex));
+                    }else{
+                        res = MediacentreController.isFileValid(pathExport + getExportFileName_2D("Eleve", fileIndex));
+                    }
+
                 } catch (IOException e) {
                     e.printStackTrace();
                 } catch (SAXException e) {
                     e.printStackTrace();
                 }
                 if (res == false) {
-                    System.out.println("Error on file : " + pathExport + getExportFileName("Eleve", fileIndex));
+
+                    if(is1D){
+                        System.out.println("Error on file : " + pathExport + getExportFileName_1D("Eleve", fileIndex));
+                    }else{
+                        System.out.println("Error on file : " + pathExport + getExportFileName_2D("Eleve", fileIndex));
+                    }
+
                 } else {
-                    System.out.println("File valid : " + pathExport + getExportFileName("Eleves", fileIndex));
+
+                    if(is1D){
+                        System.out.println("File valid : " + pathExport + getExportFileName_1D("Eleves", fileIndex));
+                    }else{
+                        System.out.println("File valid : " + pathExport + getExportFileName_2D("Eleves", fileIndex));
+                    }
                 }
                 fileIndex++;
                 counter = 0;

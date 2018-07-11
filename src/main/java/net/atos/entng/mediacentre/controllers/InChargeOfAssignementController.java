@@ -24,6 +24,8 @@ import java.util.Collections;
 import java.util.List;
 
 import static net.atos.entng.mediacentre.controllers.MediacentreController.getExportFileName;
+import static net.atos.entng.mediacentre.controllers.MediacentreController.getExportFileName_1D;
+import static net.atos.entng.mediacentre.controllers.MediacentreController.getExportFileName_2D;
 
 public class InChargeOfAssignementController {
 
@@ -194,7 +196,7 @@ public class InChargeOfAssignementController {
                         transformer.setOutputProperty(OutputKeys.INDENT, "yes");
                         transformer.setOutputProperty("{http://xml.apache.org/xslt}indent-amount", "2");
                         DOMSource source = new DOMSource(doc);
-                        StreamResult result = new StreamResult(new File(path + getExportFileName("RespAff", 0)));
+                        StreamResult result = new StreamResult(new File(path + getExportFileName_1D("RespAff", 0)));
 
                         transformer.transform(source, result);
 
@@ -288,7 +290,7 @@ public class InChargeOfAssignementController {
                                 transformer.setOutputProperty(OutputKeys.INDENT, "yes");
                                 transformer.setOutputProperty("{http://xml.apache.org/xslt}indent-amount", "2");
                                 DOMSource source = new DOMSource(doc);
-                                StreamResult result = new StreamResult(new File(path + getExportFileName("RespAff", 0)));
+                                StreamResult result = new StreamResult(new File(path + getExportFileName_2D("RespAff", 0)));
 
                                 transformer.transform(source, result);
 

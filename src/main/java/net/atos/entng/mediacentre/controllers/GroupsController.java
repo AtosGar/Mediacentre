@@ -24,6 +24,8 @@ import java.util.*;
 
 
 import static net.atos.entng.mediacentre.controllers.MediacentreController.getExportFileName;
+import static net.atos.entng.mediacentre.controllers.MediacentreController.getExportFileName_1D;
+import static net.atos.entng.mediacentre.controllers.MediacentreController.getExportFileName_2D;
 
 public class GroupsController {
 
@@ -517,21 +519,21 @@ public class GroupsController {
                                                     transformer.setOutputProperty(OutputKeys.INDENT, "yes");
                                                     transformer.setOutputProperty("{http://xml.apache.org/xslt}indent-amount", "2");
                                                     DOMSource source = new DOMSource(doc);
-                                                    StreamResult result = new StreamResult(new File(path + getExportFileName("Groupe", fileIndex)));
+                                                    StreamResult result = new StreamResult(new File(path + getExportFileName_1D("Groupe", fileIndex)));
 
                                                     transformer.transform(source, result);
                                                     boolean res = false;
                                                     try {
-                                                        res = MediacentreController.isFileValid(pathExport + getExportFileName("Groupe", fileIndex));
+                                                        res = MediacentreController.isFileValid(pathExport + getExportFileName_1D("Groupe", fileIndex));
                                                     } catch (IOException e) {
                                                         e.printStackTrace();
                                                     } catch (SAXException e) {
                                                         e.printStackTrace();
                                                     }
                                                     if( res == false ){
-                                                        System.out.println("Error on file : " + pathExport + getExportFileName("Groupes", fileIndex));
+                                                        System.out.println("Error on file : " + pathExport + getExportFileName_1D("Groupes", fileIndex));
                                                     } else {
-                                                        System.out.println("File valid : " + pathExport + getExportFileName("Groupes", fileIndex));
+                                                        System.out.println("File valid : " + pathExport + getExportFileName_1D("Groupes", fileIndex));
                                                     }
 
                                                     System.out.println("Groupes saved");
@@ -814,21 +816,21 @@ public class GroupsController {
                                                             transformer.setOutputProperty(OutputKeys.INDENT, "yes");
                                                             transformer.setOutputProperty("{http://xml.apache.org/xslt}indent-amount", "2");
                                                             DOMSource source = new DOMSource(doc);
-                                                            StreamResult result = new StreamResult(new File(path + getExportFileName("Groupe", fileIndex)));
+                                                            StreamResult result = new StreamResult(new File(path + getExportFileName_2D("Groupe", fileIndex)));
 
                                                             transformer.transform(source, result);
                                                             boolean res = false;
                                                             try {
-                                                                res = MediacentreController.isFileValid(pathExport + getExportFileName("Groupe", fileIndex));
+                                                                res = MediacentreController.isFileValid(pathExport + getExportFileName_2D("Groupe", fileIndex));
                                                             } catch (IOException e) {
                                                                 e.printStackTrace();
                                                             } catch (SAXException e) {
                                                                 e.printStackTrace();
                                                             }
                                                             if( res == false ){
-                                                                System.out.println("Error on file : " + pathExport + getExportFileName("Groupes", fileIndex));
+                                                                System.out.println("Error on file : " + pathExport + getExportFileName_2D("Groupes", fileIndex));
                                                             } else {
-                                                                System.out.println("File valid : " + pathExport + getExportFileName("Groupes", fileIndex));
+                                                                System.out.println("File valid : " + pathExport + getExportFileName_2D("Groupes", fileIndex));
                                                             }
 
                                                             System.out.println("Groupes saved");
@@ -863,21 +865,42 @@ public class GroupsController {
                 transformer.setOutputProperty(OutputKeys.INDENT, "yes");
                 transformer.setOutputProperty("{http://xml.apache.org/xslt}indent-amount", "2");
                 DOMSource source = new DOMSource(doc);
-                StreamResult result = new StreamResult(new File(pathExport + getExportFileName("Groupe", fileIndex)));
+
+                StreamResult result;
+                if(is1D){
+                    result = new StreamResult(new File(pathExport + getExportFileName_1D("Groupe", fileIndex)));
+                }else{
+                    result = new StreamResult(new File(pathExport + getExportFileName_2D("Groupe", fileIndex)));
+                }
+
 
                 transformer.transform(source, result);
                 boolean res = false;
                 try {
-                    res = MediacentreController.isFileValid(pathExport + getExportFileName("Groupe", fileIndex));
+
+                    if(is1D){
+                        res = MediacentreController.isFileValid(pathExport + getExportFileName_1D("Groupe", fileIndex));
+                    }else{
+                        res = MediacentreController.isFileValid(pathExport + getExportFileName_2D("Groupe", fileIndex));
+                    }
+
                 } catch (IOException e) {
                     e.printStackTrace();
                 } catch (SAXException e) {
                     e.printStackTrace();
                 }
                 if( res == false ){
-                    System.out.println("Error on file : " + pathExport + getExportFileName("Groupe", fileIndex));
+                    if(is1D){
+                        System.out.println("Error on file : " + pathExport + getExportFileName_1D("Groupe", fileIndex));
+                    }else{
+                        System.out.println("Error on file : " + pathExport + getExportFileName_2D("Groupe", fileIndex));
+                    }
                 } else {
-                    System.out.println("File valid : " + pathExport + getExportFileName("Groupe", fileIndex));
+                    if(is1D){
+                        System.out.println("File valid : " + pathExport + getExportFileName_1D("Groupe", fileIndex));
+                    }else{
+                        System.out.println("File valid : " + pathExport + getExportFileName_2D("Groupe", fileIndex));
+                    }
                 }
 
                 System.out.println("Groupes" + fileIndex + " saved");

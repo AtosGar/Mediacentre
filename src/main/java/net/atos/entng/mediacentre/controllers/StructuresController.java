@@ -25,6 +25,8 @@ import java.util.HashMap;
 import java.util.Map;
 
 import static net.atos.entng.mediacentre.controllers.MediacentreController.getExportFileName;
+import static net.atos.entng.mediacentre.controllers.MediacentreController.getExportFileName_1D;
+import static net.atos.entng.mediacentre.controllers.MediacentreController.getExportFileName_2D;
 
 public class StructuresController {
 
@@ -459,22 +461,22 @@ public class StructuresController {
                                                 transformer.setOutputProperty(OutputKeys.INDENT, "yes");
                                                 transformer.setOutputProperty("{http://xml.apache.org/xslt}indent-amount", "2");
                                                 DOMSource source = new DOMSource(doc);
-                                                StreamResult result = new StreamResult(new File(path + getExportFileName("Etab", fileIndex)));
+                                                StreamResult result = new StreamResult(new File(path + getExportFileName_1D("Etab", fileIndex)));
                                                 transformer.transform(source, result);
 
                                                 System.out.println("Structures saved");
                                                 boolean res = false;
                                                 try {
-                                                    res = MediacentreController.isFileValid(pathExport + getExportFileName("Etab", fileIndex));
+                                                    res = MediacentreController.isFileValid(pathExport + getExportFileName_1D("Etab", fileIndex));
                                                 } catch (IOException e) {
                                                     e.printStackTrace();
                                                 } catch (SAXException e) {
                                                     e.printStackTrace();
                                                 }
                                                 if( res == false ){
-                                                    System.out.println("Error on file : " + pathExport + getExportFileName("Etab", fileIndex));
+                                                    System.out.println("Error on file : " + pathExport + getExportFileName_1D("Etab", fileIndex));
                                                 } else {
-                                                    System.out.println("File valid : " + pathExport + getExportFileName("Etab", fileIndex));
+                                                    System.out.println("File valid : " + pathExport + getExportFileName_1D("Etab", fileIndex));
                                                 }
                                             } catch (TransformerException tfe) {
                                                 tfe.printStackTrace();
@@ -752,22 +754,22 @@ public class StructuresController {
                                                                                                 transformer.setOutputProperty(OutputKeys.INDENT, "yes");
                                                                                                 transformer.setOutputProperty("{http://xml.apache.org/xslt}indent-amount", "2");
                                                                                                 DOMSource source = new DOMSource(doc);
-                                                                                                StreamResult result = new StreamResult(new File(path + getExportFileName("Etab", fileIndex)));
+                                                                                                StreamResult result = new StreamResult(new File(path + getExportFileName_2D("Etab", fileIndex)));
                                                                                                 transformer.transform(source, result);
 
                                                                                                 System.out.println("Structures saved");
                                                                                                 boolean res = false;
                                                                                                 try {
-                                                                                                    res = MediacentreController.isFileValid(pathExport + getExportFileName("Etab", fileIndex));
+                                                                                                    res = MediacentreController.isFileValid(pathExport + getExportFileName_2D("Etab", fileIndex));
                                                                                                 } catch (IOException e) {
                                                                                                     e.printStackTrace();
                                                                                                 } catch (SAXException e) {
                                                                                                     e.printStackTrace();
                                                                                                 }
                                                                                                 if( res == false ){
-                                                                                                    System.out.println("Error on file : " + pathExport + getExportFileName("Etab", fileIndex));
+                                                                                                    System.out.println("Error on file : " + pathExport + getExportFileName_2D("Etab", fileIndex));
                                                                                                 } else {
-                                                                                                    System.out.println("File valid : " + pathExport + getExportFileName("Etab", fileIndex));
+                                                                                                    System.out.println("File valid : " + pathExport + getExportFileName_2D("Etab", fileIndex));
                                                                                                 }
                                                                                             } catch (TransformerException tfe) {
                                                                                                 tfe.printStackTrace();
@@ -809,21 +811,43 @@ public class StructuresController {
                 transformer.setOutputProperty(OutputKeys.INDENT, "yes");
                 transformer.setOutputProperty("{http://xml.apache.org/xslt}indent-amount", "2");
                 DOMSource source = new DOMSource(doc);
-                StreamResult result = new StreamResult(new File(pathExport + getExportFileName("Etab", fileIndex)));
+
+                StreamResult result  ;
+
+                if(is1D){
+                    result = new StreamResult(new File(pathExport + getExportFileName_1D("Etab", fileIndex)));
+                }else{
+                    result = new StreamResult(new File(pathExport + getExportFileName_2D("Etab", fileIndex)));
+                }
+
 
                 transformer.transform(source, result);
                 boolean res = false;
                 try {
-                    res = MediacentreController.isFileValid(pathExport + getExportFileName("Etab", fileIndex));
+
+                    if(is1D){
+                        res = MediacentreController.isFileValid(pathExport + getExportFileName_1D("Etab", fileIndex));
+                    }else{
+                        res = MediacentreController.isFileValid(pathExport + getExportFileName_2D("Etab", fileIndex));
+                    }
+
                 } catch (IOException e) {
                     e.printStackTrace();
                 } catch (SAXException e) {
                     e.printStackTrace();
                 }
                 if( res == false ){
-                    System.out.println("Error on file : " + pathExport + getExportFileName("Etab", fileIndex));
+                    if(is1D){
+                        System.out.println("Error on file : " + pathExport + getExportFileName_1D("Etab", fileIndex));
+                    }else{
+                        System.out.println("Error on file : " + pathExport + getExportFileName_2D("Etab", fileIndex));
+                    }
                 } else {
-                    System.out.println("File valid : " + pathExport + getExportFileName("Etab", fileIndex));
+                    if(is1D){
+                        System.out.println("File valid : " + pathExport + getExportFileName_1D("Etab", fileIndex));
+                    }else{
+                        System.out.println("File valid : " + pathExport + getExportFileName_2D("Etab", fileIndex));
+                    }
                 }
 
                 System.out.println("Etab" + fileIndex + " saved");
