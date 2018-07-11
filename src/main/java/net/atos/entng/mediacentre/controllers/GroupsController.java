@@ -22,6 +22,7 @@ import java.io.File;
 import java.io.IOException;
 import java.util.*;
 
+
 import static net.atos.entng.mediacentre.controllers.MediacentreController.getExportFileName;
 
 public class GroupsController {
@@ -106,7 +107,7 @@ public class GroupsController {
                             MediacentreController.insertNode("men:GARGroupeLibelle", doc, garDivision, jObj.getString("c.name"));
                             MediacentreController.insertNode("men:GARGroupeStatut", doc, garDivision, "DIVISION");
                             counter += 5;
-                            doc = testNumberOfOccurrences(doc);
+                            doc = testNumberOfOccurrences(doc, false);
                         }
                     }
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -126,7 +127,7 @@ public class GroupsController {
                                         if (!lastGroup.equals(jObj.getString("fg.id"))) {
                                             if( !lGroupes.contains(jObj.getString("s.UAI") + jObj.getString("fg.externalId").split("\\$")[1])) {
                                                 counter += 6;
-                                                doc = testNumberOfOccurrences(doc);
+                                                doc = testNumberOfOccurrences(doc, false);
                                                 garGroup = doc.createElement("men:GARGroupe");
                                                 garEntGroup.appendChild(garGroup);
                                                 if (jObj.getString("fg.externalId") != null && !"null".equals(jObj.getString("fg.externalId"))) {
@@ -177,7 +178,7 @@ public class GroupsController {
                                                             MediacentreController.insertNode("men:GARGroupeCode", doc, garPersonGroup, jObj.getString("fg.id"));
                                                         }
                                                         counter += 4;
-                                                        doc = testNumberOfOccurrences(doc);
+                                                        doc = testNumberOfOccurrences(doc, false);
                                                     }
                                                 }
                                             }
@@ -211,7 +212,7 @@ public class GroupsController {
                                                                     MediacentreController.insertNode("men:GARGroupeCode", doc, garPersonGroup, MediacentreController.customSubString(jObj.getString("c.id"), 255));
                                                                 }
                                                                 counter += 4;
-                                                                doc = testNumberOfOccurrences(doc);
+                                                                doc = testNumberOfOccurrences(doc, false);
                                                             }
                                                         }
                                                     }
@@ -285,7 +286,7 @@ public class GroupsController {
                                                                     }
                                                                 }
                                                                 counter += 5;
-                                                                doc = testNumberOfOccurrences(doc);
+                                                                doc = testNumberOfOccurrences(doc, false);
                                                             }
 
                                                             for (Map.Entry<GAREnsGroupeMatiereKey, Set<String>> entry : mapClasses.entrySet()) {
@@ -306,7 +307,7 @@ public class GroupsController {
                                                                     }
                                                                 }
                                                                 counter += 5;
-                                                                doc = testNumberOfOccurrences(doc);
+                                                                doc = testNumberOfOccurrences(doc, false);
                                                             }
 
                                                         }
@@ -400,7 +401,7 @@ public class GroupsController {
                             MediacentreController.insertNode("men:GARGroupeLibelle", doc, garDivision, jObj.getString("c.name"));
                             MediacentreController.insertNode("men:GARGroupeStatut", doc, garDivision, "DIVISION");
                             counter += 5;
-                            doc = testNumberOfOccurrences(doc);
+                            doc = testNumberOfOccurrences(doc, true);
                         }
                     }
 
@@ -479,7 +480,7 @@ public class GroupsController {
                                                     MediacentreController.insertNode("men:GARGroupeCode", doc, garPersonGroup, jObj.getString("c.externalId"));
 
                                                     counter += 4;
-                                                    doc = testNumberOfOccurrences(doc);
+                                                    doc = testNumberOfOccurrences(doc, true);
                                                 }
                                             }
                                         }
@@ -503,7 +504,7 @@ public class GroupsController {
                                                             MediacentreController.insertNode("men:GARGroupeCode", doc, garPersonGroup, jObj.getString("c.externalId"));
 
                                                             counter += 4;
-                                                            doc = testNumberOfOccurrences(doc);
+                                                            doc = testNumberOfOccurrences(doc, true);
 
                                                         }
                                                     }
@@ -590,7 +591,7 @@ public class GroupsController {
                             MediacentreController.insertNode("men:GARGroupeLibelle", doc, garDivision, jObj.getString("c.name"));
                             MediacentreController.insertNode("men:GARGroupeStatut", doc, garDivision, "DIVISION");
                             counter += 5;
-                            doc = testNumberOfOccurrences(doc);
+                            doc = testNumberOfOccurrences(doc, false);
                         }
                     }
 
@@ -613,7 +614,7 @@ public class GroupsController {
                                         if (!lastGroup.equals(jObj.getString("fg.id"))) {
                                             if( !lGroupes.contains(jObj.getString("s.UAI") + jObj.getString("fg.externalId").split("\\$")[1])) {
                                                 counter += 6;
-                                                doc = testNumberOfOccurrences(doc);
+                                                doc = testNumberOfOccurrences(doc, false);
                                                 garGroup = doc.createElement("men:GARGroupe");
                                                 garEntGroup.appendChild(garGroup);
                                                 if (jObj.getString("fg.externalId") != null && !"null".equals(jObj.getString("fg.externalId"))) {
@@ -666,7 +667,7 @@ public class GroupsController {
                                                             MediacentreController.insertNode("men:GARGroupeCode", doc, garPersonGroup, jObj.getString("fg.id"));
                                                         }
                                                         counter += 4;
-                                                        doc = testNumberOfOccurrences(doc);
+                                                        doc = testNumberOfOccurrences(doc, false);
 
                                                 }
                                             }
@@ -703,7 +704,7 @@ public class GroupsController {
                                                                     MediacentreController.insertNode("men:GARGroupeCode", doc, garPersonGroup, MediacentreController.customSubString(jObj.getString("c.id"), 255));
                                                                 }
                                                                 counter += 4;
-                                                                doc = testNumberOfOccurrences(doc);
+                                                                doc = testNumberOfOccurrences(doc, false);
 
                                                         }
                                                     }
@@ -780,7 +781,7 @@ public class GroupsController {
                                                                     }
                                                                 }
                                                                 counter += 5;
-                                                                doc = testNumberOfOccurrences(doc);
+                                                                doc = testNumberOfOccurrences(doc, false);
                                                             }
 
                                                             for (Map.Entry<GAREnsGroupeMatiereKey, Set<String>> entry : mapClasses.entrySet()) {
@@ -801,7 +802,7 @@ public class GroupsController {
                                                                     }
                                                                 }
                                                                 counter += 5;
-                                                                doc = testNumberOfOccurrences(doc);
+                                                                doc = testNumberOfOccurrences(doc, false);
                                                             }
 
                                                         }
@@ -853,7 +854,7 @@ public class GroupsController {
     } // end exportGroups
 
 
-    private Document testNumberOfOccurrences(Document doc) {
+    private Document testNumberOfOccurrences(Document doc, boolean is1D) {
         if (nbElem <= counter) {
             // close the full file
             try {
@@ -890,7 +891,11 @@ public class GroupsController {
                 e.printStackTrace();*/
             }
             // open the new one
-            return fileHeader();
+            if(is1D){
+                return fileHeader_1D();
+            }else{
+                return fileHeader();
+            }
         } else {
             return doc;
         }

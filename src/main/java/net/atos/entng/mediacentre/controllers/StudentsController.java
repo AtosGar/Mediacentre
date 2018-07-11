@@ -98,7 +98,7 @@ public class StudentsController {
                                         }
                                         etabs = new ArrayList<String>();
                                         MediacentreController.insertNode("men:GARPersonDateNaissance", doc, garEleve, lastStudentBirthDate);
-                                        doc = testNumberOfOccurrences(doc);
+                                        doc = testNumberOfOccurrences(doc, false);
                                     } else {
                                         if (lastjObj != null) {
                                             bannedUsers.add(lastjObj.getString("u.id"));
@@ -181,7 +181,7 @@ public class StudentsController {
                                             MediacentreController.insertNode("men:GARPersonIdentifiant", doc, garPersonMef, jObj.getString("u.id"));
                                             MediacentreController.insertNode("men:GARMEFCode", doc, garPersonMef, jObj.getString("u.module"));
                                             counter += 4;
-                                            doc = testNumberOfOccurrences(doc);
+                                            doc = testNumberOfOccurrences(doc, false);
                                         }
                                     }
                                 }
@@ -210,7 +210,7 @@ public class StudentsController {
                                                             MediacentreController.insertNode("men:GARMatiereCode", doc, garEleveEnseignement, MediacentreController.customSubString(fos, 255));
                                                             counter += 4;
                                                         }
-                                                        doc = testNumberOfOccurrences(doc);
+                                                        doc = testNumberOfOccurrences(doc, false);
                                                     }
                                                 }
                                             }
@@ -330,7 +330,7 @@ public class StudentsController {
                                         }
                                         etabs = new ArrayList<String>();
                                         MediacentreController.insertNode("men:GARPersonDateNaissance", doc, garEleve, lastStudentBirthDate);
-                                        doc = testNumberOfOccurrences(doc);
+                                        doc = testNumberOfOccurrences(doc, true);
                                     } else {
                                         if (lastjObj != null) {
 
@@ -411,7 +411,7 @@ public class StudentsController {
                                             MediacentreController.insertNode("men:GARPersonIdentifiant", doc, garPersonMef, jObj.getString("u.id"));
                                             MediacentreController.insertNode("men:GARMEFSTAT4Code", doc, garPersonMef, jObj.getString("u.level"));
                                             counter += 4;
-                                            doc = testNumberOfOccurrences(doc);
+                                            doc = testNumberOfOccurrences(doc, true);
                                         }
                                     }
                                 }
@@ -526,7 +526,7 @@ public class StudentsController {
                                         }
                                         etabs = new ArrayList<String>();
                                         MediacentreController.insertNode("men:GARPersonDateNaissance", doc, garEleve, lastStudentBirthDate);
-                                        doc = testNumberOfOccurrences(doc);
+                                        doc = testNumberOfOccurrences(doc, false);
                                     } else {
                                         if (lastjObj != null) {
                                             bannedUsers.add(lastjObj.getString("u.id"));
@@ -612,7 +612,7 @@ public class StudentsController {
                                             MediacentreController.insertNode("men:GARPersonIdentifiant", doc, garPersonMef, jObj.getString("u.id"));
                                             MediacentreController.insertNode("men:GARMEFCode", doc, garPersonMef, jObj.getString("u.module"));
                                             counter += 4;
-                                            doc = testNumberOfOccurrences(doc);
+                                            doc = testNumberOfOccurrences(doc, false);
                                         }
                                     }
                                 }
@@ -643,7 +643,7 @@ public class StudentsController {
                                                             MediacentreController.insertNode("men:GARMatiereCode", doc, garEleveEnseignement, MediacentreController.customSubString(fos, 255));
                                                             counter += 4;
                                                         }
-                                                        doc = testNumberOfOccurrences(doc);
+                                                        doc = testNumberOfOccurrences(doc, false);
                                                     }
                                                 }
                                             }
@@ -651,24 +651,40 @@ public class StudentsController {
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
                                             try {
                                                 TransformerFactory transformerFactory = TransformerFactory.newInstance();
+
                                                 Transformer transformer = transformerFactory.newTransformer();
+
                                                 transformer.setOutputProperty(OutputKeys.INDENT, "yes");
+
                                                 transformer.setOutputProperty("{http://xml.apache.org/xslt}indent-amount", "2");
+
                                                 DOMSource source = new DOMSource(doc);
 
                                                 StreamResult result = new StreamResult(new File(path + getExportFileName("Eleve", fileIndex)));
+
                                                 transformer.transform(source, result);
+
                                                 boolean res = false;
+
                                                 try {
+
                                                     res = MediacentreController.isFileValid(pathExport + getExportFileName("Eleve", fileIndex));
+
                                                 } catch (IOException e) {
+
                                                     e.printStackTrace();
+
                                                 } catch (SAXException e) {
+
                                                     e.printStackTrace();
+
                                                 }
                                                 if (res == false) {
+
                                                     System.out.println("Error on file : " + pathExport + getExportFileName("Eleves", fileIndex));
+
                                                 } else {
+
                                                     System.out.println("File valid : " + pathExport + getExportFileName("Eleves", fileIndex));
                                                 }
 
@@ -698,7 +714,7 @@ public class StudentsController {
      * @param doc
      * @return
      */
-    private Document testNumberOfOccurrences(Document doc) {
+    private Document testNumberOfOccurrences(Document doc, boolean is1D) {
         if (nbElem <= counter) {
             // close the full file
             try {
@@ -734,7 +750,13 @@ public class StudentsController {
                 e.printStackTrace();*/
             }
             // open the new one
-            return fileHeader();
+
+            if(is1D){
+                return fileHeader_1D();
+            }else{
+                return fileHeader();
+            }
+
         } else {
             return doc;
         }
@@ -764,9 +786,13 @@ public class StudentsController {
     private Document fileHeader_1D() {
         DocumentBuilderFactory docFactory = DocumentBuilderFactory.newInstance();
         DocumentBuilder docBuilder = null;
+
         try {
+
             docBuilder = docFactory.newDocumentBuilder();
+
         } catch (ParserConfigurationException e) {
+
             e.printStackTrace();
         }
         // root elements

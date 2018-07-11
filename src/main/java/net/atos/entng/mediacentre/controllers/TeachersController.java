@@ -145,7 +145,7 @@ public class TeachersController {
                                                     }
                                                     profilType = "National_ens";
                                                     etabs = new HashSet<String>();
-                                                    doc = testNumberOfOccurrences(doc);
+                                                    doc = testNumberOfOccurrences(doc, false);
 
                                                 } else {
                                                     if (lastjObj != null) {
@@ -265,7 +265,7 @@ public class TeachersController {
                                         counter += 3;
                                     }
                                 }
-                                doc = testNumberOfOccurrences(doc);
+                                doc = testNumberOfOccurrences(doc, false);
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
                                 mediacentreService.getPersonMefTeacher(new Handler<Either<String, JsonArray>>() {
@@ -294,7 +294,7 @@ public class TeachersController {
                                                         }
                                                     }
                                                 }
-                                                doc = testNumberOfOccurrences(doc);
+                                                doc = testNumberOfOccurrences(doc, false);
                                             }
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -457,7 +457,7 @@ public class TeachersController {
                                             } else {
                                                 //1 profile for 1 structure
                                                 Element garProfil = doc.createElement("men:GARPersonProfils");
-                                                System.out.println(" key : "+pair.getKey()+" | value : "+ pair.getValue());
+
                                                 MediacentreController.insertNode("men:GARStructureUAI", doc, garProfil, pair.getKey().toString());
                                                 MediacentreController.insertNode("men:GARPersonProfil", doc, garProfil, pair.getValue().toString());
                                                 garEnseignant.appendChild(garProfil);
@@ -494,7 +494,7 @@ public class TeachersController {
                                         }
                                         profilType = "National_ens";
                                         etabs = new HashSet<String>();
-                                        doc = testNumberOfOccurrences(doc);
+                                        doc = testNumberOfOccurrences(doc, true);
 
                                     } else {
                                         if (lastjObj != null) {
@@ -617,7 +617,7 @@ public class TeachersController {
                             }
                         }
 
-                        doc = testNumberOfOccurrences(doc);
+                        doc = testNumberOfOccurrences(doc, true);
                     }
 
                     /**
@@ -654,7 +654,7 @@ public class TeachersController {
 
                                         counter += 4;
                                     }
-                                    doc = testNumberOfOccurrences(doc);
+                                    doc = testNumberOfOccurrences(doc, true);
                                 }
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -711,7 +711,7 @@ public class TeachersController {
         counter = 0;
         pathExport = path;
         nbElem = nbElementPerFile;
-        mediacentreService.getAllStructures(new Handler<Either<String, JsonArray>>() {
+        mediacentreService.getAllStructures_2D(exportUAIList2D, new Handler<Either<String, JsonArray>>() {
             @Override
             public void handle(Either<String, JsonArray> event) {
                 if (event.isRight()) {
@@ -800,7 +800,7 @@ public class TeachersController {
                                                     MediacentreController.insertNode("men:GARPersonDateNaissance", doc, garEnseignant, lastTeacherBirthDate);
 
                                                     for (String[] data : listDisciplinesPostes) {
-                                                        if (data[2] != null) { // field men:GAREnsDisciplinePosteCode is mandatory
+                                                        if (data[2] != null && mapStructures.get(data[0])!=null) { // field men:GAREnsDisciplinePosteCode is mandatory
                                                             Element garEnsDisciplinesPostes = doc.createElement("men:GAREnsDisciplinesPostes");
                                                             MediacentreController.insertNode("men:GARStructureUAI", doc, garEnsDisciplinesPostes, mapStructures.get(data[0]));
                                                             MediacentreController.insertNode("men:GAREnsDisciplinePosteCode", doc, garEnsDisciplinesPostes, MediacentreController.customSubString(data[2], 255));
@@ -810,7 +810,7 @@ public class TeachersController {
                                                     }
                                                     profilType = "National_ens";
                                                     etabs = new HashSet<String>();
-                                                    doc = testNumberOfOccurrences(doc);
+                                                    doc = testNumberOfOccurrences(doc, false);
 
                                                 } else {
                                                     if (lastjObj != null) {
@@ -838,22 +838,29 @@ public class TeachersController {
                                                         }
 
                                                         // test if it already exists with another profileType for the structure
-                                                        String existingProfileType = structProfile.get(mapStructures.get(data[0].toString()));
-                                                        if (existingProfileType != null && !profilType.equals(existingProfileType)) {
-                                                            // we need to make a structure with both profiles
-                                                            structProfile.put(mapStructures.get(data[0].toString()), BOTHPROFILES);
-                                                        } else {
-                                                            structProfile.put(mapStructures.get(data[0].toString()), profilType/*data[1]*/); // for  GARPersonProfils, because it can be multiple for 1 structure
-                                                        }
 
-                                                        etabs.add(mapStructures.get(data[0].toString()));
-                                                        if (jObj.getString("s2.UAI") != null) {
-                                                            etabs.add(jObj.getString("s2.UAI"));
-                                                            if (!structProfile.containsKey(jObj.getString("s2.UAI"))) {
-                                                                structProfile.put(mapStructures.get(data[0].toString()), "National_ens");
+                                                        if(mapStructures.get(data[0].toString()) != null) {
+                                                            String existingProfileType = structProfile.get(mapStructures.get(data[0].toString()));
+
+                                                            if (existingProfileType != null && !profilType.equals(existingProfileType)) {
+                                                                // we need to make a structure with both profiles
+                                                                structProfile.put(mapStructures.get(data[0].toString()), BOTHPROFILES);
+                                                            } else {
+                                                                structProfile.put(mapStructures.get(data[0].toString()), profilType/*data[1]*/); // for  GARPersonProfils, because it can be multiple for 1 structure
                                                             }
+
+
+                                                            etabs.add(mapStructures.get(data[0].toString()));
+
+
+                                                            if (jObj.getString("s2.UAI") != null) {
+                                                                etabs.add(jObj.getString("s2.UAI"));
+                                                                if (!structProfile.containsKey(jObj.getString("s2.UAI"))) {
+                                                                    structProfile.put(mapStructures.get(data[0].toString()), "National_ens");
+                                                                }
+                                                            }
+                                                            listDisciplinesPostes.add(data);
                                                         }
-                                                        listDisciplinesPostes.add(data);
                                                     }
                                                 } else {
                                                     // we create an empty one, because there is no functions attribute
@@ -923,7 +930,7 @@ public class TeachersController {
                                     MediacentreController.insertNode("men:GARPersonDateNaissance", doc, garEnseignant, lastTeacherBirthDate);
 
                                     for (String[] data : listDisciplinesPostes) {
-                                        if (data[2] != null) { // field men:GAREnsDisciplinePosteCode is mandatory
+                                        if (data[2] != null && mapStructures.get(data[0]) != null ) { // field men:GAREnsDisciplinePosteCode is mandatory
                                             Element garEnsDisciplinesPostes = doc.createElement("men:GAREnsDisciplinesPostes");
                                             MediacentreController.insertNode("men:GARStructureUAI", doc, garEnsDisciplinesPostes, mapStructures.get(data[0]));
                                             MediacentreController.insertNode("men:GAREnsDisciplinePosteCode", doc, garEnsDisciplinesPostes, MediacentreController.customSubString(data[2], 255));
@@ -932,7 +939,7 @@ public class TeachersController {
                                         }
                                     }
                                 }
-                                doc = testNumberOfOccurrences(doc);
+                                doc = testNumberOfOccurrences(doc, false);
 
                                 // ----------------------------------
                                 // GARPersonMEF
@@ -954,16 +961,19 @@ public class TeachersController {
                                                         for (int i = 0; i < modulesArray.size(); i++) {
                                                             String module = modulesArray.get(i).toString();
                                                             String[] parts = module.split("\\$");
-                                                            Element garPersonMef = doc.createElement("men:GARPersonMEF");
-                                                            garEntEnseignant.appendChild(garPersonMef);
-                                                            MediacentreController.insertNode("men:GARStructureUAI", doc, garPersonMef, mapStructures.get(parts[0]));
-                                                            MediacentreController.insertNode("men:GARPersonIdentifiant", doc, garPersonMef, jObj.getString("u.id"));
-                                                            MediacentreController.insertNode("men:GARMEFCode", doc, garPersonMef, MediacentreController.customSubString(parts[1], 255));
-                                                            counter += 4;
+
+                                                            if(mapStructures.get(parts[0]) != null) {
+                                                                Element garPersonMef = doc.createElement("men:GARPersonMEF");
+                                                                garEntEnseignant.appendChild(garPersonMef);
+                                                                MediacentreController.insertNode("men:GARStructureUAI", doc, garPersonMef, mapStructures.get(parts[0]));
+                                                                MediacentreController.insertNode("men:GARPersonIdentifiant", doc, garPersonMef, jObj.getString("u.id"));
+                                                                MediacentreController.insertNode("men:GARMEFCode", doc, garPersonMef, MediacentreController.customSubString(parts[1], 255));
+                                                                counter += 4;
+                                                            }
                                                         }
                                                     }
                                                 }
-                                                doc = testNumberOfOccurrences(doc);
+                                                doc = testNumberOfOccurrences(doc, false);
                                             }
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -1075,7 +1085,7 @@ public class TeachersController {
      * @param doc
      * @return
      */
-    private Document testNumberOfOccurrences(Document doc) {
+    private Document testNumberOfOccurrences(Document doc, boolean is1D) {
         if (nbElem <= counter) {
             // close the full file
             try {
@@ -1111,7 +1121,11 @@ public class TeachersController {
                 e.printStackTrace();*/
             }
             // open the new one
-            return fileHeader();
+            if(is1D){
+                return fileHeader_1D();
+            }else{
+                return fileHeader();
+            }
         } else {
             return doc;
         }

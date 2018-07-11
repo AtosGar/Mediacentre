@@ -131,7 +131,7 @@ public class StructuresController {
                                                             MediacentreController.insertNode("men:GARStructureTelephone", doc, garEtab, lastPhone);
                                                             //MediacentreController.insertNode("men:GARStructureEmail", doc, garEtab, "null");
                                                         }
-                                                        doc = testNumberOfOccurrences(doc);
+                                                        doc = testNumberOfOccurrences(doc, false);
                                                         lastStructureId = jObj.getString("s.UAI");
                                                         garEtab = doc.createElement("men:GAREtab");
                                                         garEntEtablissement.appendChild(garEtab);
@@ -230,7 +230,7 @@ public class StructuresController {
                                                                             MediacentreController.insertNode("men:GARMEFSTAT11", doc, garEtablissementMef, garmefstat11);
 
                                                                             counter += 4;
-                                                                            doc = testNumberOfOccurrences(doc);
+                                                                            doc = testNumberOfOccurrences(doc, false);
                                                                         }
                                                                     }
                                                                     //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -255,7 +255,7 @@ public class StructuresController {
                                                                                     MediacentreController.insertNode("men:GARMatiereLibelle", doc, garEtablissementMatiere, jObj.getString("sub.label"));*/
                                                                                     }
                                                                                     counter += 4;
-                                                                                    doc = testNumberOfOccurrences(doc);
+                                                                                    doc = testNumberOfOccurrences(doc, false);
                                                                                 }
 
                                                                                 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -306,7 +306,7 @@ public class StructuresController {
                                                                                                     MediacentreController.insertNode("men:GARMatiereCode", doc, garEtablissementMatiere, MediacentreController.customSubString(key.getSubCode(), 255));
                                                                                                     MediacentreController.insertNode("men:GARMatiereLibelle", doc, garEtablissementMatiere, MediacentreController.customSubString(subName, 255));
                                                                                                     counter += 4;
-                                                                                                    doc = testNumberOfOccurrences(doc);
+                                                                                                    doc = testNumberOfOccurrences(doc, false);
                                                                                                 }
                                                                                             }
 
@@ -431,7 +431,7 @@ public class StructuresController {
                                                             MediacentreController.insertNode("men:GARStructureTelephone", doc, garEtab, lastPhone);
                                                             //MediacentreController.insertNode("men:GARStructureEmail", doc, garEtab, "null");
                                                         }
-                                                        doc = testNumberOfOccurrences(doc);
+                                                        doc = testNumberOfOccurrences(doc, true);
                                                         lastStructureId = jObj.getString("s.UAI");
                                                         garEtab = doc.createElement("men:GAREtab");
                                                         garEntEtablissement.appendChild(garEtab);
@@ -514,7 +514,7 @@ public class StructuresController {
                     }
 
 
-                    mediacentreService.getAllStructures( new Handler<Either<String, JsonArray>>() {
+                    mediacentreService.getAllStructures_2D(exportUAIList2D, new Handler<Either<String, JsonArray>>() {
                         @Override
                         public void handle(Either<String, JsonArray> event) {
                             if (event.isRight()) {
@@ -554,7 +554,7 @@ public class StructuresController {
                                                             MediacentreController.insertNode("men:GARStructureTelephone", doc, garEtab, lastPhone);
                                                             //MediacentreController.insertNode("men:GARStructureEmail", doc, garEtab, "null");
                                                         }
-                                                        doc = testNumberOfOccurrences(doc);
+                                                        doc = testNumberOfOccurrences(doc, false);
                                                         lastStructureId = jObj.getString("s.UAI");
                                                         garEtab = doc.createElement("men:GAREtab");
                                                         garEntEtablissement.appendChild(garEtab);
@@ -631,8 +631,10 @@ public class StructuresController {
                                                                                     if (module instanceof String) {
                                                                                         String mod = (String) module;
                                                                                         String[] parts = mod.split("\\$");
-                                                                                        GARStructureMatiereEleveKey key = new GARStructureMatiereEleveKey(mapStructures.get(parts[0]), parts[1]);
-                                                                                        mapSubjectTeacher.put(key, parts[2]);
+                                                                                        if(mapStructures.get(parts[0]) != null) {
+                                                                                            GARStructureMatiereEleveKey key = new GARStructureMatiereEleveKey(mapStructures.get(parts[0]), parts[1]);
+                                                                                            mapSubjectTeacher.put(key, parts[2]);
+                                                                                        }
                                                                                     }
                                                                                 }
                                                                             }
@@ -658,7 +660,7 @@ public class StructuresController {
                                                                             MediacentreController.insertNode("men:GARMEFSTAT11", doc, garEtablissementMef, garmefstat11);
 
                                                                             counter += 4;
-                                                                            doc = testNumberOfOccurrences(doc);
+                                                                            doc = testNumberOfOccurrences(doc, false);
                                                                         }
                                                                     }
 
@@ -686,7 +688,7 @@ public class StructuresController {
                                                                                     MediacentreController.insertNode("men:GARMatiereLibelle", doc, garEtablissementMatiere, jObj.getString("sub.label"));*/
                                                                                     }
                                                                                     counter += 4;
-                                                                                    doc = testNumberOfOccurrences(doc);
+                                                                                    doc = testNumberOfOccurrences(doc, false);
                                                                                 }
 
                                                                                 // -------------------------------------
@@ -739,7 +741,7 @@ public class StructuresController {
                                                                                                     MediacentreController.insertNode("men:GARMatiereCode", doc, garEtablissementMatiere, MediacentreController.customSubString(key.getSubCode(), 255));
                                                                                                     MediacentreController.insertNode("men:GARMatiereLibelle", doc, garEtablissementMatiere, MediacentreController.customSubString(subName, 255));
                                                                                                     counter += 4;
-                                                                                                    doc = testNumberOfOccurrences(doc);
+                                                                                                    doc = testNumberOfOccurrences(doc, false);
                                                                                                 }
                                                                                             }
 
@@ -798,7 +800,7 @@ public class StructuresController {
         });
     }
 
-    private Document testNumberOfOccurrences(Document doc) {
+    private Document testNumberOfOccurrences(Document doc, boolean is1D) {
         if (nbElem <= counter) {
             // close the full file
             try {
@@ -835,7 +837,11 @@ public class StructuresController {
                 e.printStackTrace();*/
             }
             // open the new one
-            return fileHeader();
+            if(is1D){
+                return fileHeader_1D();
+            }else{
+                return fileHeader();
+            }
         } else {
             return doc;
         }

@@ -35,6 +35,8 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.util.ArrayList;
 
+import java.io.File;
+
 
 
 /**
@@ -52,6 +54,7 @@ public class MediacentreController extends BaseController {
 
     private final String UAI_1D_LIST_FILE = "ListeUAIExportGAR_1D.txt";
     private final String UAI_2D_LIST_FILE = "ListeUAIExportGAR_2D.txt";
+
 
     /**
      * Computation service
@@ -179,38 +182,41 @@ public class MediacentreController extends BaseController {
 
         final String exportUAIList1D = getExportUAIListFromFile(uaiList1DPath);
 
-        String inChargeOfAssignementName = container.config().getString("inChargeOfAssignementGroupName", "Responsables d'affectation");
+        if(exportUAIList1D!=null) {
 
-        final StudentsController studentsController = new StudentsController();
+            String inChargeOfAssignementName = container.config().getString("inChargeOfAssignementGroupName", "Responsables d'affectation");
 
-        StructuresController structuresController = new StructuresController();
+            final StudentsController studentsController = new StudentsController();
 
-        final TeachersController teachersController = new TeachersController();
+            StructuresController structuresController = new StructuresController();
 
-        final GroupsController groupsController = new GroupsController();
+            final TeachersController teachersController = new TeachersController();
 
-        InChargeOfAssignementController inChargeOfAssignementController = new InChargeOfAssignementController();
+            final GroupsController groupsController = new GroupsController();
 
-        fileDate = sdf.format(new Date());
+            InChargeOfAssignementController inChargeOfAssignementController = new InChargeOfAssignementController();
 
-        /**
-         * Begin export
-         */
-        // GAR-ENT-Etab
-        structuresController.exportStructures_1D(mediacentreService, path, nbElementPerFile, exportUAIList1D);
+            fileDate = sdf.format(new Date());
 
-        // GAR-ENT-Groupe
-        groupsController.exportGroups_1D(mediacentreService, path, nbElementPerFile, exportUAIList1D);
+            /**
+             * Begin export
+             */
+            // GAR-ENT-Etab
+            structuresController.exportStructures_1D(mediacentreService, path, nbElementPerFile, exportUAIList1D);
 
-        // GAR-ENT-RespAff
-        inChargeOfAssignementController.exportInChargeOfAssignement_1D(mediacentreService, path, nbElementPerFile,
-                inChargeOfAssignementName, emailDefault, exportUAIList1D);
+            // GAR-ENT-Groupe
+            groupsController.exportGroups_1D(mediacentreService, path, nbElementPerFile, exportUAIList1D);
 
-        //GAR-ENT-Enseignant
-        teachersController.exportTeachers_1D(mediacentreService, path, nbElementPerFile, exportUAIList1D);
+            // GAR-ENT-RespAff
+            inChargeOfAssignementController.exportInChargeOfAssignement_1D(mediacentreService, path, nbElementPerFile,
+                    inChargeOfAssignementName, emailDefault, exportUAIList1D);
 
-        // GAR-ENT-Eleve
-        studentsController.exportStudents_1D(mediacentreService, path, nbElementPerFile, exportUAIList1D);
+            //GAR-ENT-Enseignant
+            teachersController.exportTeachers_1D(mediacentreService, path, nbElementPerFile, exportUAIList1D);
+
+            // GAR-ENT-Eleve
+            studentsController.exportStudents_1D(mediacentreService, path, nbElementPerFile, exportUAIList1D);
+        }
 
     }
 
@@ -235,38 +241,41 @@ public class MediacentreController extends BaseController {
 
         final String exportUAIList2D = getExportUAIListFromFile(uaiList2DPath);
 
-        String inChargeOfAssignementName = container.config().getString("inChargeOfAssignementGroupName", "Responsables d'affectation");
+        if(exportUAIList2D!=null) {
 
-        final StudentsController studentsController = new StudentsController();
+            String inChargeOfAssignementName = container.config().getString("inChargeOfAssignementGroupName", "Responsables d'affectation");
 
-        StructuresController structuresController = new StructuresController();
+            final StudentsController studentsController = new StudentsController();
 
-        final TeachersController teachersController = new TeachersController();
+            StructuresController structuresController = new StructuresController();
 
-        final GroupsController groupsController = new GroupsController();
+            final TeachersController teachersController = new TeachersController();
 
-        InChargeOfAssignementController inChargeOfAssignementController = new InChargeOfAssignementController();
+            final GroupsController groupsController = new GroupsController();
 
-        fileDate = sdf.format(new Date());
+            InChargeOfAssignementController inChargeOfAssignementController = new InChargeOfAssignementController();
 
-        /**
-         * Begin export
-         */
-        // GAR-ENT-Etab
-        structuresController.exportStructures_2D(mediacentreService, path, nbElementPerFile, exportUAIList2D);
+            fileDate = sdf.format(new Date());
 
-        // GAR-ENT-Groupe
-        groupsController.exportGroups_2D(mediacentreService, path, nbElementPerFile, exportUAIList2D);
+            /**
+             * Begin export
+             */
+            // GAR-ENT-Etab
+            structuresController.exportStructures_2D(mediacentreService, path, nbElementPerFile, exportUAIList2D);
 
-        // GAR-ENT-RespAff
-        inChargeOfAssignementController.exportInChargeOfAssignement_2D(mediacentreService, path, nbElementPerFile,
-                inChargeOfAssignementName, emailDefault, exportUAIList2D);
+            // GAR-ENT-Groupe
+            groupsController.exportGroups_2D(mediacentreService, path, nbElementPerFile, exportUAIList2D);
 
-        //GAR-ENT-Enseignant
-        teachersController.exportTeachers_2D(mediacentreService, path, nbElementPerFile, exportUAIList2D);
+            // GAR-ENT-RespAff
+            inChargeOfAssignementController.exportInChargeOfAssignement_2D(mediacentreService, path, nbElementPerFile,
+                    inChargeOfAssignementName, emailDefault, exportUAIList2D);
 
-        // GAR-ENT-Eleve
-        studentsController.exportStudents_2D(mediacentreService, path, nbElementPerFile, exportUAIList2D);
+            //GAR-ENT-Enseignant
+            teachersController.exportTeachers_2D(mediacentreService, path, nbElementPerFile, exportUAIList2D);
+
+            // GAR-ENT-Eleve
+            studentsController.exportStudents_2D(mediacentreService, path, nbElementPerFile, exportUAIList2D);
+        }
 
     }
 
@@ -433,12 +442,43 @@ public class MediacentreController extends BaseController {
 
     public String getExportUAIListFromFile(String pathFile){
         ArrayList<String> uaiList = new ArrayList<String>();
+
+        File listUAIfile  = new File(pathFile);
+
+        // Controle existance du fichier
+        if(!listUAIfile.exists() || listUAIfile.isDirectory())
+        {
+            System.out.println("Erreur : Le fichier "+pathFile+" est absent");
+
+            return null;
+        }
+
+        // Controle fichier vide
+        if(listUAIfile.length() == 0)
+        {
+            System.out.println("Erreur : Le fichier "+pathFile+" est vide");
+
+            return null;
+        }
+
+
         try (BufferedReader br = new BufferedReader(new FileReader(pathFile)))
         {
             String sCurrentLine;
+            int lineNumber = 1;
 
             while ((sCurrentLine = br.readLine()) != null) {
+
+                // Controle format des lignes
+                if ((sCurrentLine.length() != 8) || !sCurrentLine.matches("\\d\\d\\d\\d\\d\\d\\d[A-Z]")){
+                    System.out.println("Erreur : Format du fichier "+pathFile+" errone ligne "+lineNumber );
+                    System.out.println("Reprendre le contenu de la ligne");
+
+                    return null;
+                }
+
                 uaiList.add("'" + sCurrentLine + "'");
+                lineNumber ++;
             }
 
         } catch (IOException e){
@@ -447,7 +487,6 @@ public class MediacentreController extends BaseController {
 
         return uaiList.toString();
     }
-
 
 
 }
