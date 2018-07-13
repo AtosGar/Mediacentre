@@ -97,7 +97,7 @@ public class MediacentreServiceImpl implements MediacentreService {
     public void getPersonGroupeStudent_1D(String uaiExportList, Handler<Either<String, JsonArray>> handler) {
         String query = "MATCH (c:Class)<-[d:DEPENDS]-(pg:ProfileGroup)<-[IN]-(u:User)-[ADMINISTRATIVE_ATTACHMENT]->(s:Structure)  " +
                 " WHERE u.source = 'AAF1D' and s.UAI in " + uaiExportList + " " +
-                " AND exists(c.externalId) RETURN u.id, c.externalId, s.UAI";
+                " AND exists(c.externalId) RETURN distinct u.id, c.externalId, s.UAI";
         neo4j.execute(query, new JsonObject(), validResultHandler(handler));
     }
 
@@ -364,7 +364,7 @@ public class MediacentreServiceImpl implements MediacentreService {
     public void getTeacherClasse_1D(String uaiExportList, Handler<Either<String, JsonArray>> handler) {
         String query = "MATCH (c:Class)<-[d:DEPENDS]-(pg:ProfileGroup)<-[IN]-(u:User)-[ADMINISTRATIVE_ATTACHMENT]->(s:Structure)  " +
                 " WHERE str(u.profiles) CONTAINS 'Teacher'  AND u.source = 'AAF1D' and s.UAI in " + uaiExportList + " " +
-                " AND exists(c.externalId) RETURN u.id, c.externalId, s.UAI";
+                " AND exists(c.externalId) RETURN distinct u.id, c.externalId, s.UAI";
         neo4j.execute(query, new JsonObject(), validResultHandler(handler));
     }
 
