@@ -1005,10 +1005,6 @@ public class TeachersController {
                                                 System.out.println("Teachers saved");
                                             } catch (TransformerException tfe) {
                                                 tfe.printStackTrace();
-/*                                } catch (SAXException e) {
-                                                e.printStackTrace();
-                                            } catch (IOException e) {
-                                    e.printStackTrace();*/
                                             }
                                         }
 
