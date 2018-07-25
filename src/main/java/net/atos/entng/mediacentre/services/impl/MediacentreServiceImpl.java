@@ -386,15 +386,9 @@ public class MediacentreServiceImpl implements MediacentreService {
      */
     @Override
     public void getTeacherClasse_1D(String uaiExportList, Handler<Either<String, JsonArray>> handler) {
-        String query = "MATCH (u:User)-[ADMINISTRATIVE_ATTACHMENT]->(s:Structure)  " +
-                "WHERE  str(u.profiles) CONTAINS 'Student'  AND u.source = 'AAF1D' AND s.UAI in " + uaiExportList + " " +
-                "WITH u MATCH (u:User)-[IN]->(pg:ProfileGroup)-[d:DEPENDS]->(c:Class) WHERE exists(c.externalId) " +
-                "RETURN distinct c.externalId,  substring(u.level, 0, 4) as mefstat4Code " +
-                "UNION " +
-                "MATCH (s:Structure)<-[DEPENDS]-(pg:ProfileGroup)<-[i1:IN]-(u:User)  " +
-                "WHERE  str(u.profiles) CONTAINS 'Student'  AND u.source = 'AAF1D' AND s.UAI in " + uaiExportList + " " +
-                "WITH u MATCH (u:User)-[IN]->(pg:ProfileGroup)-[DEPENDS]->(c:Class) WHERE exists(c.externalId) " +
-                "RETURN distinct c.externalId,  substring(u.level, 0, 4) as mefstat4Code ";
+        String query = "MATCH (c:Class)<-[d:DEPENDS]-(pg:ProfileGroup)<-[IN]-(u:User)-[ADMINISTRATIVE_ATTACHMENT]->(s:Structure)  " +
+                " WHERE str(u.profiles) CONTAINS 'Teacher'  AND u.source = 'AAF1D' and s.UAI in " + uaiExportList + " " +
+                " AND exists(c.externalId) RETURN distinct u.id, c.externalId, s.UAI";
         neo4j.execute(query, new JsonObject(), validResultHandler(handler));
     }
 

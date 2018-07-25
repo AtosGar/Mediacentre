@@ -636,7 +636,6 @@ public class TeachersController {
                                 for (Object obj : personMef) {
                                     if (obj instanceof JsonObject) {
                                         JsonObject jObj = (JsonObject) obj;
-                                        JsonArray modulesArray = jObj.getArray("u.modules");
 
                                         String garStructureUai = jObj.getString("s.UAI");
                                         String classeExternalId = jObj.getString("c.externalId");
