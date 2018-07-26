@@ -387,8 +387,9 @@ public class TeachersController {
 
         // Construct association  UAI/externalId
         final Map<String, String> mapStructures = new HashMap<String, String>();
+        final Set<String> uaiSelectedSet = new HashSet<String>();
 
-        mediacentreService.getAllStructures(new Handler<Either<String, JsonArray>>() {
+        mediacentreService.getAllStructures_1D(exportUAIList1D, new Handler<Either<String, JsonArray>>() {
 
                     @Override
                     public void handle(Either<String, JsonArray> event) {
@@ -399,6 +400,7 @@ public class TeachersController {
                                 if (obj instanceof JsonObject) {
                                     JsonObject jObj = (JsonObject) obj;
                                     mapStructures.put(jObj.getString("s.externalId"), jObj.getString("s.UAI"));
+                                    uaiSelectedSet.add(jObj.getString("s.UAI"));
                                 }
                             }
                         }
@@ -486,7 +488,7 @@ public class TeachersController {
                                         MediacentreController.insertNode("men:GARPersonDateNaissance", doc, garEnseignant, lastTeacherBirthDate);
 
                                         for (String[] data : listDisciplinesPostes) {
-                                            if (data[2] != null) { // field men:GAREnsDisciplinePosteCode is mandatory
+                                            if (data[2] != null && mapStructures.get(data[0])!=null) { // field men:GAREnsDisciplinePosteCode is mandatory
                                                 Element garEnsDisciplinesPostes = doc.createElement("men:GAREnsSpecialitesPostes");
                                                 MediacentreController.insertNode("men:GARStructureUAI", doc, garEnsDisciplinesPostes, mapStructures.get(data[0]));
                                                 MediacentreController.insertNode("men:GAREnsSpecialitePosteCode", doc, garEnsDisciplinesPostes, MediacentreController.customSubString(data[2], 255));
@@ -522,33 +524,42 @@ public class TeachersController {
                                                 profilType = "National_ens";
                                             }
 
-                                            // test if it already exists with another profileType for the structure
-                                            String existingProfileType = structProfile.get(mapStructures.get(data[0].toString()));
-                                            if (existingProfileType != null && !profilType.equals(existingProfileType)) {
-                                                // we need to make a structure with both profiles
-                                                structProfile.put(mapStructures.get(data[0].toString()), BOTHPROFILES);
-                                            } else {
-                                                structProfile.put(mapStructures.get(data[0].toString()), profilType/*data[1]*/); // for  GARPersonProfils, because it can be multiple for 1 structure
-                                            }
 
-                                            etabs.add(mapStructures.get(data[0].toString()));
-                                            if (jObj.getString("s2.UAI") != null) {
-                                                etabs.add(jObj.getString("s2.UAI"));
-                                                if (!structProfile.containsKey(jObj.getString("s2.UAI"))) {
-                                                    structProfile.put(mapStructures.get(data[0].toString()), "National_ens");
+                                            if(mapStructures.get(data[0].toString()) != null) {
+                                                // test if it already exists with another profileType for the structure
+
+                                                String existingProfileType = structProfile.get(mapStructures.get(data[0].toString()));
+                                                if (existingProfileType != null && !profilType.equals(existingProfileType)) {
+                                                    // we need to make a structure with both profiles
+                                                    structProfile.put(mapStructures.get(data[0].toString()), BOTHPROFILES);
+                                                } else {
+                                                    structProfile.put(mapStructures.get(data[0].toString()), profilType/*data[1]*/); // for  GARPersonProfils, because it can be multiple for 1 structure
                                                 }
+
+                                                etabs.add(mapStructures.get(data[0].toString()));
+
+                                                if (jObj.getString("s2.UAI") != null) {
+                                                    if (uaiSelectedSet.contains(jObj.getString("s2.UAI"))) {
+                                                        etabs.add(jObj.getString("s2.UAI"));
+                                                    }
+                                                    if (!structProfile.containsKey(jObj.getString("s2.UAI"))) {
+                                                        structProfile.put(mapStructures.get(data[0].toString()), "National_ens");
+                                                    }
+                                                }
+                                                listDisciplinesPostes.add(data);
                                             }
-                                            listDisciplinesPostes.add(data);
                                         }
                                     } else {
                                         // we create an empty one, because there is no functions attribute
-                                        if (jObj.getString("s.UAI") != null) {
+                                        if (jObj.getString("s.UAI") != null && uaiSelectedSet.contains(jObj.getString("s.UAI"))) {
+
                                             etabs.add(jObj.getString("s.UAI"));
                                             if (!structProfile.containsKey(jObj.getString("s2.UAI"))) {
                                                 structProfile.put(jObj.getString("s2.UAI"), "National_ens");
                                             }
+
                                         }
-                                        if (jObj.getString("s2.UAI") != null) {
+                                        if (jObj.getString("s2.UAI") != null && uaiSelectedSet.contains(jObj.getString("s2.UAI"))) {
                                             etabs.add(jObj.getString("s2.UAI"));
                                             if (!structProfile.containsKey(jObj.getString("s2.UAI"))) {
                                                 structProfile.put(jObj.getString("s2.UAI"), "National_ens");
@@ -559,7 +570,7 @@ public class TeachersController {
                                     lastTeacherBirthDate = jObj.getString("u.birthDate");
                                     lastjObj = jObj;
                                 } else {
-                                    if (jObj.getString("s2.UAI") != null) {
+                                    if (jObj.getString("s2.UAI") != null  && uaiSelectedSet.contains(jObj.getString("s2.UAI"))) {
                                         etabs.add(jObj.getString("s2.UAI"));
                                         if (!structProfile.containsKey(jObj.getString("s2.UAI"))) {
                                             structProfile.put(jObj.getString("s2.UAI"), "National_ens");
@@ -592,11 +603,13 @@ public class TeachersController {
                         MediacentreController.insertNode("men:GARPersonNomPatro", doc, garEnseignant, lastjObj.getString("u.lastName"));
                         MediacentreController.insertNode("men:GARPersonNom", doc, garEnseignant, lastjObj.getString("u.lastName"));
                         MediacentreController.insertNode("men:GARPersonPrenom", doc, garEnseignant, lastjObj.getString("u.firstName"));
+
                         if (lastjObj.getString("u.otherNames") != null) {
                             MediacentreController.insertNode("men:GARPersonAutresPrenoms", doc, garEnseignant, lastjObj.getString("u.otherNames"));
                         } else {
                             MediacentreController.insertNode("men:GARPersonAutresPrenoms", doc, garEnseignant, lastjObj.getString("u.firstName"));
                         }
+
                         MediacentreController.insertNode("men:GARPersonCivilite", doc, garEnseignant, lastjObj.getString(""));
                         MediacentreController.insertNode("men:GARPersonStructRattach", doc, garEnseignant, lastjObj.getString("s.UAI"));
 
@@ -610,7 +623,7 @@ public class TeachersController {
                         MediacentreController.insertNode("men:GARPersonDateNaissance", doc, garEnseignant, lastTeacherBirthDate);
 
                         for (String[] data : listDisciplinesPostes) {
-                            if (data[2] != null) { // field men:GAREnsDisciplinePosteCode is mandatory
+                            if (data[2] != null && mapStructures.get(data[0]) != null ) { // field men:GAREnsDisciplinePosteCode is mandatory
                                 Element garEnsDisciplinesPostes = doc.createElement("men:GAREnsSpecialitesPostes");
                                 MediacentreController.insertNode("men:GARStructureUAI", doc, garEnsDisciplinesPostes, mapStructures.get(data[0]));
                                 MediacentreController.insertNode("men:GAREnsSpecialitePosteCode", doc, garEnsDisciplinesPostes, MediacentreController.customSubString(data[2], 255));
@@ -718,11 +731,14 @@ public class TeachersController {
                 if (event.isRight()) {
                     // construct hashmap association between UAI and externalId
                     final Map<String, String> mapStructures = new HashMap<String, String>();
+                    final Set<String> uaiSelectedSet = new HashSet<String>();
+
                     JsonArray allStructures = event.right().getValue();
                     for (Object obj : allStructures) {
                         if (obj instanceof JsonObject) {
                             JsonObject jObj = (JsonObject) obj;
                             mapStructures.put(jObj.getString("s.externalId"), jObj.getString("s.UAI"));
+                            uaiSelectedSet.add(jObj.getString("s.UAI"));
                         }
                     }
 
@@ -795,7 +811,7 @@ public class TeachersController {
 
                                                     // add all the  GARPersonEtab
                                                     for (String etab : etabs) {
-                                                        MediacentreController.insertNode("men:GARPersonEtab", doc, garEnseignant, etab/*jObj.getString("s.UAI")*/);
+                                                        MediacentreController.insertNode("men:GARPersonEtab", doc, garEnseignant, etab);
                                                     }
 
                                                     MediacentreController.insertNode("men:GARPersonDateNaissance", doc, garEnseignant, lastTeacherBirthDate);
@@ -855,7 +871,10 @@ public class TeachersController {
 
 
                                                             if (jObj.getString("s2.UAI") != null) {
-                                                                etabs.add(jObj.getString("s2.UAI"));
+                                                                if (uaiSelectedSet.contains(jObj.getString("s2.UAI"))) {
+                                                                    etabs.add(jObj.getString("s2.UAI"));
+                                                                }
+
                                                                 if (!structProfile.containsKey(jObj.getString("s2.UAI"))) {
                                                                     structProfile.put(mapStructures.get(data[0].toString()), "National_ens");
                                                                 }
@@ -865,13 +884,16 @@ public class TeachersController {
                                                     }
                                                 } else {
                                                     // we create an empty one, because there is no functions attribute
-                                                    if (jObj.getString("s.UAI") != null) {
+                                                    if (jObj.getString("s.UAI") != null && uaiSelectedSet.contains(jObj.getString("s.UAI"))) {
+
                                                         etabs.add(jObj.getString("s.UAI"));
+
                                                         if (!structProfile.containsKey(jObj.getString("s2.UAI"))) {
                                                             structProfile.put(jObj.getString("s2.UAI"), "National_ens");
                                                         }
                                                     }
-                                                    if (jObj.getString("s2.UAI") != null) {
+
+                                                    if (jObj.getString("s2.UAI") != null && uaiSelectedSet.contains(jObj.getString("s2.UAI")))  {
                                                         etabs.add(jObj.getString("s2.UAI"));
                                                         if (!structProfile.containsKey(jObj.getString("s2.UAI"))) {
                                                             structProfile.put(jObj.getString("s2.UAI"), "National_ens");
@@ -882,7 +904,7 @@ public class TeachersController {
                                                 lastTeacherBirthDate = jObj.getString("u.birthDate");
                                                 lastjObj = jObj;
                                             } else {
-                                                if (jObj.getString("s2.UAI") != null) {
+                                                if (jObj.getString("s2.UAI") != null && uaiSelectedSet.contains(jObj.getString("s2.UAI"))) {
                                                     etabs.add(jObj.getString("s2.UAI"));
                                                     if (!structProfile.containsKey(jObj.getString("s2.UAI"))) {
                                                         structProfile.put(jObj.getString("s2.UAI"), "National_ens");
