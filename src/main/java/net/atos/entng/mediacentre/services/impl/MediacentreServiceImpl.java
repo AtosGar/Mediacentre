@@ -636,12 +636,12 @@ public class MediacentreServiceImpl implements MediacentreService {
     @Override
     public void getInChargeOfExportData_1D(String uaiExportList, String groupName, Handler<Either<String, JsonArray>> handler) {
         String query = "MATCH (s:Structure)<-[ADMINISTRATIVE_ATTACHMENT]-(u:User)-[IN]->(n:ManualGroup)-[DEPENDS]->(s2:Structure)" +
-                "                where n.name = {groupName} and u.source = 'AAF1D' and s.UAI in " + uaiExportList + " " +
+                "                where n.name = {groupName} and u.source = 'AAF1D' and s2.UAI in " + uaiExportList + " " +
                 "                RETURN substring(u.id, 0, 63) as `u.id`, substring(u.lastName, 0, 499) as `u.lastName`, substring(u.firstName, 0, 499) as `u.firstName`, " +
                 "                substring(u.email, 0, 254) as `u.email`, substring(s2.UAI, 0, 44) as `s2.UAI`" +
                 "                union" +
                 "                match (s:Structure)<-[d1:DEPENDS]-(pg:ProfileGroup)<-[i1:IN]-(u:User)-[i2:IN]->(n:ManualGroup)-[d2:DEPENDS]->(s2:Structure)" +
-                "                where n.name = {groupName} and u.source = 'AAF1D' and s.UAI in " + uaiExportList + " " +
+                "                where n.name = {groupName} and u.source = 'AAF1D' and s2.UAI in " + uaiExportList + " " +
                 "                RETURN substring(u.id, 0, 63) as `u.id`, substring(u.lastName, 0, 499) as `u.lastName`, substring(u.firstName, 0, 499) as `u.firstName`, " +
                 "                substring(u.email, 0, 254) as `u.email`, substring(s2.UAI, 0, 44) as `s2.UAI` order by `u.id`";
         JsonObject params = new JsonObject().putString("groupName", groupName);
@@ -682,12 +682,12 @@ public class MediacentreServiceImpl implements MediacentreService {
     @Override
     public void getInChargeOfExportData_2D(String uaiExportList, String groupName, Handler<Either<String, JsonArray>> handler) {
         String query = "MATCH (s:Structure)<-[ADMINISTRATIVE_ATTACHMENT]-(u:User)-[IN]->(n:ManualGroup)-[DEPENDS]->(s2:Structure)" +
-                "                where n.name = {groupName} and u.source = 'AAF' and s.UAI in " + uaiExportList + " " +
+                "                where n.name = {groupName} and u.source = 'AAF' and s2.UAI in " + uaiExportList + " " +
                 "                RETURN substring(u.id, 0, 63) as `u.id`, substring(u.lastName, 0, 499) as `u.lastName`, substring(u.firstName, 0, 499) as `u.firstName`, " +
                 "                substring(u.email, 0, 254) as `u.email`, substring(s2.UAI, 0, 44) as `s2.UAI`" +
                 "                union" +
                 "                match (s:Structure)<-[d1:DEPENDS]-(pg:ProfileGroup)<-[i1:IN]-(u:User)-[i2:IN]->(n:ManualGroup)-[d2:DEPENDS]->(s2:Structure)" +
-                "                where n.name = {groupName} and u.source = 'AAF' and s.UAI in " + uaiExportList + " " +
+                "                where n.name = {groupName} and u.source = 'AAF' and s2.UAI in " + uaiExportList + " " +
                 "                RETURN substring(u.id, 0, 63) as `u.id`, substring(u.lastName, 0, 499) as `u.lastName`, substring(u.firstName, 0, 499) as `u.firstName`, " +
                 "                substring(u.email, 0, 254) as `u.email`, substring(s2.UAI, 0, 44) as `s2.UAI` order by `u.id`";
         JsonObject params = new JsonObject().putString("groupName", groupName);
