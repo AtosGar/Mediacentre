@@ -358,7 +358,7 @@ public class TeachersController {
 
 
         // Construct association MefStat4/Classe
-        final Map<String, String> associationsClasseMefMap = new HashMap<String, String>();
+        final Map<String, Set<String>> associationsClasseMefMap = new HashMap<String, Set<String>>();
 
         mediacentreService.getClasseMefStat4_1D(exportUAIList1D,
                 new Handler<Either<String, JsonArray>>() {
@@ -376,7 +376,15 @@ public class TeachersController {
                             String mef = jObj.getString("mefstat4Code");
                             String classe = jObj.getString("c.externalId");
 
-                            associationsClasseMefMap.put(classe, mef);
+                            Set<String> mefstatSet = associationsClasseMefMap.get(classe);
+
+                            if(mefstatSet == null){
+                                mefstatSet = new HashSet<String>();
+                                associationsClasseMefMap.put(classe, mefstatSet);
+                            }
+
+                            mefstatSet.add(mef);
+
 
                         }
                     }
@@ -654,19 +662,23 @@ public class TeachersController {
                                         String classeExternalId = jObj.getString("c.externalId");
                                         String garPersonIdentifiant = jObj.getString("u.id");
 
-                                        String garMefstat4Code = associationsClasseMefMap.get(classeExternalId);
+                                        Set<String> mefstatSet = associationsClasseMefMap.get(classeExternalId);
 
-                                        Element garPersonMefstat4 = doc.createElement("men:GARPersonMEFSTAT4");
-                                        garEntEnseignant.appendChild(garPersonMefstat4);
+                                        for(String garMefstat4Code : mefstatSet){
+                                            Element garPersonMefstat4 = doc.createElement("men:GARPersonMEFSTAT4");
+                                            garEntEnseignant.appendChild(garPersonMefstat4);
 
-                                        MediacentreController.insertNode(
-                                                "men:GARStructureUAI", doc, garPersonMefstat4, garStructureUai);
-                                        MediacentreController.insertNode(
-                                                "men:GARPersonIdentifiant", doc, garPersonMefstat4, garPersonIdentifiant);
-                                        MediacentreController.insertNode(
-                                                "men:GARMEFSTAT4Code", doc, garPersonMefstat4, garMefstat4Code);
+                                            MediacentreController.insertNode(
+                                                    "men:GARStructureUAI", doc, garPersonMefstat4, garStructureUai);
+                                            MediacentreController.insertNode(
+                                                    "men:GARPersonIdentifiant", doc, garPersonMefstat4, garPersonIdentifiant);
+                                            MediacentreController.insertNode(
+                                                    "men:GARMEFSTAT4Code", doc, garPersonMefstat4, garMefstat4Code);
 
-                                        counter += 4;
+                                            counter += 4;
+                                        }
+
+
                                     }
                                     doc = testNumberOfOccurrences(doc, true);
                                 }
