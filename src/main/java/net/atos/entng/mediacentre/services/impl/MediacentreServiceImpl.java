@@ -353,14 +353,14 @@ public class MediacentreServiceImpl implements MediacentreService {
                 "WHERE (p.name = 'Teacher') AND u.source = 'AAF1D' AND s.UAI in " + uaiExportList + " " +
                 "OPTIONAL MATCH (pg:ProfileGroup)-[DEPENDS]->(s2:Structure) " +
                 "RETURN distinct substring(u.id, 0, 63) as `u.id`, substring(u.lastName, 0, 499) as `u.lastName`, " +
-                "u.displayName, substring(u.firstName, 0, 499) as `u.firstName`, u.structures, u.birthDate, " +
+                "u.displayName, substring(u.firstName, 0, 499) as `u.firstName`, u.structures, u.birthDate, u.email, " +
                 "substring(s.UAI, 0, 44) as `s.UAI`, u.functions, substring(s2.UAI, 0, 44) as `s2.UAI`  order by `u.id` " +
                 "UNION " +
                 "MATCH (s2:Structure)<-[d1:DEPENDS]-(pg:ProfileGroup)<-[i1:IN]-(u:User) " +
                 "WHERE str(u.profiles) CONTAINS 'Teacher' AND u.source = 'AAF1D' AND s2.UAI in  " + uaiExportList + " " +
                 "OPTIONAL MATCH (u:User)-[ADMINISTRATIVE_ATTACHMENT]->(s:Structure) " +
                 "RETURN DISTINCT substring(u.id, 0, 63) as `u.id`, substring(u.lastName, 0, 499) AS `u.lastName`, " +
-                "u.displayName, substring(u.firstName, 0, 499) as `u.firstName`, u.structures, u.birthDate, " +
+                "u.displayName, substring(u.firstName, 0, 499) as `u.firstName`, u.structures, u.birthDate, u.email, " +
                 "substring(s.UAI, 0, 44) as `s.UAI`,  u.functions, substring(s2.UAI, 0, 44) as `s2.UAI` order by `u.id`";
         neo4j.execute(query, new JsonObject(), validResultHandler(handler));
     }
@@ -430,14 +430,14 @@ public class MediacentreServiceImpl implements MediacentreService {
         String query = "MATCH (p:Profile)<-[HAS_PROFILE]-(pg:ProfileGroup)<-[IN]-(u:User)-[ADMINISTRATIVE_ATTACHMENT]->(s:Structure) " +
                 "WHERE (p.name = 'Teacher') AND u.source = 'AAF' AND s.UAI in " + uaiExportList +" " +
                 "OPTIONAL MATCH (pg:ProfileGroup)-[DEPENDS]->(s2:Structure) " +
-                "RETURN distinct substring(u.id, 0, 63) as `u.id`, substring(u.lastName, 0, 499) as `u.lastName`, u.displayName, substring(u.firstName, 0, 499) as `u.firstName`, u.structures, u.birthDate, " +
+                "RETURN distinct substring(u.id, 0, 63) as `u.id`, substring(u.lastName, 0, 499) as `u.lastName`, u.displayName, substring(u.firstName, 0, 499) as `u.firstName`, u.structures, u.birthDate, u.email, " +
                 "substring(s.UAI, 0, 44) as `s.UAI`, u.functions, substring(s2.UAI, 0, 44) as `s2.UAI` order by `u.id` " +
                 "UNION " +
                 "MATCH (s2:Structure)<-[d1:DEPENDS]-(pg:ProfileGroup)<-[i1:IN]-(u:User) " +
                 "WHERE str(u.profiles) CONTAINS 'Teacher' AND u.source = 'AAF' AND s2.UAI in  " + uaiExportList +" " +
                 "OPTIONAL MATCH (u:User)-[ADMINISTRATIVE_ATTACHMENT]->(s:Structure) " +
                 "RETURN DISTINCT substring(u.id, 0, 63) as `u.id`, substring(u.lastName, 0, 499) AS `u.lastName`, " +
-                "u.displayName, substring(u.firstName, 0, 499) as `u.firstName`, u.structures, u.birthDate, " +
+                "u.displayName, substring(u.firstName, 0, 499) as `u.firstName`, u.structures, u.birthDate, u.email, " +
                 "substring(s.UAI, 0, 44) as `s.UAI`,  u.functions, substring(s2.UAI, 0, 44) as `s2.UAI` order by `u.id`";
         neo4j.execute(query, new JsonObject(), validResultHandler(handler));
     }

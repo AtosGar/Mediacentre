@@ -490,6 +490,7 @@ public class TeachersController {
                                                                         }
 
                                                                         MediacentreController.insertNode("men:GARPersonDateNaissance", doc, garEnseignant, lastTeacherBirthDate);
+                                                                        MediacentreController.insertNode("men:GARPersonEmail", doc, garEnseignant, lastjObj.getString("u.email"));
 
                                                                         for (String[] data : listDisciplinesPostes) {
                                                                             if (data[2] != null && mapStructures.get(data[0])!=null) { // field men:GAREnsDisciplinePosteCode is mandatory
@@ -625,6 +626,7 @@ public class TeachersController {
 
 
                                                         MediacentreController.insertNode("men:GARPersonDateNaissance", doc, garEnseignant, lastTeacherBirthDate);
+                                                        MediacentreController.insertNode("men:GARPersonEmail", doc, garEnseignant, lastjObj.getString("u.email"));
 
                                                         for (String[] data : listDisciplinesPostes) {
                                                             if (data[2] != null && mapStructures.get(data[0]) != null ) { // field men:GAREnsDisciplinePosteCode is mandatory
@@ -831,6 +833,7 @@ public class TeachersController {
                                                     }
 
                                                     MediacentreController.insertNode("men:GARPersonDateNaissance", doc, garEnseignant, lastTeacherBirthDate);
+                                                    MediacentreController.insertNode("men:GARPersonEmail", doc, garEnseignant, lastjObj.getString("u.email"));
 
                                                     for (String[] data : listDisciplinesPostes) {
                                                         if (data[2] != null && mapStructures.get(data[0])!=null) { // field men:GAREnsDisciplinePosteCode is mandatory
@@ -967,6 +970,7 @@ public class TeachersController {
                                     }
 
                                     MediacentreController.insertNode("men:GARPersonDateNaissance", doc, garEnseignant, lastTeacherBirthDate);
+                                    MediacentreController.insertNode("men:GARPersonEmail", doc, garEnseignant, lastjObj.getString("u.email"));
 
                                     for (String[] data : listDisciplinesPostes) {
                                         if (data[2] != null && mapStructures.get(data[0]) != null ) { // field men:GAREnsDisciplinePosteCode is mandatory
